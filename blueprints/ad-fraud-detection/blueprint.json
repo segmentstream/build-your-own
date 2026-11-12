@@ -1,7 +1,7 @@
 {
   "id": "ad-fraud-detection",
   "title": "Ad fraud and bot detection",
-  "tagline": "A verdict with its evidence for every website session: bots, automation, data-centre traffic and AI agents, reported by channel and campaign.",
+  "tagline": "A verdict with its evidence for every website session and conversion: SegmentStream's complete production rules for bots, spoofed crawlers, automation, data-centre traffic and AI agents.",
   "replaces": [
     "ClickCease",
     "CHEQ",
@@ -16,11 +16,25 @@
     "company-agent"
   ],
   "connections": {
-    "required": [],
+    "required": [
+      "public_openai",
+      "public_anthropic_bots",
+      "public_perplexity",
+      "public_google_crawlers",
+      "public_bingbot",
+      "public_commoncrawl",
+      "public_applebot",
+      "public_aws",
+      "public_gcp",
+      "public_azure",
+      "public_oracle",
+      "public_cloudflare",
+      "public_ripe_announced",
+      "public_icloud_private_relay"
+    ],
     "optional": [
       "google_ads",
-      "microsoft_ads",
-      "public_ip_ranges"
+      "public_tor"
     ]
   },
   "components": [

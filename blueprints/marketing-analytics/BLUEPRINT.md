@@ -245,16 +245,17 @@ ad-fraud-detection blueprint adds full invalid-traffic rules on the same columns
 catalogue; `bot` (`script`, `spoofed`) from automation flags, headless browsers or a
 catalogue claim whose vendor IP check failed; `internal` from staff rules in config;
 `human` and `unverified` are browser user agents with and without a JavaScript page view.
-With ad-fraud-detection installed, counting, attribution and `session_report` read class,
-group and `effective_verdict` from its `silver/traffic_sessions` instead: invalid sessions
-are no candidates and their conversions get `invalid_traffic`.
+With ad-fraud-detection installed, attribution and `session_report` read class, group and
+`effective_verdict` from its `silver/traffic_sessions` instead, and counting reads each
+conversion's `counted` from its `silver/conversion_verdicts`: invalid sessions are no
+candidates and uncounted conversions get `invalid_traffic`.
 
 The catalogue (`ref_agents`: key, user-agent token, vendor, class, IP list key, docs URL)
 is reviewed code. The `references` job fetches vendor IP lists through declared
 connections and replaces `ref_ip_ranges` (`list_key`, `cidr`, `snapshot_date`) only
 after a complete, valid download.
 `identity_verified` is true only when the IP is in the vendor's list. A missing or stale
-list (older than 45 days) leaves verification unknown; it never makes a hit a bot.
+list (older than 60 days) leaves verification unknown; it never makes a hit a bot.
 
 ### 6.6 Sessions and acquisition
 

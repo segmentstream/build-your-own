@@ -45,7 +45,7 @@ Paste that into Claude Code, Codex or Cursor. Other things to ask for:
 | [CRM](blueprints/crm/) | Companies, contacts, leads and a deal pipeline shaped to how you sell | HubSpot, Salesforce | preview |
 | [Email marketing](blueprints/email-marketing/) | Consent, audiences on your own CRM data, campaigns with approval, delivery events | Mailchimp, Klaviyo | stable |
 | [Bookkeeping](blueprints/bookkeeping/) | One journal, invoices, bills, fixed assets, multi-currency, P&L and balance sheet | Xero, QuickBooks | stable |
-| [Ad fraud detection](blueprints/ad-fraud-detection/) | A verdict with evidence for every session and ad click: bots, automation, proxies, AI agents | ClickCease, traffic verification vendors | stable |
+| [Ad fraud detection](blueprints/ad-fraud-detection/) | A verdict with evidence for every website session: bots, automation, data-centre and proxy traffic, AI agents; the complete production rule set | ClickCease, traffic verification vendors | stable |
 | [Company agent](blueprints/company-agent/) | An AI agent in Slack, Telegram or WhatsApp that works on your records with each person's permissions | Microsoft 365 Copilot, Slack AI | preview |
 | [Drive](blueprints/drive/) | Folders, online documents, versions, sharing and comments, linked to your records | Google Drive, Google Docs | stable |
 | [E-signature](blueprints/e-signature/) | Envelopes, signers, a signing page and sealed, timestamped PDFs | DocuSign | stable |
