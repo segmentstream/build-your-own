@@ -104,4 +104,4 @@ this repository; we keep them current as the platform changes.
 ## Licence
 
 By contributing you agree that your contribution is licensed under the
-Apache License 2.0.
+Apache License 2.0 and provided on the terms of the [disclaimer](DISCLAIMER.md).

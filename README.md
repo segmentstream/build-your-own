@@ -162,8 +162,8 @@ advice. Your agent writes the code into your own repository; you review it,
 test it, and decide what it does with money, messages, signatures and personal
 data. Have a qualified professional check anything with legal or tax effect
 before you rely on it. SegmentStream runs the platform; it does not certify or
-warrant software built from these blueprints, which are provided as is under
-the [Apache License 2.0](LICENSE).
+warrant software built from these blueprints, which are provided as is. See the
+[disclaimer](DISCLAIMER.md).
 
 **Can someone build it for us?** Yes. SegmentStream's engineers build the first
 version on your data in a fixed-price pilot: [start a pilot](https://segmentstream.com/enterprise).
@@ -200,6 +200,7 @@ New to SegmentStream? [Request access](https://segmentstream.com/#waitlist).
 
 [Apache License 2.0](LICENSE). The blueprints are provided as is, without
 warranties of any kind; software built from them is the responsibility of
-whoever builds and runs it. Screenshots show invented demo data. Product
+whoever builds and runs it. Read the [disclaimer](DISCLAIMER.md) before you rely
+on anything here. Screenshots show invented demo data. Product
 names are trademarks of their owners, named only to describe what a blueprint
 can replace.
