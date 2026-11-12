@@ -198,7 +198,7 @@ sample row count.
   unpartitioned full rebuilds reading `s.AllPartitions(...)`, stored with
   `storage=s.TableStorage(partition_by_date=...)` so report queries prune by date.
 - **Adapters.** Every source has a `sample` adapter (invented, deterministic rows yielded
-  in code, as the starter's `raw_orders` does) and a `real` one. Both declare the same asset
+  in code, like the starter's `raw_orders` example before you remove it) and a `real` one. Both declare the same asset
   `key=` and tier and write one contract with an `adapter` column; `definitions.py`
   registers one. Switching to `real` means a deploy and a backfill of every retained date.
 - **Money**, as in the foundation: gold tables and entities carry integer minor units
