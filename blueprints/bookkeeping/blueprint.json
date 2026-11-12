@@ -1,5 +1,6 @@
 {
   "id": "bookkeeping",
+  "version": "1.0.0",
   "title": "Bookkeeping",
   "tagline": "One general ledger for invoices, bills, expenses with receipts, fixed assets and multi-currency, with the reports your accountant reads.",
   "replaces": [

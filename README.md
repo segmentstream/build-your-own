@@ -65,10 +65,10 @@ companies, contacts, members and the conventions they all follow.
    sell, who approves what, which tools you keep. About ten questions, once.
 3. **Plan.** It shows you one page: the records, actions, roles, screens and
    data sources it will build, and what it leaves out. You approve or change it.
-4. **Build and deploy.** It writes your version, turns every invariant into a
-   test, runs the checks, and deploys to your SegmentStream workspace when you
-   say so. You authorize your own connections; your data never touches this
-   repository.
+4. **Build and test.** It writes your version and turns every invariant into a
+   test that runs on your laptop, with no account and no real data.
+5. **Deploy.** When you say so, it deploys to your SegmentStream workspace. You
+   authorize your own connections; your data never touches this repository.
 
 The full procedure your agent follows is in [AGENTS.md](AGENTS.md).
 
@@ -132,6 +132,10 @@ on any stack.
 **Do I need to be a developer?** No. You need a coding agent and the ability to
 answer questions about how your company works. The agent writes, tests and
 deploys the code.
+
+**Can I try it before I have access?** Yes, up to deployment. Your agent builds
+the project and runs every invariant test locally, on invented data; deploying
+it and opening the screens needs a SegmentStream workspace.
 
 **What does it cost?** The blueprints are free. Running your software on
 SegmentStream is billed by usage: see [pricing](https://segmentstream.com/pricing).

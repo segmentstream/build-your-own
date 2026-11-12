@@ -1,7 +1,7 @@
 # Bookkeeping: invariants
 
 Rules that hold in every version, whatever the company. Each one becomes a test in
-the project, run against the ontology with invented records (a book `main` in a
+the project, run on the harness in [testing](../../docs/testing.md) with invented records (a book `main` in a
 two-decimal base currency, a starter chart, rates for one foreign currency). Amounts
 below are minor units.
 

@@ -1,9 +1,9 @@
 # Email marketing: invariants
 
 Each rule holds in every version. Each becomes a test in the project. Tests run
-the actions against a development database or an in-memory runtime, with the
-email provider replaced by `Connections.test({ <provider>: (request) => … })`
-that records every request. Data is invented: Northwind, Ada Example
+the actions on the harness in [testing](../../docs/testing.md), with the email
+provider replaced by `Connections.test({ <provider>: (request) => … })` that
+records every request. Data is invented: Northwind, Ada Example
 (`ada@example.com`), Grace Sample (`grace@example.com`).
 
 ### 1. Consent is checked again just before each message is sent.

@@ -1,18 +1,32 @@
 {
   "id": "your-blueprint-id",
+  "version": "0.1.0",
   "title": "Your blueprint",
   "tagline": "One sentence: what it does for a company and what it replaces.",
-  "replaces": ["A product it replaces"],
+  "replaces": [
+    "A product it replaces"
+  ],
   "status": "preview",
-  "dependsOn": ["foundation"],
+  "dependsOn": [
+    "foundation"
+  ],
   "worksWith": [],
   "connections": {
     "required": [],
     "optional": []
   },
-  "components": ["ontology", "app", "agent"],
-  "sdks": ["@segmentstream/ontology", "@segmentstream/app"],
+  "components": [
+    "ontology",
+    "app",
+    "agent"
+  ],
+  "sdks": [
+    "@segmentstream/ontology",
+    "@segmentstream/app"
+  ],
   "reference": false,
   "screens": [],
-  "authors": ["your-github-handle"]
+  "authors": [
+    "your-github-handle"
+  ]
 }

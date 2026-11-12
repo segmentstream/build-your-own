@@ -1,5 +1,6 @@
 {
   "id": "company-agent",
+  "version": "0.1.0",
   "title": "Company agent",
   "tagline": "An AI agent in your team's chats that works on your own records, with the permissions of whoever asks.",
   "replaces": [

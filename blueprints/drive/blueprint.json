@@ -1,5 +1,6 @@
 {
   "id": "drive",
+  "version": "1.0.0",
   "title": "Drive",
   "tagline": "Company files and online documents in one folder tree, with versions, PDFs, sharing, comments and an access log.",
   "replaces": [

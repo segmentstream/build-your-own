@@ -18,14 +18,19 @@ has one job, so an agent can load only what it needs.
 | `VARIATIONS.md` | Agents | Where companies legitimately differ, the options, and the default |
 | `PITFALLS.md` | Agents | Mistakes already made on the platform, and how to avoid them |
 
-Reference implementations (`workspace/`) and screenshots (`screens/`) are added
-per blueprint as they are extracted; `blueprint.json` says which exist.
+Shared files live outside the blueprints. [`kernel/`](../kernel/) holds files an
+agent copies into a project without changing them, such as the test harness;
+[testing](testing.md) says how to use them. A blueprint refers to them and never
+keeps its own copy. Reference implementations (`workspace/`) and screenshots
+(`screens/`) are added per blueprint as they are extracted; `blueprint.json`
+says which exist.
 
 ## blueprint.json
 
 ```json
 {
   "id": "crm",
+  "version": "0.1.0",
   "title": "CRM",
   "tagline": "Companies, contacts, leads and a deal pipeline shaped to how you sell.",
   "replaces": ["HubSpot", "Salesforce"],
@@ -40,9 +45,23 @@ per blueprint as they are extracted; `blueprint.json` says which exist.
   "sdks": ["@segmentstream/ontology", "@segmentstream/app"],
   "reference": false,
   "screens": [],
+  "testedWith": {
+    "@segmentstream/ontology": "0.92.1",
+    "@segmentstream/app": "0.38.1"
+  },
   "authors": ["segmentstream"]
 }
 ```
+
+- `version`: the blueprint's version. `0.x` while `preview`, `1.0.0` from
+  `stable`. Raise the minor version for an addition a built project can skip,
+  and the major version when an invariant changes meaning or a record changes in
+  a way built projects must follow. Every change gets an entry in
+  [CHANGELOG.md](../CHANGELOG.md), which is how an agent updates a project built
+  from an earlier version.
+- `testedWith`: the SDK versions of the last build that followed the blueprint
+  end to end and passed every invariant test. Optional; leave it out until such a
+  build exists.
 
 - `status`: `preview` (the design is sound, details may move) or `stable` (a
   version of it runs in production on SegmentStream for at least one company,
@@ -128,9 +147,15 @@ Numbered rules that must hold in every version, whatever the company. For each:
 
 - the rule in one sentence;
 - why it exists;
-- how to test it (the test to write, with its input and expected result).
+- how to test it (the test to write, with its input and expected result), in a
+  form the harness in [testing](testing.md) can run at milestone M1. Say so when
+  part of a rule can only be checked at M2, and test the rest at M1.
 
 Only rules that would be a bug if broken. Preferences belong in VARIATIONS.md.
+
+Numbers are permanent: a project's tests are named after them (`crm 1. one
+submission id is one lead`). Add new invariants at the end. A retired invariant
+keeps its number, marked **Retired** with the reason.
 
 ## VARIATIONS.md
 

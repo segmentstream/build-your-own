@@ -35,41 +35,59 @@ Tell the person which blueprints you will use and why, in two or three lines.
 
 For each blueprint, read `BLUEPRINT.md`, `INVARIANTS.md`, `VARIATIONS.md` and
 `PITFALLS.md`. Read `foundation/FOUNDATION.md` once if any blueprint depends on
-it. Do not build anything yet.
+it, and `docs/testing.md` once. Do not build anything yet.
 
 ## 4. Interview the person
 
 Ask the questions in each blueprint's `INTERVIEW.md` in one message. Skip what
-the person already told you, merge overlapping questions across blueprints,
-and offer the default for each. Ask in plain words; never ask for passwords,
-API keys or real customer records in chat.
+the person already told you and merge overlapping questions across blueprints.
+Put first the questions that need a human decision (money, messages to
+customers, signatures, deletion, access); for the rest, state the default you
+will take, so the person can answer "defaults are fine". Ask in plain words;
+never ask for passwords, API keys or real customer records in chat.
 
 ## 5. Plan, then wait
 
 Write a plan of at most one page: the entities, actions, roles, workflows,
 pipeline assets, connections and screens you will build; the variations you
-chose and why; what you leave out. Wait for the person to approve or change it.
+chose and why; what you leave out. Promise only what the platform can do today;
+each blueprint's VARIATIONS.md and PITFALLS.md say where it cannot. Wait for the
+person to approve or change it.
 
 ## 6. Build
 
 1. Follow each blueprint's "Build order". Build the foundation first.
-2. Write the tests for the blueprint's invariants before or with the code they
-   protect. Every invariant in `INVARIANTS.md` becomes a test in the project.
-3. Use invented data in code, tests and demos. Warehouse sources get a `sample`
+2. Set up the tests as `docs/testing.md` describes. Copy the files in `kernel/`
+   without changing them.
+3. Write the tests for the blueprint's invariants before or with the code they
+   protect. Every invariant in `INVARIANTS.md` becomes a test, named after it:
+   `crm 1. one submission id is one lead`.
+4. Use invented data in code, tests and demos. Warehouse sources get a `sample`
    adapter that generates invented data and a `real` adapter that reads through
    a connection; both write the same contract table.
-4. Never put credentials, real records, exports or customer names in the
+5. Never put credentials, real records, exports or customer names in the
    repository. Connections hold credentials; real data arrives through
    connections, event streams and actions.
+6. Keep a build record in `BLUEPRINTS.md` at the project root, and add a line
+   pointing to it below the managed block of the project's `AGENTS.md`. For each
+   blueprint record: its id and `version`, the date you read it, the variations
+   you chose and the answer that chose each, every deviation from the blueprint
+   and why, and the test that covers each invariant. Update it with every change.
 
 ## 7. Check
 
-Run the project's checks after every meaningful step: `npm --prefix ontology
-run check`, the app's typecheck and build, the pipeline validation in the
-project's README, and the invariant tests. Exercise changed screens and
-actions with `segmentstream dev` as the project's README describes. Trigger
-nothing with an external effect (an email, a signature request, a ledger
-posting, a payment) that the person has not approved.
+A build reaches three milestones; `docs/testing.md` lists what runs at each.
+
+- **M1, local:** `npm --prefix ontology run check` with no errors or warnings,
+  the ontology's typecheck, build and tests, the app's typecheck and build,
+  pipeline validation and tests, and the agent's typecheck. M1 needs no
+  SegmentStream account. Run these checks after every meaningful step.
+- **M2, linked:** with a linked workspace, exercise every changed screen and
+  action with `segmentstream dev`, as the project's README describes.
+- **M3, deployed:** step 8.
+
+Trigger nothing with an external effect (an email, a signature request, a
+ledger posting, a payment) that the person has not approved.
 
 ## 8. Deploy
 
@@ -81,15 +99,23 @@ posting, a payment) that the person has not approved.
    `segmentstream connection authorize <key>`), then run the jobs that load
    history once they are authorized.
 
-If the person has no SegmentStream access yet, stop before this step: the
-project, plan and tests are ready, and they can request access at
+If the person has no SegmentStream access yet, stop at M1: the project, plan,
+build record and passing tests are ready, and they can request access at
 https://segmentstream.com/#waitlist.
 
 ## 9. Report
 
 Tell the person, briefly: what was built, how to open it, what each role can
-do, which connections are pending, what you left out, and which blueprints
-would extend it. Suggest a first thing to try with real data.
+do, which connections are pending, what you left out and every deviation from
+the blueprint, which milestone the build reached, and which blueprints would
+extend it. Suggest a first thing to try with real data.
+
+## Updating a build
+
+When the person asks to bring their software up to date with a blueprint, read
+`BLUEPRINTS.md` in their project and the entries of `CHANGELOG.md` in this
+repository since the version it records. Propose the changes that apply to their
+build, wait for approval, apply them with their tests, and update the record.
 
 ## When you are unsure
 

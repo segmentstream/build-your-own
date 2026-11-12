@@ -1,5 +1,6 @@
 {
   "id": "email-marketing",
+  "version": "1.0.0",
   "title": "Email marketing",
   "tagline": "Consent by topic, audiences on your own customer records, campaigns with a separate approval, and delivery events that keep your list clean.",
   "replaces": [

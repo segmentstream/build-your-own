@@ -53,6 +53,16 @@ for (const id of ids) {
     if (typeof meta[key] !== "string" || !meta[key].trim()) fail(`${where}: ${key} is required`);
   }
   if (!STATUSES.includes(meta.status)) fail(`${where}: status must be one of ${STATUSES.join(", ")}`);
+  const semver = /^(\d+)\.(\d+)\.(\d+)$/.exec(meta.version ?? "");
+  if (!semver) fail(`${where}: version must be MAJOR.MINOR.PATCH`);
+  else if (meta.status === "preview" && semver[1] !== "0") fail(`${where}: a preview blueprint's version is 0.x`);
+  else if (meta.status === "stable" && semver[1] === "0") fail(`${where}: a stable blueprint's version is 1.0.0 or later`);
+  if (meta.testedWith !== undefined) {
+    const tested = meta.testedWith;
+    if (typeof tested !== "object" || tested === null || Array.isArray(tested) || Object.values(tested).some((v) => typeof v !== "string")) {
+      fail(`${where}: testedWith maps package names to the versions a build used`);
+    }
+  }
   for (const key of ["replaces", "dependsOn", "worksWith", "components", "sdks", "screens"]) {
     if (!Array.isArray(meta[key])) fail(`${where}: ${key} must be an array`);
   }
@@ -112,6 +122,8 @@ const llms = [
   `- [registry.json](${RAW}/registry.json): every blueprint with its metadata`,
   `- [Foundation](${RAW}/foundation/FOUNDATION.md): shared companies, contacts, members and conventions`,
   `- [SDKs](${RAW}/SDKS.md): the public SDKs and where they are documented`,
+  `- [Testing](${RAW}/docs/testing.md): milestones, the test harness in kernel/, and how to test each kind of invariant`,
+  `- [Changelog](${RAW}/CHANGELOG.md): what changed in each blueprint, for updating a project built from an earlier version`,
   "",
   "## Blueprints",
   "",
@@ -169,9 +181,10 @@ const SKIP_FILES = new Set(["LICENSE", "scripts/check.mjs"]);
 const TEXT = /\.(md|json|txt|ya?ml|ts|tsx|js|mjs|py|sql|toml)$/;
 
 const PATTERNS = [
-  ["UUID", /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/i],
+  // Placeholder UUIDs that start with 00000000-0000 are allowed; they are clearly invented.
+  ["UUID", /\b(?!00000000-0000-)[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/i],
   ["organization ID", /\borg_[0-9A-Za-z]{16,}\b/],
-  ["email outside example domains", /[\w.+-]+@(?!example\.(?:com|org|net)\b)[\w-]+(?:\.[\w-]+)+/],
+  ["email outside example domains", /[\w.+-]+@(?!example\.(?:com|org|net)\b)[\w-]+(?:\.[\w-]+)*\.[A-Za-z]{2,}\b/],
   ["internal hostname", /\b[\w-]+\.segmentstream\.app\b/],
   ["Cyrillic text", /[Ѐ-ӿ]/],
 ];

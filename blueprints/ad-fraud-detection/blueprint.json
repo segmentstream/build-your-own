@@ -1,5 +1,6 @@
 {
   "id": "ad-fraud-detection",
+  "version": "1.0.0",
   "title": "Ad fraud and bot detection",
   "tagline": "A verdict with its evidence for every website session and conversion: SegmentStream's complete production rules for bots, spoofed crawlers, automation, data-centre traffic and AI agents.",
   "replaces": [

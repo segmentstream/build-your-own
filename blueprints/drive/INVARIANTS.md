@@ -1,7 +1,7 @@
 # Drive: invariants
 
 Rules that must hold in every version of Drive. Each one is a bug if broken.
-Tests use invented members (Ada Example, a teammate; Grace Sample, an outsider;
+Tests run on the harness in [testing](../../docs/testing.md) and use invented members (Ada Example, a teammate; Grace Sample, an outsider;
 an `hr` holder; a `drive_admin`), the folders `Clients/Northwind` and `HR`, and
 invented files. "Fixtures" below means that set.
 

@@ -1,7 +1,7 @@
 # Company agent: invariants
 
-Rules that hold in every version. Unit tests run with the ontology checks
-(`ontology/test/`); acceptance tests are scenarios run in a direct message with
+Rules that hold in every version. Unit tests run on the harness in
+[testing](../../docs/testing.md) (`ontology/test/`); acceptance tests are scenarios run in a direct message with
 the agent, on invented records, after every change to the instructions,
 actions or roles, and checked against `segmentstream agent logs`.
 

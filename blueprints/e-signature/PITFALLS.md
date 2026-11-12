@@ -151,8 +151,9 @@ Mistakes already made building signing on the platform. Each is easy to repeat.
   that uses it; or an action wrote a value that is not one of the select's
   options, and the in-memory test did not check options.
 - **Instead:** for each status and setting, name the action or workflow that
-  sets or reads it, and test that path. Run the full lifecycle once against a
-  real migrated database (`segmentstream dev`) before the first deploy.
+  sets or reads it, and test that path. Run the full lifecycle on the harness in
+  [testing](../../docs/testing.md), which migrates a real PostgreSQL and rejects
+  values a column would reject.
 
 ## 15. Outside recipients are sent to a sign-up they cannot finish
 

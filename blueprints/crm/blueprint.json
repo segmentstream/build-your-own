@@ -1,5 +1,6 @@
 {
   "id": "crm",
+  "version": "0.1.0",
   "title": "CRM",
   "tagline": "Leads from your forms, triage, deal pipelines and customers on your own companies and contacts, shaped to how you sell.",
   "replaces": [

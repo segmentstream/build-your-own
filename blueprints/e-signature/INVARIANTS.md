@@ -1,7 +1,8 @@
 # E-signature: invariants
 
-Each rule holds in every version. Each becomes a test in the project, with
-invented people and PDFs generated in the test (Northwind, Ada Example,
+Each rule holds in every version. Each becomes a test in the project, run on the
+harness in [testing](../../docs/testing.md), with invented people and PDFs
+generated in the test (Northwind, Ada Example,
 Grace Sample, `example.com`), and the timestamp authority replaced with
 `Connections.test`.
 

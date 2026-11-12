@@ -8,6 +8,8 @@
 - [registry.json](https://raw.githubusercontent.com/segmentstream/build-your-own/main/registry.json): every blueprint with its metadata
 - [Foundation](https://raw.githubusercontent.com/segmentstream/build-your-own/main/foundation/FOUNDATION.md): shared companies, contacts, members and conventions
 - [SDKs](https://raw.githubusercontent.com/segmentstream/build-your-own/main/SDKS.md): the public SDKs and where they are documented
+- [Testing](https://raw.githubusercontent.com/segmentstream/build-your-own/main/docs/testing.md): milestones, the test harness in kernel/, and how to test each kind of invariant
+- [Changelog](https://raw.githubusercontent.com/segmentstream/build-your-own/main/CHANGELOG.md): what changed in each blueprint, for updating a project built from an earlier version
 
 ## Blueprints
 

@@ -1,5 +1,6 @@
 {
   "id": "e-signature",
+  "version": "1.0.0",
   "title": "E-signature",
   "tagline": "Envelopes, signers, a signing page and sealed, timestamped PDFs.",
   "replaces": [
