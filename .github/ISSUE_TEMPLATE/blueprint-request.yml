@@ -1,6 +1,11 @@
+name: Request a blueprint
+description: Ask for a blueprint of software your company needs. Upvote existing requests with a thumbs-up instead of opening duplicates.
 title: "Blueprint: "
 labels: ["blueprint request"]
 body:
+  - type: markdown
+    attributes:
+      value: Search the open requests first and add a thumbs-up to the ones you need. We build the most-wanted blueprints first.
   - type: textarea
     id: job
     attributes:
@@ -17,4 +22,4 @@ body:
     id: musts
     attributes:
       label: Rules it must follow
-      description: Approvals, compliance, things that must never happen.
+      description: Approvals, compliance, things that must never happen. Never paste customer data.

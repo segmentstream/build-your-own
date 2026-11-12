@@ -67,7 +67,5 @@ the design is sound but details are still moving.
 
 Blueprints describe complete, working software. A few things remain products or
 services of SegmentStream rather than blueprints: advanced attribution models,
-budget optimization and incrementality experiments for marketing analytics;
-tuned fraud rules, cross-customer reputation and decision models for traffic
-verification; and engineers who build the first version with you. See
-https://segmentstream.com.
+budget optimization and incrementality experiments for marketing analytics, and
+engineers who build the first version with you. See https://segmentstream.com.

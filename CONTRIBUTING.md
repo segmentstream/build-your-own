@@ -2,9 +2,10 @@
 
 ## Request a blueprint
 
-Open a discussion in the **Blueprint requests** category. Describe the job the
+Open an issue with the **Request a blueprint** form. Describe the job the
 software does for your company, the tool it would replace, and who uses it.
-Upvote requests you need too. We build the most-wanted ones first.
+Add a thumbs-up to existing requests you need too. We build the most-wanted
+ones first.
 
 Requests for one company's bespoke system are better served by a SegmentStream
 pilot, where our engineers build the first version with you:

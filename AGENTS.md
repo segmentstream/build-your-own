@@ -82,8 +82,8 @@ posting, a payment) that the person has not approved.
    history once they are authorized.
 
 If the person has no SegmentStream access yet, stop before this step: the
-project, plan and tests are ready, and access starts at
-https://segmentstream.com/signup.
+project, plan and tests are ready, and they can request access at
+https://segmentstream.com/#waitlist.
 
 ## 9. Report
 

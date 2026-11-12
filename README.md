@@ -132,9 +132,10 @@ version on your data in a fixed-price pilot: [start a pilot](https://segmentstre
 
 ## Request a blueprint
 
-Missing something your company needs? [Request a blueprint](https://github.com/segmentstream/build-your-own/discussions/categories/blueprint-requests)
-and upvote the ones you want. We build the most-wanted ones first. To improve
-an existing blueprint, see [CONTRIBUTING.md](CONTRIBUTING.md).
+Missing something your company needs? [Request a blueprint](https://github.com/segmentstream/build-your-own/issues/new?template=blueprint-request.yml),
+or add a thumbs-up to an [open request](https://github.com/segmentstream/build-your-own/issues?q=is%3Aissue+is%3Aopen+%22Blueprint%3A%22+in%3Atitle).
+We build the most-wanted ones first. To improve an existing blueprint, see
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Get started
 
@@ -144,7 +145,7 @@ Install the CLI and give your agent this repository:
 curl -fsSL https://segmentstream.com/install.sh | sh
 ```
 
-New to SegmentStream? [Get access](https://segmentstream.com/signup).
+New to SegmentStream? [Request access](https://segmentstream.com/#waitlist).
 
 ## License
 
