@@ -1,0 +1,10 @@
+[
+  {"model": "first_click", "conversion_instance_id": "newsletter_signup|signup-1", "session_id": "view-4", "channel_group": "paid_social", "credit": 1.0, "allocated_value_minor": null, "days_to_convert": 0},
+  {"model": "first_click", "conversion_instance_id": "purchase|purchase-1", "session_id": "view-1", "channel_group": "paid_search", "credit": 1.0, "allocated_value_minor": 12000, "days_to_convert": 0},
+  {"model": "first_click", "conversion_instance_id": "purchase|purchase-3", "session_id": "view-1", "channel_group": "paid_search", "credit": 1.0, "allocated_value_minor": 4550, "days_to_convert": 0},
+  {"model": "first_click", "conversion_instance_id": "purchase|purchase-4", "session_id": null, "channel_group": "(unattributed)", "credit": 1.0, "allocated_value_minor": 3000, "days_to_convert": null},
+  {"model": "last_click", "conversion_instance_id": "newsletter_signup|signup-1", "session_id": "view-4", "channel_group": "paid_social", "credit": 1.0, "allocated_value_minor": null, "days_to_convert": 0},
+  {"model": "last_click", "conversion_instance_id": "purchase|purchase-1", "session_id": "view-1", "channel_group": "paid_search", "credit": 1.0, "allocated_value_minor": 12000, "days_to_convert": 0},
+  {"model": "last_click", "conversion_instance_id": "purchase|purchase-3", "session_id": "view-3", "channel_group": "email", "credit": 1.0, "allocated_value_minor": 4550, "days_to_convert": 0},
+  {"model": "last_click", "conversion_instance_id": "purchase|purchase-4", "session_id": null, "channel_group": "(unattributed)", "credit": 1.0, "allocated_value_minor": 3000, "days_to_convert": null}
+]

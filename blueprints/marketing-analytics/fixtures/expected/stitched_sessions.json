@@ -1,0 +1,6 @@
+[
+  {"session_id": "view-1", "paid_looking": true, "ad_matched": true, "match_strategy": "click_id", "campaign_key": "google_ads:1234567890:111", "ad_group_id": "222", "ad_id": "444", "diagnostic_code": null},
+  {"session_id": "view-3", "paid_looking": false, "ad_matched": false, "match_strategy": null, "campaign_key": null, "ad_group_id": null, "ad_id": null, "diagnostic_code": null},
+  {"session_id": "view-4", "paid_looking": true, "ad_matched": true, "match_strategy": "ad_id_evidence", "campaign_key": "meta_ads:act_555:333", "ad_group_id": "3332", "ad_id": "333444", "diagnostic_code": null},
+  {"session_id": "view-5", "paid_looking": false, "ad_matched": false, "match_strategy": null, "campaign_key": null, "ad_group_id": null, "ad_id": null, "diagnostic_code": null}
+]

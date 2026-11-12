@@ -1,0 +1,6 @@
+[
+  {"session_id": "view-1", "session_date": "2026-03-10", "anonymous_id": "visitor-1", "started_at": "2026-03-10T08:00:01Z", "hits": 2, "source": "google", "medium": "cpc", "utm_campaign": "spring_sale", "channel_group": "paid_search", "traffic_group": "human", "traffic_class": "human"},
+  {"session_id": "view-3", "session_date": "2026-03-10", "anonymous_id": "visitor-1", "started_at": "2026-03-10T10:00:01Z", "hits": 1, "source": "newsletter", "medium": "email", "utm_campaign": "march_news", "channel_group": "email", "traffic_group": "human", "traffic_class": "human"},
+  {"session_id": "view-4", "session_date": "2026-03-10", "anonymous_id": "visitor-2", "started_at": "2026-03-10T12:30:01Z", "hits": 1, "source": "facebook", "medium": "paid_social", "utm_campaign": "trail_shoes", "channel_group": "paid_social", "traffic_group": "human", "traffic_class": "human"},
+  {"session_id": "view-5", "session_date": "2026-03-10", "anonymous_id": null, "started_at": "2026-03-10T14:00:01Z", "hits": 1, "source": "(direct)", "medium": "(none)", "utm_campaign": null, "channel_group": "direct", "traffic_group": "human", "traffic_class": "human"}
+]

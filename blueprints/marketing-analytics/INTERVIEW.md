@@ -3,16 +3,20 @@
 Ask these in one message. Offer the default with each question and skip what the person
 already said.
 
-## 1. Which sites and apps should be tracked, and how are they built?
+## 1. Which sites and apps should be tracked, how are they built, and where is their code?
 
 - **Why**: the stream admits only declared origins, the session rules need the list of
-  the company's own domains, and server events need middleware the site can run.
+  the company's own domains, and server events need middleware the site can run. The
+  tracker code goes into the site's own repository, not into the SegmentStream project.
 - **Answers change**: each origin goes into `auth.Origin(...)` and the internal-domain
   list; a site on Next.js gets the tracker's browser and server parts as in the sketch;
   another framework or host gets the browser tracker plus its own server snippet
   (VARIATIONS.md, "Site stack"); a signed-in product app gets its own stream for product
   analytics; several brands on separate domains share one stream and get a `site` field.
-- **Default**: one marketing site on Next.js, its apex and `www` origins.
+  When the agent can work in the site's repository, it changes and tests the site there;
+  otherwise it writes the changes into `site-integration/` for the person to copy.
+- **Default**: one marketing site on Next.js, its apex and `www` origins; the site's code
+  is out of reach, so the agent prepares `site-integration/`.
 
 ## 2. Which time zone do you report in, and which time zone are your ad accounts in?
 
@@ -27,12 +31,15 @@ already said.
 
 - **Why**: conversions are declared in code, each with a business ID that makes it
   count once.
-- **Answers change**: one declaration per answer. A website form becomes `lead` from a
-  server-side `lead_submitted` with the form's submission ID; a sign-up becomes
-  `signed_up` with the account ID; an online order becomes `purchase` with the order ID,
-  value and currency; a deal won in the CRM becomes an offline conversion read from the
-  CRM's records (VARIATIONS.md, "Conversion sources").
-- **Default**: `lead` from website forms.
+- **Answers change**: one declaration per answer, and the metrics are named after it
+  (BLUEPRINT 2). An online order becomes `purchase` with the order ID, value and
+  currency (CPA and ROAS on purchases); a contact or demo form becomes `lead` from a
+  server-side `lead_submitted` with the form's submission ID; a newsletter form becomes
+  its own conversion, `newsletter_signup`, from `lead_submitted` with `form` =
+  `newsletter`; a sign-up becomes `signed_up` with the account ID; a deal won in the CRM
+  becomes an offline conversion read from the CRM's records (VARIATIONS.md, "Conversion
+  sources").
+- **Default**: `purchase` for an online store, `lead` from website forms otherwise.
 
 ## 4. Should the same person count again if they convert twice?
 
@@ -80,7 +87,8 @@ already said.
 ## 9. Do you need visitor consent before setting analytics cookies, and how long may you keep raw data?
 
 - **Why**: the anonymous ID is a first-party cookie; in many countries it needs consent.
-  Raw captures hold IP addresses and user agents.
+  Raw captures hold user agents, and IP addresses when SegmentStream has switched on IP
+  capture for the workspace, which verifying AI agents needs (BLUEPRINT 6.2, 6.5).
 - **Answers change**: the middleware sets `ss_aid` only after consent, or never
   (cookieless mode); the stream's `retention_days`; a deletion procedure for a visitor's
   data on request.

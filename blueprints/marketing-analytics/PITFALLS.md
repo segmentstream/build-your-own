@@ -1,7 +1,9 @@
 # Pitfalls
 
 Mistakes already made building this kind of software on the platform. Each one is easy
-to repeat.
+to repeat. Ibis and SDK mistakes that every pipeline blueprint shares (self-joins,
+`hexdigest`, DuckDB tests, check factories, the starter's pins) are in the
+[pipeline notes](../../docs/pipeline-notes.md).
 
 ## 1. Sessions and costs on different calendars
 
@@ -10,7 +12,8 @@ to repeat.
 - **Cause**: sessions were dated in UTC while the ad accounts report days in their own
   time zone, so same-day stitching compared different days.
 - **Instead**: one reporting calendar in the ad accounts' time zone for every daily asset,
-  local dates computed in the warehouse with the zone, never in UTC by default.
+  local dates computed in the warehouse with the zone (`DATETIME(ts, zone)` then
+  `.date()`, as in the sketch), never in UTC by default.
 
 ## 2. Current-state ad reports stored as dated history
 
@@ -21,8 +24,9 @@ to repeat.
   return current state whatever the filter.
 - **Instead**: decide the mode from what the provider returns, not from the filter. Load
   current state as SnapshotHistory scoped by account and read the latest successful
-  capture per account through the snapshot ledger, empty captures included. Selecting the
-  latest non-empty rows resurrects deleted entities.
+  capture per account through the snapshot ledger (`<table>__snapshots`, declared as an
+  external table; `gold/campaigns` in the BLUEPRINT sketch), empty captures included.
+  Selecting the latest non-empty rows resurrects deleted entities.
 
 ## 3. Money that quietly becomes a float
 
@@ -31,9 +35,10 @@ to repeat.
 - **Cause**: an Ibis division (micros to currency, cost spread over rows) compiled to
   floating-point division even inside a decimal cast, and the expression type hid it.
 - **Instead**: divide with explicit decimal operands (a typed `SAFE_DIVIDE` on `NUMERIC`
-  through an Ibis builtin), keep `decimal(38, 9)` in Silver schemas, round once to
-  integer minor units in gold, map those with `p.integer` (never `p.number`), and check
-  the physical type of each money column after the first run.
+  through an Ibis builtin), cast a float weight to `decimal(38, 9)` before multiplying a
+  value by it, keep `decimal(38, 9)` in Silver schemas, round once to integer minor units
+  in gold, map those with `p.integer` (never `p.number`), and check the physical type of
+  each money column after the first run.
 
 ## 4. Costs multiplied by joins
 
@@ -78,10 +83,13 @@ to repeat.
 
 - **Symptom**: models fail on a missing partition filter, or late browser beacons never
   appear, or one event shows up twice.
-- **Cause**: the capture table is partitioned by receipt time and keeps every retry as
-  its own capture; the model filtered by event time or by date alone.
-- **Instead**: bound every read by receipt time, wider than the event days, then compute
-  the reporting date and collapse retries by `event_id`.
+- **Cause**: the capture table is partitioned by UTC receipt day, requires a partition
+  filter, and keeps every retry as its own capture; the model filtered by event time or
+  by date alone, or declared the capture as a daily input on the reporting calendar.
+- **Instead**: declare it unpartitioned, bound every read by `received_at`, wider than the
+  event days, then compute the reporting date and collapse retries by `event_id`. Its
+  `request_id` column is the collector's; the site's request ID is in `body.payload`
+  (BLUEPRINT 6.3).
 
 ## 9. Prefetches and app fetches counted as page views
 
@@ -150,3 +158,50 @@ to repeat.
   or anything starting with `_PARTITION`, `_TABLE_` or `_FILE_`.
 - **Instead**: never start your own column names with an underscore followed by those
   words; keep extraction metadata as plain names such as `extracted_at`.
+
+## 16. The starter's sample left in place
+
+- **Symptom**: the app's home page fails on `gold.revenue_summary`; the ontology still
+  lists orders from `silver/normalized_orders`; `segmentstream job run refresh` rebuilds
+  invented commerce tables beside the analytics.
+- **Cause**: the starter's commerce sample was kept next to the new pipeline. Validation
+  passes, because nothing refers to the removed tables until a page or job reads them.
+- **Instead**: remove the sample's ingestions, models, job, `Order` entity, revenue card
+  and README walkthrough in the first build step
+  ([pipeline notes](../../docs/pipeline-notes.md#the-starter)).
+
+## 17. A later stitching strategy beating the click ID
+
+- **Symptom**: auto-tagged Google sessions show `ad_id_evidence` or `utm_id` as their
+  strategy and only campaign-level matches, although `click_view` has their `gclid`.
+- **Cause**: results were ranked with a flag such as `strategy = 'click_id' AND code =
+  'conflicting_click_id'`, which is NULL when the code is NULL. NULL sorts last, so the
+  click-ID row lost to the next strategy.
+- **Instead**: coalesce every flag in the ranking to false, rank blocked, then matched,
+  then strategy number, and keep invariant 26's test.
+
+## 18. Counting windows against the previous observation
+
+- **Symptom**: with `occurrence_after_days` or `person_window_days`, a third conversion
+  is suppressed although the last *counted* one was long enough ago.
+- **Cause**: the window was computed with `lag()` against the previous observation,
+  counted or not. Days 0, 20 and 40 with n = 30 then count only day 0.
+- **Instead**: decide observations in order against the last counted one, with
+  `warehouse.iterate` (BLUEPRINT 6.10); test days 0, 20 and 40.
+
+## 19. Conversion value counted twice
+
+- **Symptom**: purchase value and ROAS above the shop's revenue; the gap equals the value
+  of repeated thank-you pages.
+- **Cause**: the value metric summed `valueMinor` of every observation, duplicates
+  included, although `credit` was right.
+- **Instead**: filter value metrics to `credit = 1` as well as the conversion name, and
+  allocate value only from counted conversions.
+
+## 20. A value sent as a JSON number
+
+- **Symptom**: purchases arrive with a NULL value; revenue and ROAS stay empty.
+- **Cause**: the site sent `"value": 120.5`. The adapter reads JSON with
+  `unwrap_as("string")`, which BigQuery compiles to `SAFE.STRING`, NULL for a JSON number.
+- **Instead**: send money as a decimal string (`"120.50"`) with its `currency`, and cast it
+  to `decimal(38, 9)` in the adapter.

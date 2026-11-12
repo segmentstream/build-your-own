@@ -19,6 +19,9 @@ changes, and the default this blueprint takes.
   with the write key. Without server events, there is no agent and crawler report.
 - **Several sites or brands**: one stream, all origins declared, and the site's host kept
   on every hit so reports can filter; separate streams only when access must differ.
+- **Where the site's code lives**: in the site's own repository (default when the agent
+  can work there), changed and tested there; otherwise in `site-integration/` in the
+  project, outside every deployed component, for the person to copy.
 
 ## What is collected
 
@@ -86,7 +89,8 @@ server events. Default: not built.
 
 ## Conversion sources
 
-- **Server events from the site** (default): `lead_submitted`, `signed_up`, `purchase`.
+- **Server events from the site** (default): `purchase`, `lead_submitted` (a `lead`, or
+  `newsletter_signup` when `form` is `newsletter`), `signed_up`.
 - **An order or billing system** (WooCommerce, BigCommerce, Stripe, an ERP): an ingestion of orders through
   its connection; the extractor joins orders to sessions by an anonymous ID or email hash
   the checkout passed along.
@@ -94,6 +98,15 @@ server events. Default: not built.
   replicated CRM records becomes an offline conversion, linked by the website submission
   ID or email hash. Declare `crmLead: rel.one(Lead, { on: { occurrenceId: "submissionId" } })`
   on `conversion` so the CRM's lead page includes its conversion and credited sessions.
+
+## Counting
+
+- **Every business ID once** (`once_per_occurrence`, default): every order counts.
+- **Again after n days** (`occurrence_after_days(n)`): a subscription renewal or a
+  re-submitted form counts again once n days have passed since its last counted one.
+- **One per person per window** (`person_window_days(n)`): one lead per person a month.
+  Needs the identity graph. Both windowed rules compare with the last *counted*
+  observation, so they iterate (BLUEPRINT 6.10).
 
 ## Attribution
 
@@ -125,9 +138,10 @@ server events. Default: not built.
 
 ## Channel groups
 
-The default groups and their order are config. Companies add groups (partners, app
-stores, marketplaces), split organic social by network, or map their own UTM mediums.
-Changing the rules changes history on the next rebuild; annotate the change.
+The default rules are the table in BLUEPRINT 6.6, and their lists are config. Companies
+add groups (partners, app stores, marketplaces) as new rows, split organic social by
+network, or map their own UTM mediums. Changing the rules changes history on the next
+rebuild; annotate the change.
 
 ## Migration
 

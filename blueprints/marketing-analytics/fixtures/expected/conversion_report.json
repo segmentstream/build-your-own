@@ -1,0 +1,7 @@
+[
+  {"conversion_instance_id": "newsletter_signup|signup-1", "conversion_name": "newsletter_signup", "occurrence_id": "sub-1", "conversion_date": "2026-03-10", "credit": 1, "credit_reason": "counted", "value_minor": null, "currency": null, "visitor_id": "visitor-2", "person_id": "visitor-2", "traffic_group": "human"},
+  {"conversion_instance_id": "purchase|purchase-1", "conversion_name": "purchase", "occurrence_id": "order-1", "conversion_date": "2026-03-10", "credit": 1, "credit_reason": "counted", "value_minor": 12000, "currency": "eur", "visitor_id": "visitor-1", "person_id": "visitor-1", "traffic_group": "human"},
+  {"conversion_instance_id": "purchase|purchase-2", "conversion_name": "purchase", "occurrence_id": "order-1", "conversion_date": "2026-03-10", "credit": 0, "credit_reason": "duplicate", "value_minor": 12000, "currency": "eur", "visitor_id": "visitor-1", "person_id": "visitor-1", "traffic_group": "human"},
+  {"conversion_instance_id": "purchase|purchase-3", "conversion_name": "purchase", "occurrence_id": "order-2", "conversion_date": "2026-03-10", "credit": 1, "credit_reason": "counted", "value_minor": 4550, "currency": "eur", "visitor_id": "visitor-1", "person_id": "visitor-1", "traffic_group": "human"},
+  {"conversion_instance_id": "purchase|purchase-4", "conversion_name": "purchase", "occurrence_id": "order-3", "conversion_date": "2026-03-10", "credit": 1, "credit_reason": "counted", "value_minor": 3000, "currency": "eur", "visitor_id": null, "person_id": null, "traffic_group": "unverified"}
+]
