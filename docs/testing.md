@@ -133,32 +133,85 @@ test("crm 1. one submission id is one lead", async () => {
 
 ## Pipeline tests
 
-Keep each model's transformation in a function that takes Ibis tables and
-returns an Ibis table. The model calls it with warehouse tables; a test calls it
-with invented rows.
+A test calls a model through its declaration, `model.function(...)`, with
+tables of invented rows on DuckDB, so it runs the same Ibis expression the
+pipeline compiles for the warehouse. A model that reads a table with
+`warehouse.table(...)`, such as a replicated ontology entity, keeps its
+transformation in a plain function that takes that table; the test calls the
+plain function.
 
-```sh
-segmentstream uv add --directory pipeline --dev duckdb pytest
-segmentstream uv run --directory pipeline pytest
-```
+1. Copy [`kernel/pipeline/tests/warehouse_harness.py`](../kernel/pipeline/tests/warehouse_harness.py)
+   to `pipeline/tests/warehouse_harness.py` without changing it, and add an
+   empty `pipeline/tests/__init__.py`.
+2. Create `pipeline/tests/conftest.py` with one line:
+
+   ```python
+   from tests.warehouse_harness import con, warehouse  # noqa: F401  (pytest fixtures)
+   ```
+
+3. Add the development dependencies, with the Ibis version the pipeline SDK
+   already uses, and tell pytest where the code is:
+
+   ```sh
+   IBIS=$(segmentstream uv run --directory pipeline python -c "import ibis; print(ibis.__version__)" | tail -1)
+   segmentstream uv add --directory pipeline --dev "ibis-framework[duckdb]==$IBIS" pytest
+   ```
+
+   ```toml
+   # pipeline/pyproject.toml
+   [tool.pytest.ini_options]
+   pythonpath = ["."]
+   testpaths = ["tests"]
+   ```
+
+4. Run `segmentstream uv run --directory pipeline pytest`.
+
+| Helper | Use |
+| --- | --- |
+| `con` | A fresh DuckDB, with BigQuery functions the models call defined as macros |
+| `warehouse` | Stands in for `s.WarehouseResource`: `materialize_scratch`, `release_scratch`, `execute`, `iterate` |
+| `table(con, rows, schema)` | A table of invented rows with an exact schema, also when empty or with NULLs |
+| `ingest(con, ingestion, ...)` | Runs a row ingestion's function and loads its rows |
+| `rows(con, expression, order_by)` | The result as a list of dicts |
+| `bigquery_sql(expression)` | Compiles for BigQuery; call it on every model's output to catch what only BigQuery rejects |
+| `Context(days)` | Stands in for `s.Context` with partition keys |
 
 ```python
-import ibis
+from datetime import date
 
-from models.customers import customers_from_deals
+from models.crm_customers import customers_from_deals
+from tests.warehouse_harness import bigquery_sql, rows, table
+
+DEALS = {
+    "id": "string",
+    "company_id": "string",
+    "primary_contact_id": "string",
+    "status": "string",
+    "amount_minor": "int64",
+    "currency": "string",
+    "closed_on": "date",
+}
 
 
-def test_crm_19_one_row_per_customer_and_currency():
-    deals = ibis.memtable(
-        [
-            {"id": "deal-1", "company_id": "company-1", "status": "won", "amount_minor": 100000, "currency": "eur"},
-            {"id": "deal-2", "company_id": "company-1", "status": "won", "amount_minor": 50000, "currency": "usd"},
-            {"id": "deal-3", "company_id": "company-1", "status": "lost", "amount_minor": 70000, "currency": "eur"},
-        ]
+def deal(deal_id, status, amount_minor, currency):
+    return {"id": deal_id, "company_id": "company-1", "primary_contact_id": "contact-1", "status": status,
+            "amount_minor": amount_minor, "currency": currency, "closed_on": date(2026, 10, 1)}
+
+
+def test_crm_19_one_row_per_customer_and_currency(con):
+    deals = table(
+        con,
+        [deal("deal-1", "won", 100000, "eur"), deal("deal-2", "won", 50000, "usd"), deal("deal-3", "lost", 70000, "eur")],
+        DEALS,
     )
-    rows = ibis.duckdb.connect().execute(customers_from_deals(deals)).to_dict("records")
-    assert {(r["currency"], r["won_amount_minor"]) for r in rows} == {("eur", 100000), ("usd", 50000)}
+    result = customers_from_deals(deals)
+    bigquery_sql(result)
+    assert {(r["currency"], r["won_amount_minor"]) for r in rows(con, result)} == {("eur", 100000), ("usd", 50000)}
 ```
+
+A blueprint may ship a worked example in its `fixtures/` folder: invented input
+rows and the output rows its rules produce. Load them with `table` and compare
+with `rows`; a build that disagrees has a bug or a deviation to record.
 
 Also validate the definitions on every run:
 
@@ -166,12 +219,22 @@ Also validate the definitions on every run:
 segmentstream uv run --directory pipeline python -c "import segmentstream as s; from definitions import defs; s.validate(defs)"
 ```
 
+[Pipeline notes](pipeline-notes.md) lists Ibis and SDK mistakes that tests
+alone do not explain.
+
 ## App checks
 
 ```sh
 npm --prefix app run typecheck
 npm --prefix app run build
 ```
+
+An app that publishes page navigation (`withPageCatalog` and
+`page.navigation.json` files) cannot build locally with app SDK 0.38.1: the
+build needs a page catalog, and the catalog stops matching once the build
+rewrites its own workflow files. For such an app, run the typecheck and validate
+the navigation files with the catalog's `generate`, as the CRM blueprint shows;
+`segmentstream deploy` builds and verifies the catalog itself.
 
 ## What cannot run at M1
 
