@@ -1,17 +1,25 @@
 # Build your own CRM, analytics, books and e-signature with your AI agent
 
-**Blueprints of the software SegmentStream runs on: marketing analytics, CRM, email marketing, bookkeeping, ad fraud detection, a company agent, a document drive and e-signature. Your coding agent builds your company's own version.**
+**Blueprints for the era of custom software. Give one to your coding agent and it builds software shaped to your company on the [SegmentStream platform](https://segmentstream.com): marketing analytics, CRM, email marketing, bookkeeping, ad fraud detection, a company agent, a document drive and e-signature.**
 
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-black)](LICENSE)
 ![Works with Claude Code](https://img.shields.io/badge/works%20with-Claude%20Code-black)
 ![Works with Codex](https://img.shields.io/badge/works%20with-Codex-black)
 ![Works with Cursor](https://img.shields.io/badge/works%20with-Cursor-black)
 
-These are blueprints of the software we run SegmentStream on. They are not
-software you install. Give your coding agent this repository and say what you
-want. It asks about your company, shows you a plan, and builds your own version
-in a repository you own, with sign-in, roles checked on every record, a history
-of every change, and an API and MCP tools for your other agents.
+Companies no longer have to rent software built for someone else's process, or
+install someone else's code and bend it to fit. With a good example, a coding
+agent can build software that fits your company exactly. These blueprints are
+those examples: each one is the design, the questions to ask, the rules that
+must always hold and the mistakes to avoid, taken from software already running
+in production.
+
+Nothing here is installed. Give your coding agent this repository and say what
+you want. It asks about your company, shows you a plan, and builds your own
+version on [SegmentStream](https://segmentstream.com), the platform for a
+company's custom software and AI agents: sign-in, roles checked on every
+record, a history of every change, and an API and MCP tools for your other
+agents come with it.
 
 ```text
 Read https://github.com/segmentstream/build-your-own/blob/main/AGENTS.md and follow it.
@@ -27,7 +35,7 @@ Paste that into Claude Code, Codex or Cursor. Other things to ask for:
 
 ![The deals pipeline in SegmentStream's own CRM](assets/screens/hq-deals.webp)
 
-<sub>The deals pipeline in the CRM SegmentStream runs on. Demo data.</sub>
+<sub>A deals pipeline built from these designs on the SegmentStream platform. Demo data.</sub>
 
 ## Blueprints
 
@@ -100,12 +108,13 @@ break, and agents keep making the same mistakes. So each blueprint carries the
 idea, the questions to ask, the invariants with their tests, and the pitfalls
 we hit in production. [How it works](docs/how-it-works.md) explains the format.
 
-## We run on this
+## Proven in production
 
-SegmentStream runs its own company on software its coding agents built from
-these designs: the CRM, the books, documents and signatures, campaigns and
-analytics. Our workspace has 136 entities, 395 actions and 27 roles, and every
-change goes through the same rules your version will.
+Every `stable` blueprint is taken from custom software running in production
+on the SegmentStream platform. Our own team runs the company on it, from the CRM
+and campaigns to the books, documents and signatures: one workspace with 136
+entities, 395 actions and 27 roles, built and maintained by coding agents, where
+every change goes through the same rules your version will.
 
 ![The ontology map of SegmentStream's own workspace](assets/screens/console-ontology.webp)
 

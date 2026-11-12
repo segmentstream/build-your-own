@@ -58,10 +58,11 @@ A blueprint is never connected to anyone's real account.
 
 ## Built in production first
 
-Every blueprint marked `stable` describes software SegmentStream runs on its own
-company or for its customers. The blueprints are extracted from that code,
-generalized, and stripped of anything specific to one company. `preview` means
-the design is sound but details are still moving.
+Every blueprint marked `stable` describes custom software running in production
+on the SegmentStream platform, for our own team or for our customers. The
+blueprints are extracted from that code, generalized, and stripped of anything
+specific to one company. `preview` means the design is sound but details are
+still moving.
 
 ## What stays with SegmentStream
 
