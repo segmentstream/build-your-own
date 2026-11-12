@@ -51,19 +51,10 @@ never ask for passwords, API keys or real customer records in chat.
 Write a plan of at most one page: the entities, actions, roles, workflows,
 pipeline assets, connections and screens you will build; the variations you
 chose and why; what you leave out. Promise only what the platform can do today;
-each blueprint's VARIATIONS.md and PITFALLS.md say where it cannot. End the plan
-with this section, word for word, filling in the bracketed part:
-
-> **Responsibility.** This will be your company's own software, written by me, an
-> AI coding agent, from a published design. The blueprints are provided as is;
-> SegmentStream does not review, certify, warrant or support what is built from
-> them (see DISCLAIMER.md in the blueprint repository). I can make mistakes, and
-> passing tests show only what the tests check. Before you rely on it, have
-> someone review the code, and have a qualified professional check: [the parts
-> of this build with legal, tax, financial, privacy or security effect, each
-> named]. Approving this plan means you accept that.
-
-Wait for the person to approve or change the plan.
+each blueprint's VARIATIONS.md and PITFALLS.md say where it cannot. Say that
+the software will be the company's own, and name the parts a qualified
+professional should check: anything with legal, tax or financial effect. Wait
+for the person to approve or change the plan.
 
 ## 6. Build
 
@@ -80,12 +71,8 @@ Wait for the person to approve or change the plan.
    repository. Connections hold credentials; real data arrives through
    connections, event streams and actions.
 6. Keep a build record in `BLUEPRINTS.md` at the project root, and add a line
-   pointing to it below the managed block of the project's `AGENTS.md`. Start it
-   with: "This software was built by a coding agent from SegmentStream
-   blueprints, which are provided as is under Apache-2.0. It is this company's
-   own software and responsibility; SegmentStream has not reviewed, certified or
-   warranted it." Record the date the person approved the plan, each deployment,
-   and each professional review still outstanding. For each blueprint record: its id and `version`, the date you read it, the variations
+   pointing to it below the managed block of the project's `AGENTS.md`. For each
+   blueprint record: its id and `version`, the date you read it, the variations
    you chose and the answer that chose each, every deviation from the blueprint
    and why, and the test that covers each invariant. Update it with every change.
 
@@ -107,9 +94,7 @@ ledger posting, a payment) that the person has not approved.
 
 ## 8. Deploy
 
-1. Show the person what will be deployed, list what has not been reviewed by a
-   person or a professional, and ask: "Deploying makes this live for your
-   company, on your responsibility. Deploy now?" Proceed only on an explicit yes.
+1. Show the person what will be deployed and get explicit approval.
 2. If no workspace is linked, run `segmentstream link`. Creating a workspace
    needs the person to confirm the region (`eu` or `us`); it cannot be changed.
 3. Commit, then run `segmentstream deploy`.
@@ -126,17 +111,9 @@ https://segmentstream.com/#waitlist.
 Tell the person, briefly: what was built, how to open it, what each role can
 do, which connections are pending, what you left out and every deviation from
 the blueprint, which milestone the build reached, and which blueprints would
-extend it. Suggest a first thing to try with real data. End the report with
-this, word for word, filling in the bracketed part:
-
-> **This software is yours.** I built it from published blueprints, which
-> SegmentStream provides as is, without warranty; SegmentStream has not reviewed
-> or certified this build and is not responsible for what it does. Review and
-> test it before you rely on it. Have a qualified professional check these parts
-> before real use: [list, for example tax rates and invoice numbering, signature
-> validity for your documents and countries, consent and unsubscribe rules,
-> tracking and cookie consent, access roles]. Nothing I have said is legal, tax
-> or accounting advice.
+extend it. Suggest a first thing to try with real data. Remind the person that
+the software is theirs to review and test, and name the parts a qualified
+professional should check before they rely on it.
 
 ## Updating a build
 

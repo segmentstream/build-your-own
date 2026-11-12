@@ -4,10 +4,8 @@ Copyright 2026 SegmentStream Ltd
 This repository contains blueprints: designs, interviews, invariants and
 reference material for building company software on SegmentStream.
 The blueprints are provided "AS IS", without warranties or conditions of any
-kind, as the Apache License 2.0 states. They are designs and guidance, not
-certified or supported software, and not legal, tax or financial advice.
-Software built from them is the responsibility of whoever builds and runs it;
-SegmentStream does not certify, warrant or support it. See DISCLAIMER.md.
+kind, as the Apache License 2.0 states. Software built from them is the
+responsibility of whoever builds and runs it. See DISCLAIMER.md.
 The screenshots in assets/ show invented demo data.
 Product names mentioned in this repository are trademarks of their owners.
 They are named only to describe what a blueprint can be compared with; no affiliation
