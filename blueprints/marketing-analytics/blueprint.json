@@ -56,6 +56,13 @@
   ],
   "reference": false,
   "screens": [],
+  "testedWith": {
+    "@segmentstream/ontology": "0.92.1",
+    "@segmentstream/app": "0.38.1",
+    "@segmentstream/agent": "0.36.2",
+    "segmentstream-pipeline": "0.1.0a56",
+    "segmentstream-connections": "0.1.0"
+  },
   "authors": [
     "segmentstream"
   ]

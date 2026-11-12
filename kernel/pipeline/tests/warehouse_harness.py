@@ -24,7 +24,10 @@ import pytest
 
 # BigQuery functions the models may call, defined on DuckDB under the same name.
 # DATE cannot be redefined on DuckDB: convert with DATETIME(ts, tz) and .date().
-MACROS = ("CREATE MACRO datetime(ts, tz) AS timezone(tz, ts)",)
+MACROS = (
+    "CREATE MACRO datetime(ts, tz) AS timezone(tz, ts)",
+    "CREATE MACRO json_query_array(j) AS json_extract(j, '$[*]')",
+)
 
 _counter = 0
 

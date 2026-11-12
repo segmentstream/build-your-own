@@ -26,6 +26,22 @@ platforms.
 - Answers from the workspace agent, such as "what did paid social cost per lead last
   month under last click?", computed from the same metrics as the reports.
 
+## What the platform runs for you
+
+- Real-time event collection: one endpoint, served by the nearest healthy
+  collector in the US or EU, streams page views and server request evidence from
+  the first-party tracker into warehouse tables in your region, with no
+  ingestion job and no third-party tag.
+- A warehouse in your region where events, ad costs and your CRM records meet
+  without exports.
+- Connections to Google Ads and Meta Ads with OAuth; credentials stay in
+  SegmentStream, and cost ingestion runs through them.
+- Managed pipelines for sessions, the identity graph, cost stitching and
+  attribution: daily partitions, backfills when a rule changes, retries, checks
+  and lineage.
+- A metrics layer, so reports, the API and the company agent answer from the
+  same definitions.
+
 ## Build it
 
 ```text

@@ -21,5 +21,8 @@ project built from the previous version should do.
 | [E-signature](blueprints/e-signature/) | 1.0.0 |
 
 The CRM and marketing analytics blueprints were built end to end by a coding
-agent from these files before release, and corrected where the agent stumbled.
-The test harness in [`kernel/`](kernel/) came out of those builds.
+agent from these files before release, to milestone M1 with every invariant
+tested, and corrected where the agent stumbled. Their `testedWith` records the
+SDK versions of those builds. The test harnesses in [`kernel/`](kernel/), the
+shared [pipeline notes](docs/pipeline-notes.md) and the marketing analytics
+worked example in `fixtures/` came out of those builds.

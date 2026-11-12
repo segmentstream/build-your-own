@@ -54,9 +54,8 @@ rules and links here. How to set up and run the tests is in [testing](testing.md
   DuckDB macro. BigQuery receives `DATE(DATETIME(ts, 'Europe/Berlin'))`.
 - **JSON arrays need a builtin.** `.array` and `unwrap_as("array<json>")` have no BigQuery
   rule, and `cast("array<json>")` compiles to a cast BigQuery rejects. Declare a builtin
-  named `JSON_QUERY_ARRAY(json) -> array<json>` (it compiles to `JSON_EXTRACT_ARRAY`), and
-  in the test that needs it run
-  `con.raw_sql("CREATE MACRO json_query_array(j) AS json_extract(j, '$[*]')")`.
+  named `JSON_QUERY_ARRAY(json) -> array<json>` (it compiles to `JSON_EXTRACT_ARRAY`); the
+  harness defines `json_query_array` as a DuckDB macro.
 - **NULL in a sort key or a flag.** `a & b` is NULL when `b` is NULL, and NULL sorts last.
   Coalesce every boolean used in `order_by`, `ifelse` or `filter` that decides precedence.
 - **`row_number()` starts at 0** in Ibis. Keep the first row with `== 0`.
