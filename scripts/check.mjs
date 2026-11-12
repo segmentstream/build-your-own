@@ -125,13 +125,35 @@ const llms = [
   "## Optional",
   "",
   `- [How it works](${RAW}/docs/how-it-works.md)`,
+  `- [Alternatives](${RAW}/docs/alternatives.md): which blueprint replaces which product`,
   `- [Blueprint format](${RAW}/docs/blueprint-format.md)`,
+  "",
+].join("\n");
+
+const alternatives = [
+  "# Alternatives to popular business software",
+  "",
+  "Each product below can be replaced by software your coding agent builds from a",
+  "blueprint in this repository, shaped to your company and running on",
+  "[SegmentStream](https://segmentstream.com). Give your agent",
+  "[AGENTS.md](../AGENTS.md) and name the tool you want to replace.",
+  "",
+  "| Instead of | Build your own | Blueprint |",
+  "| --- | --- | --- |",
+  ...blueprints
+    .flatMap((meta) => meta.replaces.map((product) => ({ product, meta })))
+    .sort((a, b) => a.product.localeCompare(b.product, "en", { sensitivity: "base" }))
+    .map(({ product, meta }) => `| ${product} | ${meta.title} | [${meta.id}](../blueprints/${meta.id}/) |`),
+  "",
+  "Product names are trademarks of their owners. They are named only to describe",
+  "what a blueprint can replace; no affiliation or endorsement is implied.",
   "",
 ].join("\n");
 
 for (const [file, text] of [
   ["registry.json", registryText],
   ["llms.txt", llms],
+  ["docs/alternatives.md", alternatives],
 ]) {
   const path = join(root, file);
   if (write) writeFileSync(path, text);

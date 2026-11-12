@@ -1,8 +1,10 @@
-# Email marketing
+# Email marketing: build your own Mailchimp and Klaviyo alternative
 
 Campaign email to the people in your own records, sent only to those who agreed
 to each topic, with a separate approval before anything goes out. It replaces
 Mailchimp, Klaviyo and similar tools for newsletters and one-off campaigns.
+
+**Alternative to** Mailchimp, Klaviyo, HubSpot Marketing Hub, ActiveCampaign, Brevo, Kit (formerly ConvertKit), MailerLite, Campaign Monitor and Omnisend: built by your own coding agent on [SegmentStream](https://segmentstream.com), shaped to how your company works.
 
 ## What you get
 

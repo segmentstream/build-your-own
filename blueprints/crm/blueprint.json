@@ -3,9 +3,14 @@
   "title": "CRM",
   "tagline": "Leads from your forms, triage, deal pipelines and customers on your own companies and contacts, shaped to how you sell.",
   "replaces": [
-    "HubSpot",
     "Salesforce",
-    "Zoho CRM"
+    "HubSpot",
+    "Microsoft Dynamics 365",
+    "Zoho CRM",
+    "Monday Sales CRM",
+    "Freshsales",
+    "Attio",
+    "Close CRM"
   ],
   "status": "preview",
   "dependsOn": [

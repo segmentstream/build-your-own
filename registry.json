@@ -9,9 +9,20 @@
       "title": "Marketing analytics",
       "tagline": "Your own tracker, sessions, identity graph, ad costs, conversions and attribution in a warehouse you own, with reports on people, channels, spend and the AI agents that read your site.",
       "replaces": [
-        "Google Analytics",
-        "Google Ads attribution reports",
-        "Meta Ads Manager attribution"
+        "Google Analytics (GA4)",
+        "Adobe Analytics",
+        "Mixpanel",
+        "Heap",
+        "Matomo",
+        "Plausible",
+        "PostHog",
+        "Triple Whale",
+        "Northbeam",
+        "Rockerbox",
+        "Hyros",
+        "Dreamdata",
+        "HockeyStack",
+        "Google Ads and Meta Ads attribution reports"
       ],
       "status": "stable",
       "dependsOn": [],
@@ -68,9 +79,14 @@
       "title": "CRM",
       "tagline": "Leads from your forms, triage, deal pipelines and customers on your own companies and contacts, shaped to how you sell.",
       "replaces": [
-        "HubSpot",
         "Salesforce",
-        "Zoho CRM"
+        "HubSpot",
+        "Microsoft Dynamics 365",
+        "Zoho CRM",
+        "Monday Sales CRM",
+        "Freshsales",
+        "Attio",
+        "Close CRM"
       ],
       "status": "preview",
       "dependsOn": [
@@ -123,7 +139,13 @@
       "replaces": [
         "Mailchimp",
         "Klaviyo",
-        "Brevo"
+        "HubSpot Marketing Hub",
+        "ActiveCampaign",
+        "Brevo",
+        "Kit (formerly ConvertKit)",
+        "MailerLite",
+        "Campaign Monitor",
+        "Omnisend"
       ],
       "status": "stable",
       "dependsOn": [
@@ -178,10 +200,12 @@
       "title": "Bookkeeping",
       "tagline": "One general ledger for invoices, bills, expenses with receipts, fixed assets and multi-currency, with the reports your accountant reads.",
       "replaces": [
-        "Xero",
         "QuickBooks",
+        "Xero",
+        "Sage",
         "FreshBooks",
-        "Zoho Books"
+        "Zoho Books",
+        "Wave Accounting"
       ],
       "status": "stable",
       "dependsOn": [
@@ -236,7 +260,15 @@
       "replaces": [
         "ClickCease",
         "CHEQ",
-        "TrafficGuard"
+        "TrafficGuard",
+        "Spider AF",
+        "Fraud Blocker",
+        "ClickGUARD",
+        "HUMAN Security",
+        "DoubleVerify",
+        "Integral Ad Science",
+        "Anura",
+        "Polygraph"
       ],
       "status": "stable",
       "dependsOn": [
@@ -303,8 +335,13 @@
       "tagline": "An AI agent in your team's chats that works on your own records, with the permissions of whoever asks.",
       "replaces": [
         "Microsoft 365 Copilot",
+        "ChatGPT Enterprise",
+        "Gemini for Google Workspace",
         "Slack AI",
-        "Lindy"
+        "Glean",
+        "Lindy",
+        "Dust",
+        "Zapier Agents"
       ],
       "status": "preview",
       "dependsOn": [
@@ -361,8 +398,11 @@
       "replaces": [
         "Google Drive",
         "Google Docs",
+        "Microsoft SharePoint",
+        "OneDrive",
         "Dropbox",
-        "Microsoft SharePoint"
+        "Box",
+        "Notion"
       ],
       "status": "stable",
       "dependsOn": [
@@ -412,7 +452,14 @@
       "replaces": [
         "DocuSign",
         "Adobe Acrobat Sign",
-        "Dropbox Sign"
+        "Dropbox Sign (formerly HelloSign)",
+        "PandaDoc",
+        "SignNow",
+        "Zoho Sign",
+        "BoldSign",
+        "Yousign",
+        "SignWell",
+        "OneSpan Sign"
       ],
       "status": "stable",
       "dependsOn": [

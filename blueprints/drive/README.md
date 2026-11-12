@@ -1,8 +1,10 @@
-# Drive
+# Drive: build your own Google Drive alternative
 
 Your company's own document store and online editor: folders, uploaded files and
 documents written in the browser, with versions, sharing and an access log. It
 replaces Google Drive and Google Docs for company documents.
+
+**Alternative to** Google Drive, Google Docs, Microsoft SharePoint, OneDrive, Dropbox, Box and Notion: built by your own coding agent on [SegmentStream](https://segmentstream.com), shaped to how your company works.
 
 ## What you get
 

@@ -4,8 +4,13 @@
   "tagline": "An AI agent in your team's chats that works on your own records, with the permissions of whoever asks.",
   "replaces": [
     "Microsoft 365 Copilot",
+    "ChatGPT Enterprise",
+    "Gemini for Google Workspace",
     "Slack AI",
-    "Lindy"
+    "Glean",
+    "Lindy",
+    "Dust",
+    "Zapier Agents"
   ],
   "status": "preview",
   "dependsOn": [

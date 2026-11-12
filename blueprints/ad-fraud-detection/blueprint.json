@@ -5,7 +5,15 @@
   "replaces": [
     "ClickCease",
     "CHEQ",
-    "TrafficGuard"
+    "TrafficGuard",
+    "Spider AF",
+    "Fraud Blocker",
+    "ClickGUARD",
+    "HUMAN Security",
+    "DoubleVerify",
+    "Integral Ad Science",
+    "Anura",
+    "Polygraph"
   ],
   "status": "stable",
   "dependsOn": [

@@ -1,9 +1,11 @@
-# Company agent
+# Company agent: build your own AI agent for your business
 
 An AI agent that lives in your team's Slack, Telegram or WhatsApp and works on
 your company's own records, with the permissions of whoever asks. It replaces
 "AI agent for business" products and Copilot-style assistants that run on a
 shared account and someone else's copy of your data.
+
+**Alternative to** Microsoft 365 Copilot, ChatGPT Enterprise, Gemini for Google Workspace, Slack AI, Glean, Lindy, Dust and Zapier Agents: built by your own coding agent on [SegmentStream](https://segmentstream.com), shaped to how your company works.
 
 ## What you get
 

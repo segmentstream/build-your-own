@@ -1,9 +1,11 @@
-# Ad fraud and bot detection
+# Ad fraud and bot detection: build your own ClickCease alternative
 
 Your own invalid-traffic detection, running in your warehouse next to your conversions:
 every request, session and conversion on your site gets a verdict with the evidence
 behind it, replacing click-fraud tools such as ClickCease and black-box traffic
 verification contracts.
+
+**Alternative to** ClickCease, CHEQ, TrafficGuard, Spider AF, Fraud Blocker, ClickGUARD, HUMAN Security, DoubleVerify, Integral Ad Science, Anura and Polygraph: built by your own coding agent on [SegmentStream](https://segmentstream.com), shaped to how your company works.
 
 ## What you get
 

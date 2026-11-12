@@ -5,8 +5,11 @@
   "replaces": [
     "Google Drive",
     "Google Docs",
+    "Microsoft SharePoint",
+    "OneDrive",
     "Dropbox",
-    "Microsoft SharePoint"
+    "Box",
+    "Notion"
   ],
   "status": "stable",
   "dependsOn": [

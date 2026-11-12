@@ -3,9 +3,20 @@
   "title": "Marketing analytics",
   "tagline": "Your own tracker, sessions, identity graph, ad costs, conversions and attribution in a warehouse you own, with reports on people, channels, spend and the AI agents that read your site.",
   "replaces": [
-    "Google Analytics",
-    "Google Ads attribution reports",
-    "Meta Ads Manager attribution"
+    "Google Analytics (GA4)",
+    "Adobe Analytics",
+    "Mixpanel",
+    "Heap",
+    "Matomo",
+    "Plausible",
+    "PostHog",
+    "Triple Whale",
+    "Northbeam",
+    "Rockerbox",
+    "Hyros",
+    "Dreamdata",
+    "HockeyStack",
+    "Google Ads and Meta Ads attribution reports"
   ],
   "status": "stable",
   "dependsOn": [],

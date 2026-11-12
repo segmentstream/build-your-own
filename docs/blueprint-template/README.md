@@ -1,6 +1,8 @@
-# Your blueprint
+# Your blueprint: build your own <best-known product> alternative
 
 One or two sentences: what it is, who it is for, and what it replaces.
+
+**Alternative to** every product in `replaces`, most widely used first.
 
 ## What you get
 

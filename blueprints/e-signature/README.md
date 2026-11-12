@@ -1,9 +1,11 @@
-# E-signature
+# E-signature: build your own DocuSign alternative
 
 Send documents for signature and get back a sealed PDF that anyone can verify:
 envelopes, signing order, a signing page for people outside your company, an
 audit trail of every view and action, and a trusted timestamp on the final file.
 It replaces DocuSign, Adobe Acrobat Sign and similar tools.
+
+**Alternative to** DocuSign, Adobe Acrobat Sign, Dropbox Sign (formerly HelloSign), PandaDoc, SignNow, Zoho Sign, BoldSign, Yousign, SignWell and OneSpan Sign: built by your own coding agent on [SegmentStream](https://segmentstream.com), shaped to how your company works.
 
 ## What you get
 

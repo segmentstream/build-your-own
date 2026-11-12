@@ -1,9 +1,11 @@
-# Bookkeeping
+# Bookkeeping: build your own QuickBooks and Xero alternative
 
 Your company's own books: one general ledger behind sales invoices, supplier bills,
 expenses with their receipts, payments, fixed assets and foreign currencies, with the
 reports an accountant reads. It replaces the bookkeeping core of Xero, QuickBooks and
 similar small-business accounting tools.
+
+**Alternative to** QuickBooks, Xero, Sage, FreshBooks, Zoho Books and Wave Accounting: built by your own coding agent on [SegmentStream](https://segmentstream.com), shaped to how your company works.
 
 ## What you get
 

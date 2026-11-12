@@ -47,6 +47,9 @@ per blueprint as they are extracted; `blueprint.json` says which exist.
 - `status`: `preview` (the design is sound, details may move) or `stable` (a
   version of it runs in production on SegmentStream for at least one company,
   and the invariants are settled). New blueprints start as `preview`.
+- `replaces`: the products people search for when they want this software,
+  most widely used first. Each becomes an entry in `docs/alternatives.md` and a
+  search term ("<product> alternative"); list every well-known one.
 - `dependsOn`: blueprints, or `foundation`, that must exist in the project first.
 - `components`: which project folders the blueprint touches: `ontology`, `app`,
   `pipeline`, `connections`, `events`, `agent`.
@@ -60,7 +63,9 @@ To start a new blueprint, copy `docs/blueprint-template/` to
 
 For a person deciding whether to build it. At most one screen of reading.
 
-1. `# <Title>` and a one-sentence lead: what it is and what it replaces.
+1. `# <Title>: build your own <best-known product> alternative` and a
+   one-sentence lead: what it is and what it replaces. Then a line
+   `**Alternative to** <every product in replaces>`.
 2. **What you get**: five to eight bullets of outcomes, not features.
 3. **Build it**: the prompt to paste into a coding agent, in a code block:
 

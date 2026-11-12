@@ -3,10 +3,12 @@
   "title": "Bookkeeping",
   "tagline": "One general ledger for invoices, bills, expenses with receipts, fixed assets and multi-currency, with the reports your accountant reads.",
   "replaces": [
-    "Xero",
     "QuickBooks",
+    "Xero",
+    "Sage",
     "FreshBooks",
-    "Zoho Books"
+    "Zoho Books",
+    "Wave Accounting"
   ],
   "status": "stable",
   "dependsOn": [

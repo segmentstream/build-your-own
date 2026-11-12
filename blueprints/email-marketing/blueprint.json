@@ -5,7 +5,13 @@
   "replaces": [
     "Mailchimp",
     "Klaviyo",
-    "Brevo"
+    "HubSpot Marketing Hub",
+    "ActiveCampaign",
+    "Brevo",
+    "Kit (formerly ConvertKit)",
+    "MailerLite",
+    "Campaign Monitor",
+    "Omnisend"
   ],
   "status": "stable",
   "dependsOn": [

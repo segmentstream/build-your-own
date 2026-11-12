@@ -50,6 +50,10 @@ Paste that into Claude Code, Codex or Cursor. Other things to ask for:
 | [Drive](blueprints/drive/) | Folders, online documents, versions, sharing and comments, linked to your records | Google Drive, Google Docs | stable |
 | [E-signature](blueprints/e-signature/) | Envelopes, signers, a signing page and sealed, timestamped PDFs | DocuSign | stable |
 
+Replacing a specific tool? The [alternatives list](docs/alternatives.md) maps
+more than 70 products, from DocuSign and HubSpot to QuickBooks and Google
+Analytics, to the blueprint that replaces them.
+
 Most blueprints build on the shared [foundation](foundation/FOUNDATION.md):
 companies, contacts, members and the conventions they all follow.
 
@@ -169,4 +173,6 @@ New to SegmentStream? [Request access](https://segmentstream.com/#waitlist).
 
 ## License
 
-[Apache License 2.0](LICENSE). Screenshots show invented demo data.
+[Apache License 2.0](LICENSE). Screenshots show invented demo data. Product
+names are trademarks of their owners, named only to describe what a blueprint
+can replace.

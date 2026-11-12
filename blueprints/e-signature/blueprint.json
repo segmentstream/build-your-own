@@ -5,7 +5,14 @@
   "replaces": [
     "DocuSign",
     "Adobe Acrobat Sign",
-    "Dropbox Sign"
+    "Dropbox Sign (formerly HelloSign)",
+    "PandaDoc",
+    "SignNow",
+    "Zoho Sign",
+    "BoldSign",
+    "Yousign",
+    "SignWell",
+    "OneSpan Sign"
   ],
   "status": "stable",
   "dependsOn": [
