@@ -2,16 +2,41 @@
   "id": "drive",
   "title": "Drive",
   "tagline": "Company files and online documents in one folder tree, with versions, PDFs, sharing, comments and an access log.",
-  "replaces": ["Google Drive", "Google Docs", "Dropbox", "Microsoft SharePoint"],
+  "replaces": [
+    "Google Drive",
+    "Google Docs",
+    "Dropbox",
+    "Microsoft SharePoint"
+  ],
   "status": "stable",
-  "dependsOn": ["foundation"],
-  "worksWith": ["e-signature", "crm", "bookkeeping", "company-agent"],
+  "dependsOn": [
+    "foundation"
+  ],
+  "worksWith": [
+    "e-signature",
+    "crm",
+    "bookkeeping",
+    "company-agent"
+  ],
   "connections": {
     "required": [],
-    "optional": ["google-drive", "gmail"]
+    "optional": [
+      "google-drive",
+      "gmail"
+    ]
   },
-  "components": ["ontology", "app", "agent"],
-  "sdks": ["@segmentstream/ontology", "@segmentstream/app"],
+  "components": [
+    "ontology",
+    "app",
+    "agent"
+  ],
+  "sdks": [
+    "@segmentstream/ontology",
+    "@segmentstream/app"
+  ],
   "reference": false,
-  "screens": []
+  "screens": [],
+  "authors": [
+    "segmentstream"
+  ]
 }

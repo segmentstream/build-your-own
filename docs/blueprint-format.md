@@ -39,15 +39,22 @@ per blueprint as they are extracted; `blueprint.json` says which exist.
   "components": ["ontology", "app", "agent"],
   "sdks": ["@segmentstream/ontology", "@segmentstream/app"],
   "reference": false,
-  "screens": []
+  "screens": [],
+  "authors": ["segmentstream"]
 }
 ```
 
-- `status`: `stable` (the design runs in production at SegmentStream and the
-  invariants are settled) or `preview` (the design is sound, details may move).
+- `status`: `preview` (the design is sound, details may move) or `stable` (a
+  version of it runs in production on SegmentStream for at least one company,
+  and the invariants are settled). New blueprints start as `preview`.
 - `dependsOn`: blueprints, or `foundation`, that must exist in the project first.
 - `components`: which project folders the blueprint touches: `ontology`, `app`,
   `pipeline`, `connections`, `events`, `agent`.
+- `authors`: GitHub handles of the people or organizations who wrote it. Also
+  listed under **Authors** at the end of the blueprint's README.
+
+To start a new blueprint, copy `docs/blueprint-template/` to
+`blueprints/<id>/`. See [CONTRIBUTING.md](../CONTRIBUTING.md).
 
 ## README.md
 
@@ -64,6 +71,7 @@ For a person deciding whether to build it. At most one screen of reading.
 
 4. **How it fits**: which other blueprints it works with and why.
 5. **What it is not**: two or three honest limits.
+6. **Authors**: the GitHub handles from `blueprint.json`.
 
 ## BLUEPRINT.md
 

@@ -50,3 +50,7 @@ Build our Email marketing from the email-marketing blueprint.
   project owns; the agent writes it, people review a preview.
 - No automated journeys or drip sequences by default. They can be added with
   the same records; see the variations.
+
+## Authors
+
+- [SegmentStream](https://github.com/segmentstream)

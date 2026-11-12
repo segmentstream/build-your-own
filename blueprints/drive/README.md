@@ -58,3 +58,7 @@ Build our Drive from the drive blueprint.
 - Not a vault against your own builders. People who write the workspace's code
   or run its pipelines can reach stored content; confidential areas protect
   documents from colleagues and outsiders, not from them.
+
+## Authors
+
+- [SegmentStream](https://github.com/segmentstream)

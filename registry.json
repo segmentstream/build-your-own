@@ -50,6 +50,9 @@
       ],
       "reference": false,
       "screens": [],
+      "authors": [
+        "segmentstream"
+      ],
       "path": "blueprints/marketing-analytics",
       "files": {
         "readme": "blueprints/marketing-analytics/README.md",
@@ -100,6 +103,9 @@
       ],
       "reference": false,
       "screens": [],
+      "authors": [
+        "segmentstream"
+      ],
       "path": "blueprints/crm",
       "files": {
         "readme": "blueprints/crm/README.md",
@@ -154,6 +160,9 @@
       ],
       "reference": false,
       "screens": [],
+      "authors": [
+        "segmentstream"
+      ],
       "path": "blueprints/email-marketing",
       "files": {
         "readme": "blueprints/email-marketing/README.md",
@@ -207,6 +216,9 @@
       ],
       "reference": false,
       "screens": [],
+      "authors": [
+        "segmentstream"
+      ],
       "path": "blueprints/bookkeeping",
       "files": {
         "readme": "blueprints/bookkeeping/README.md",
@@ -272,6 +284,9 @@
       ],
       "reference": false,
       "screens": [],
+      "authors": [
+        "segmentstream"
+      ],
       "path": "blueprints/ad-fraud-detection",
       "files": {
         "readme": "blueprints/ad-fraud-detection/README.md",
@@ -326,6 +341,9 @@
       ],
       "reference": false,
       "screens": [],
+      "authors": [
+        "segmentstream"
+      ],
       "path": "blueprints/company-agent",
       "files": {
         "readme": "blueprints/company-agent/README.md",
@@ -374,6 +392,9 @@
       ],
       "reference": false,
       "screens": [],
+      "authors": [
+        "segmentstream"
+      ],
       "path": "blueprints/drive",
       "files": {
         "readme": "blueprints/drive/README.md",
@@ -424,6 +445,9 @@
       ],
       "reference": false,
       "screens": [],
+      "authors": [
+        "segmentstream"
+      ],
       "path": "blueprints/e-signature",
       "files": {
         "readme": "blueprints/e-signature/README.md",

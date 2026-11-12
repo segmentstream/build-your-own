@@ -47,3 +47,7 @@ Build our Ad fraud and bot detection from the ad-fraud-detection blueprint.
 - No cross-customer reputation: your build sees your own traffic only.
 - Rules only. It does not check Web Bot Auth signatures cryptographically, use reverse
   DNS, or report phantom clicks yet; VARIATIONS.md describes how.
+
+## Authors
+
+- [SegmentStream](https://github.com/segmentstream)

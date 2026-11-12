@@ -2,9 +2,15 @@
   "id": "company-agent",
   "title": "Company agent",
   "tagline": "An AI agent in your team's chats that works on your own records, with the permissions of whoever asks.",
-  "replaces": ["Microsoft 365 Copilot", "Slack AI", "Lindy"],
+  "replaces": [
+    "Microsoft 365 Copilot",
+    "Slack AI",
+    "Lindy"
+  ],
   "status": "preview",
-  "dependsOn": ["foundation"],
+  "dependsOn": [
+    "foundation"
+  ],
   "worksWith": [
     "crm",
     "bookkeeping",
@@ -16,9 +22,18 @@
   ],
   "connections": {
     "required": [],
-    "optional": ["telegram", "slack", "whatsapp"]
+    "optional": [
+      "telegram",
+      "slack",
+      "whatsapp"
+    ]
   },
-  "components": ["agent", "ontology", "app", "connections"],
+  "components": [
+    "agent",
+    "ontology",
+    "app",
+    "connections"
+  ],
   "sdks": [
     "@segmentstream/agent",
     "@segmentstream/ontology",
@@ -26,5 +41,8 @@
     "segmentstream-connections"
   ],
   "reference": false,
-  "screens": []
+  "screens": [],
+  "authors": [
+    "segmentstream"
+  ]
 }

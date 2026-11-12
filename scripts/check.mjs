@@ -57,6 +57,9 @@ for (const id of ids) {
     if (!Array.isArray(meta[key])) fail(`${where}: ${key} must be an array`);
   }
   if (typeof meta.reference !== "boolean") fail(`${where}: reference must be true or false`);
+  if (!Array.isArray(meta.authors) || !meta.authors.length || meta.authors.some((a) => typeof a !== "string" || !/^[A-Za-z0-9-]+$/.test(a))) {
+    fail(`${where}: authors must list at least one GitHub handle`);
+  }
   const connections = meta.connections ?? {};
   if (!Array.isArray(connections.required) || !Array.isArray(connections.optional)) {
     fail(`${where}: connections needs required and optional arrays`);

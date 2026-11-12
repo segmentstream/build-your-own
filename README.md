@@ -146,6 +146,17 @@ or add a thumbs-up to an [open request](https://github.com/segmentstream/build-y
 We build the most-wanted ones first. To improve an existing blueprint, see
 [CONTRIBUTING.md](CONTRIBUTING.md).
 
+## Contribute a blueprint
+
+Know a business from the inside? If you have built or implemented the software
+an industry runs on (an ERP, a booking or practice management system, a field
+service tool, the books of a particular kind of company), you know what generic
+SaaS gets wrong about it. Write it down as a blueprint and every company's
+coding agent can build it right. Your agent does the formatting: it interviews
+you and writes the files. See [CONTRIBUTING.md](CONTRIBUTING.md) and the
+[wanted blueprints](docs/wanted.md), from booking and hotel operations to
+property management, legal practice and ERP-lite.
+
 ## Get started
 
 Install the CLI and give your agent this repository:

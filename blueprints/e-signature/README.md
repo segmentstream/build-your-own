@@ -58,3 +58,7 @@ Build our E-signature from the e-signature blueprint.
   the seal comes from a public timestamp authority.
 - No in-person signing, witnesses, notaries or bulk sending to thousands of
   people out of the box.
+
+## Authors
+
+- [SegmentStream](https://github.com/segmentstream)

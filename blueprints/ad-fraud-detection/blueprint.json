@@ -52,5 +52,8 @@
     "segmentstream-connections"
   ],
   "reference": false,
-  "screens": []
+  "screens": [],
+  "authors": [
+    "segmentstream"
+  ]
 }

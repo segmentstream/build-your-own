@@ -1,0 +1,41 @@
+name: Propose a blueprint
+description: You know a business from the inside and want to write a blueprint for its software.
+title: "Proposal: "
+labels: ["blueprint proposal"]
+body:
+  - type: markdown
+    attributes:
+      value: Thank you. Read CONTRIBUTING.md first. A maintainer replies within a week with overlaps, dependencies and anything to settle before you write.
+  - type: textarea
+    id: software
+    attributes:
+      label: The software
+      description: What does it do, for which kind of business, and what does it replace?
+    validations:
+      required: true
+  - type: textarea
+    id: experience
+    attributes:
+      label: Your experience
+      description: How you know this business, for example years running, building or implementing this kind of software.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: The main records and workflows you would include, and what you would leave out of a first version.
+    validations:
+      required: true
+  - type: textarea
+    id: rules
+    attributes:
+      label: Rules that must never break
+      description: The things generic tools get wrong in this business.
+  - type: dropdown
+    id: production
+    attributes:
+      label: Is a version of it running in production on SegmentStream?
+      options:
+        - Not yet
+        - Yes, at my company or a client

@@ -48,3 +48,7 @@ Build our CRM from the crm blueprint.
   belong to bookkeeping. The CRM ends when a deal is won.
 - Not a two-way sync with another CRM. It can import your history once; after
   that it is the system of record.
+
+## Authors
+
+- [SegmentStream](https://github.com/segmentstream)

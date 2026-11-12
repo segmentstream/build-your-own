@@ -2,16 +2,43 @@
   "id": "e-signature",
   "title": "E-signature",
   "tagline": "Envelopes, signers, a signing page and sealed, timestamped PDFs.",
-  "replaces": ["DocuSign", "Adobe Acrobat Sign", "Dropbox Sign"],
+  "replaces": [
+    "DocuSign",
+    "Adobe Acrobat Sign",
+    "Dropbox Sign"
+  ],
   "status": "stable",
-  "dependsOn": ["drive"],
-  "worksWith": ["crm", "bookkeeping", "company-agent"],
+  "dependsOn": [
+    "drive"
+  ],
+  "worksWith": [
+    "crm",
+    "bookkeeping",
+    "company-agent"
+  ],
   "connections": {
-    "required": ["timestamp-authority"],
-    "optional": ["resend", "sms"]
+    "required": [
+      "timestamp-authority"
+    ],
+    "optional": [
+      "resend",
+      "sms"
+    ]
   },
-  "components": ["ontology", "app", "connections", "agent"],
-  "sdks": ["@segmentstream/ontology", "@segmentstream/app", "segmentstream-connections"],
+  "components": [
+    "ontology",
+    "app",
+    "connections",
+    "agent"
+  ],
+  "sdks": [
+    "@segmentstream/ontology",
+    "@segmentstream/app",
+    "segmentstream-connections"
+  ],
   "reference": false,
-  "screens": []
+  "screens": [],
+  "authors": [
+    "segmentstream"
+  ]
 }

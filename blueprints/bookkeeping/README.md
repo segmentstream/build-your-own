@@ -49,3 +49,7 @@ Build our Bookkeeping from the bookkeeping blueprint.
   payroll. They are described as extensions and are future blueprints.
 - It keeps the books of each legal entity separately. It does not consolidate groups,
   track inventory or replace an audit.
+
+## Authors
+
+- [SegmentStream](https://github.com/segmentstream)

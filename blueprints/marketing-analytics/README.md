@@ -51,3 +51,7 @@ Build our Marketing analytics from the marketing-analytics blueprint.
   ad platforms settle the previous day's costs.
 - Advanced attribution models, budget and portfolio optimization, and incrementality
   experiments are not part of this blueprint; SegmentStream offers them as a service.
+
+## Authors
+
+- [SegmentStream](https://github.com/segmentstream)

@@ -51,3 +51,7 @@ agent picks up their actions when they deploy.
   and mostly propose.
 - Not every channel. The platform's agent channels are Telegram, Slack and
   WhatsApp; your project's `docs/agent.md` lists what your SDK supports.
+
+## Authors
+
+- [SegmentStream](https://github.com/segmentstream)
