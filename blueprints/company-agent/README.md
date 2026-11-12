@@ -27,6 +27,16 @@ shared account and someone else's copy of your data.
 - When a decision belongs to a person, it asks that person and keeps the answer.
 - Every blueprint you build becomes a new skill.
 
+## What the platform runs for you
+
+- The agent itself, in Telegram, Slack or WhatsApp, paired with each member's
+  account.
+- A permission check on the server for everything the agent reads or changes,
+  with the asking member's own roles, and a history entry for every change.
+- MCP tools generated from your records and actions, so the agent knows your
+  company's software without custom integration.
+- Logs of what the agent did, for review.
+
 ## Build it
 
 ```text

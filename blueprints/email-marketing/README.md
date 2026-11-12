@@ -28,6 +28,16 @@ Mailchimp, Klaviyo and similar tools for newsletters and one-off campaigns.
 - Your workspace agent drafts campaigns and audiences from plain words, and
   explains why a person did or did not get an email.
 
+## What the platform runs for you
+
+- The connection to your email provider: credentials stay in SegmentStream and
+  your code never sees them.
+- Durable workflows that prepare and send each campaign, survive restarts, and
+  record every run.
+- Webhook endpoints for unsubscribe links and the provider's delivery events.
+- A history of every consent change, with who made it, which is what a regulator
+  or an unhappy recipient asks for.
+
 ## Build it
 
 ```text

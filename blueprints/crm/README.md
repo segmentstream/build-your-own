@@ -24,6 +24,18 @@ similar sales CRMs.
 - Ask the company agent "what is stuck in proposal?" or "log my call with
   Northwind" from your team chat, with your own permissions.
 
+## What the platform runs for you
+
+- Your leads, contacts, companies and deals in the company database, where every
+  change goes through an action, is checked against the person's role and kept
+  in history.
+- An intake API key for your website's form that can submit leads and read
+  nothing.
+- The REST API and MCP tools, so the company agent, Claude or your own agents
+  can work the pipeline with each person's permissions.
+- Replication of deals into the warehouse, so revenue reports and metrics need
+  no export.
+
 ## Build it
 
 ```text

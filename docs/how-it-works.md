@@ -26,12 +26,12 @@ company app needs runs on the platform:
 
 | You write (with your agent) | SegmentStream runs |
 | --- | --- |
-| Entities, actions, roles and workflows in `ontology/` | A company database with server-side permission checks on every record, a history of every change, a REST API and MCP tools for any agent |
-| Screens in `app/` | Hosting, sign-in, previews, deploys from `main` |
-| Ingestions and models in `pipeline/` | A warehouse, orchestration, schedules, checks and lineage |
-| Connection declarations in `connections/` | OAuth, credential storage and an authenticated client; credentials never reach your code |
-| Event streams in `events/` | Regional collection endpoints and storage |
-| The workspace agent's instructions in `agent/` | The agent in Slack, Telegram or WhatsApp, acting with each member's permissions |
+| Entities, actions, roles and workflows in `ontology/` | A company database with a permission check on the server for every write, a history of every change, migrations tried on a copy before they apply, durable workflows and webhooks, and a REST API and MCP tools for any agent |
+| Screens in `app/` | Hosting, sign-in, previews, development sessions on a private copy of production data, and deploys from Git |
+| Ingestions and models in `pipeline/` | A warehouse in your region with your records replicated into it, a metrics layer, and managed orchestration with schedules, partitions, backfills, retries, checks and lineage |
+| Connection declarations in `connections/` | OAuth, credential storage and a proxy to each provider, for data in and out; credentials never reach your code |
+| Event streams in `events/` | Real-time collection through the nearest healthy US or EU collector into warehouse tables, with no ingestion job, and a first-party tracker for the browser and the server |
+| The workspace agent's instructions in `agent/` | The agent in Telegram, Slack or WhatsApp, acting with each member's permissions |
 
 Everything lives in one Git repository your company owns. `segmentstream
 deploy` publishes it.

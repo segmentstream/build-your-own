@@ -29,6 +29,16 @@ replaces Google Drive and Google Docs for company documents.
 - Your workspace agent finds, reads, drafts and files documents from chat, and
   shares them only after you confirm the exact people.
 
+## What the platform runs for you
+
+- File storage with uploads straight from the browser, and every revision kept.
+- A company database where every access rule is checked on the server and every
+  change is kept in history.
+- Webhook endpoints for the public link page and durable workflows for
+  printing, retention and notifications.
+- The REST API and MCP tools, so the company agent can find and file documents
+  with each person's permissions.
+
 ## Build it
 
 ```text

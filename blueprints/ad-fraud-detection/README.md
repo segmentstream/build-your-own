@@ -26,6 +26,18 @@ verification contracts.
 - Invalid traffic by reason, class, channel, platform, network and country, and the AI
   agents and crawlers that read your pages, verified.
 
+## What the platform runs for you
+
+- Real-time collection of page views and server request evidence through one
+  endpoint and a first-party tracker, into warehouse tables in your region (set
+  up by the marketing analytics blueprint).
+- Scheduled ingestion of public reference lists (AI agents, crawlers, cloud and
+  proxy networks) through public, read-only connections that need no
+  credentials.
+- Managed pipelines that classify every session on a schedule (hourly in our
+  own production), with backfills, retries and checks.
+- The optional Google Ads connection, with credentials kept by SegmentStream.
+
 ## Build it
 
 ```text

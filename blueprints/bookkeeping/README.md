@@ -24,6 +24,17 @@ similar small-business accounting tools.
 - Your team and the workspace agent work from the same records: "what is overdue?",
   "file this receipt", "post depreciation for March".
 
+## What the platform runs for you
+
+- A transactional company database: a journal posts completely or not at all,
+  and every change is kept in history with who made it.
+- Roles checked on the server for every posting, approval and lock date.
+- File storage for receipts and invoices, uploaded straight from the browser.
+- Connections for exchange rates or an import from Xero, with credentials kept
+  by SegmentStream.
+- Replication into the warehouse, so management reports and metrics read the
+  same ledger.
+
 ## Build it
 
 ```text

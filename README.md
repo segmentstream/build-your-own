@@ -1,6 +1,6 @@
 # Build your own CRM, analytics, books and e-signature with your AI agent
 
-**Blueprints for the era of custom software. Give one to your coding agent and it builds software shaped to your company on the [SegmentStream platform](https://segmentstream.com): marketing analytics, CRM, email marketing, bookkeeping, ad fraud detection, a company agent, a document drive and e-signature.**
+**Blueprints for the era of custom software. Give one to your coding agent and it builds software shaped to your company: marketing analytics, CRM, email marketing, bookkeeping, ad fraud detection, a company agent, a document drive and e-signature. The [SegmentStream platform](https://segmentstream.com) runs it and does the heavy lifting: the company database, permissions, warehouse, real-time event collection, pipelines and secure connections.**
 
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-black)](LICENSE)
 ![Works with Claude Code](https://img.shields.io/badge/works%20with-Claude%20Code-black)
@@ -17,9 +17,9 @@ in production.
 Nothing here is installed. Give your coding agent this repository and say what
 you want. It asks about your company, shows you a plan, and builds your own
 version on [SegmentStream](https://segmentstream.com), the platform for a
-company's custom software and AI agents: sign-in, roles checked on every
-record, a history of every change, and an API and MCP tools for your other
-agents come with it.
+company's custom software and AI agents. Your agent writes the business logic;
+the platform runs everything underneath it, from the database and permissions
+to the warehouse, event collection and pipelines.
 
 ```text
 Read https://github.com/segmentstream/build-your-own/blob/main/AGENTS.md and follow it.
@@ -57,35 +57,30 @@ Analytics, to the blueprint that replaces them.
 Most blueprints build on the shared [foundation](foundation/FOUNDATION.md):
 companies, contacts, members and the conventions they all follow.
 
-## How it works
+## The platform does the heavy lifting
 
-1. **Pick.** Your agent reads [`registry.json`](registry.json) and chooses the
-   blueprints that match what you asked for.
-2. **Interview.** It asks the questions in the blueprint's interview: how you
-   sell, who approves what, which tools you keep. About ten questions, once.
-3. **Plan.** It shows you one page: the records, actions, roles, screens and
-   data sources it will build, and what it leaves out. You approve or change it.
-4. **Build and test.** It writes your version and turns every invariant into a
-   test that runs on your laptop, with no account and no real data.
-5. **Deploy.** When you say so, it deploys to your SegmentStream workspace. You
-   authorize your own connections; your data never touches this repository.
+A blueprint tells your agent what to build. The
+[SegmentStream platform](https://segmentstream.com) is where it runs, and it
+takes on the parts of company software that are hardest to build and to keep
+running. Your agent writes only your business logic: the records, rules,
+screens and reports that make the software yours.
 
-The full procedure your agent follows is in [AGENTS.md](AGENTS.md).
+| SegmentStream runs | So your agent never builds or operates |
+| --- | --- |
+| **A company database.** Every write is an action with a permission check on the server, for people, apps and agents alike. Every change is kept in history. Schema changes are planned, tried on a copy first, and refused when unsafe. | A database, migrations, an API, an authorization layer and an audit log |
+| **Sign-in and roles.** Members sign in; roles are written in code and enforced on every record. | An identity provider and an access model |
+| **An API and MCP server for every record.** Claude, ChatGPT and your own agents work with your software through the same permission checks as people. | An integration layer for agents |
+| **Real-time event collection.** One endpoint, served by the nearest healthy collector in the US or EU, streams events into warehouse tables in your region with no ingestion job. A first-party tracker covers the browser and the server. | A tag pipeline, collectors and queues |
+| **A warehouse with a metrics layer.** Your records replicate into it automatically, next to event and provider data. The same metrics answer screens, the API and agents. | A data warehouse, replication from your database and a semantic layer |
+| **Pipelines.** Managed orchestration of ingestions and models: schedules, daily partitions, backfills, retries, checks and lineage, each step in its own isolated worker. | An orchestrator, its workers and a transformation tool |
+| **Secure connections.** OAuth and API-key connections to the tools you use, in and out. Credentials stay in SegmentStream and reach the provider through a proxy; your code never sees them. | A secrets store, token refresh and connectors |
+| **Workflows and webhooks.** Durable processes started by an action, a schedule or a webhook, with retries and a record of every run. | A job queue, its workers and webhook endpoints |
+| **A company agent.** Your team's agent in Telegram, Slack or WhatsApp, acting with each member's own permissions. | An agent runtime and chat integrations |
+| **Hosting and safe change.** Deploys from your Git repository, previews, and development sessions on a private copy of production data, in the region you choose (EU or US). | Servers, CI and staging environments |
 
-## What your software gets from the platform
-
-Your agent writes only your business logic. [SegmentStream](https://segmentstream.com)
-runs the rest:
-
-- a company database where every write is an action with a permission, checked
-  on the server for people, apps and agents alike;
-- sign-in, roles and a history of every change, from the first deploy;
-- a REST API and MCP tools for every record, so Claude, ChatGPT or your own
-  agents can use the software you built;
-- a warehouse, pipelines, schedules and connections whose credentials never
-  reach your code;
-- a company agent in your team's chats;
-- one Git repository your company owns.
+As with any cloud platform, SegmentStream runs the infrastructure, and what you
+build on it is your company's own software, in your company's own Git
+repository.
 
 <table>
   <tr>
@@ -101,6 +96,21 @@ runs the rest:
     <td><img src="assets/screens/console-agent-groups.webp" alt="The company agent in team chats"><br><sub>The company agent in the team's chats</sub></td>
   </tr>
 </table>
+
+## How it works
+
+1. **Pick.** Your agent reads [`registry.json`](registry.json) and chooses the
+   blueprints that match what you asked for.
+2. **Interview.** It asks the questions in the blueprint's interview: how you
+   sell, who approves what, which tools you keep. About ten questions, once.
+3. **Plan.** It shows you one page: the records, actions, roles, screens and
+   data sources it will build, and what it leaves out. You approve or change it.
+4. **Build and test.** It writes your version and turns every invariant into a
+   test that runs on your laptop, with no account and no real data.
+5. **Deploy.** When you say so, it deploys to your SegmentStream workspace. You
+   authorize your own connections; your data never touches this repository.
+
+The full procedure your agent follows is in [AGENTS.md](AGENTS.md).
 
 ## Why blueprints, not open source
 

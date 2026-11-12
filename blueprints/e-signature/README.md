@@ -30,6 +30,16 @@ It replaces DocuSign, Adobe Acrobat Sign and similar tools.
 - Your workspace agent prepares envelopes, says who has not signed yet and
   sends reminders, always after you confirm. It never signs for anyone.
 
+## What the platform runs for you
+
+- File storage for the documents and sealed PDFs.
+- A company database with a history of every view, signature and change, the
+  base of the audit trail.
+- The connection to a timestamp authority, with credentials kept by
+  SegmentStream.
+- Durable workflows for sending, reminders and sealing, and hosting for the
+  signing page people outside your company open.
+
 ## Build it
 
 ```text
