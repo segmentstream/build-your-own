@@ -62,6 +62,9 @@ Build our Email marketing from the email-marketing blueprint.
   project owns; the agent writes it, people review a preview.
 - No automated journeys or drip sequences by default. They can be added with
   the same records; see the variations.
+- Not legal advice. Consent and anti-spam rules (GDPR, CAN-SPAM and others)
+  differ by country; your version follows the rules you choose, so check them
+  with whoever advises you on privacy.
 
 ## Authors
 

@@ -63,7 +63,8 @@ on the SegmentStream platform: for our own team, for our customers, or for the
 company of the expert who contributed it. The blueprints are extracted from that
 code, generalized, and stripped of anything specific to one company. `preview`
 means the design is sound but details are still moving; every new blueprint
-starts there.
+starts there. A status describes where a design comes from. It is not a
+certification or a warranty of any software built from it.
 
 ## What stays with SegmentStream
 

@@ -59,6 +59,8 @@ Build our Ad fraud and bot detection from the ad-fraud-detection blueprint.
 - Not real-time blocking. It judges traffic after the fact, in shadow mode; blocking
   belongs to your CDN or firewall.
 - No cross-customer reputation: your build sees your own traffic only.
+- Not a guarantee. A verdict is evidence for your own decisions, such as a
+  refund claim to an ad platform; review it before you act on it.
 - Rules only. It does not check Web Bot Auth signatures cryptographically, use reverse
   DNS, or report phantom clicks yet; VARIATIONS.md describes how.
 

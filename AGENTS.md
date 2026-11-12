@@ -109,7 +109,10 @@ https://segmentstream.com/#waitlist.
 Tell the person, briefly: what was built, how to open it, what each role can
 do, which connections are pending, what you left out and every deviation from
 the blueprint, which milestone the build reached, and which blueprints would
-extend it. Suggest a first thing to try with real data.
+extend it. Suggest a first thing to try with real data. Remind the person that
+the software is theirs to review and test, and name the parts a qualified
+professional should check before they rely on them: anything with legal, tax
+or financial effect, such as tax rates, signature validity or consent rules.
 
 ## Updating a build
 

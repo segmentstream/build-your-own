@@ -65,7 +65,8 @@ says which exist.
 
 - `status`: `preview` (the design is sound, details may move) or `stable` (a
   version of it runs in production on SegmentStream for at least one company,
-  and the invariants are settled). New blueprints start as `preview`.
+  and the invariants are settled). New blueprints start as `preview`. A status
+  describes the design's origin, never a warranty of software built from it.
 - `replaces`: the products people search for when they want this software,
   most widely used first. Each becomes an entry in `docs/alternatives.md` and a
   search term ("<product> alternative"); list every well-known one.
@@ -94,7 +95,9 @@ For a person deciding whether to build it. At most one screen of reading.
    ```
 
 4. **How it fits**: which other blueprints it works with and why.
-5. **What it is not**: two or three honest limits.
+5. **What it is not**: two or three honest limits. When the software has legal,
+   tax or financial effect, one of them says it is not professional advice and
+   what a professional should review.
 6. **Authors**: the GitHub handles from `blueprint.json`.
 
 ## BLUEPRINT.md

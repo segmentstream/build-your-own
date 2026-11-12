@@ -122,13 +122,14 @@ break, and agents keep making the same mistakes. So each blueprint carries the
 idea, the questions to ask, the invariants with their tests, and the pitfalls
 we hit in production. [How it works](docs/how-it-works.md) explains the format.
 
-## Proven in production
+## Taken from software in production
 
 Every `stable` blueprint is taken from custom software running in production
 on the SegmentStream platform. Our own team runs the company on it, from the CRM
 and campaigns to the books, documents and signatures: one workspace with 136
 entities, 395 actions and 27 roles, built and maintained by coding agents, where
-every change goes through the same rules your version will.
+every change goes through the same rules your version will. That is where the
+designs come from; it is not a guarantee about any version built from them.
 
 ![The ontology map of SegmentStream's own workspace](assets/screens/console-ontology.webp)
 
@@ -153,6 +154,16 @@ SegmentStream is billed by usage: see [pricing](https://segmentstream.com/pricin
 **Does anything here touch my data?** No. Blueprints contain designs and
 invented demo data. Your data reaches only your own workspace, through
 connections you authorize.
+
+**Who is responsible for the software I build?** Your company, as with any
+software it writes. A blueprint is a design and the lessons behind it, not
+certified or supported software, and nothing in it is legal, tax or financial
+advice. Your agent writes the code into your own repository; you review it,
+test it, and decide what it does with money, messages, signatures and personal
+data. Have a qualified professional check anything with legal or tax effect
+before you rely on it. SegmentStream runs the platform; it does not certify or
+warrant software built from these blueprints, which are provided as is under
+the [Apache License 2.0](LICENSE).
 
 **Can someone build it for us?** Yes. SegmentStream's engineers build the first
 version on your data in a fixed-price pilot: [start a pilot](https://segmentstream.com/enterprise).
@@ -187,6 +198,8 @@ New to SegmentStream? [Request access](https://segmentstream.com/#waitlist).
 
 ## License
 
-[Apache License 2.0](LICENSE). Screenshots show invented demo data. Product
+[Apache License 2.0](LICENSE). The blueprints are provided as is, without
+warranties of any kind; software built from them is the responsibility of
+whoever builds and runs it. Screenshots show invented demo data. Product
 names are trademarks of their owners, named only to describe what a blueprint
 can replace.
