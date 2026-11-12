@@ -28,15 +28,21 @@ Mistakes already made building CRMs on the platform, and what to do instead.
   as `EUR`.
 - **Instead:** `amountMinor` as `p.integer` in the currency's minor unit,
   converted from decimal text without floating point; select values `eur`,
-  `usd` with labels `EUR`, `USD`.
+  `usd` with labels `EUR`, `USD` (every option value is snake_case; see the
+  foundation's platform notes).
 
-## 4. The board is slow and its totals add euros to dollars
+## 4. The board is slow, its totals add euros to dollars, or "mine" will not filter them
 
 - **Symptom:** the deals page takes seconds once there are a few hundred deals,
-  and the header shows one total across currencies.
-- **Cause:** the page pages through every deal and sums amounts in the app.
+  and the header shows one total across currencies; or the board's metric
+  query does not typecheck with an owner filter.
+- **Cause:** the page pages through every deal and sums amounts in the app; or
+  it asks for an owner dimension, which does not exist: metric queries never
+  follow a relationship to `User`.
 - **Instead:** each column is one `find` page; counts and amounts come from one
-  metric query grouped by `stage` and `currency`. Totals lag writes by the
+  model-level metric query on `deal.stage` and `deal.currency` (BLUEPRINT
+  section 7). With "mine", the columns filter by owner and the headers keep
+  the team's totals, labelled "All owners". Totals lag writes by the
   replication delay; show that, never "fix" it by adding cards up.
 
 ## 5. New-lead alerts arrive twice, or never
@@ -51,14 +57,19 @@ Mistakes already made building CRMs on the platform, and what to do instead.
   from `prepare` for a write that may still fail; never resend an `uncertain`
   post.
 
-## 6. A notification sender built from scratch
+## 6. A notification sender built from scratch, or one promised for Slack
 
-- **Symptom:** a `notification` entity, a Telegram client in ontology code,
-  bot tokens in environment variables, chat ids in constants.
-- **Cause:** not knowing the platform posts exact text to agent chats.
+- **Symptom:** a `notification` entity, a Telegram or Slack client in ontology
+  code, bot tokens in environment variables, chat ids in constants; or a plan
+  that promises new-lead posts in Slack or WhatsApp.
+- **Cause:** not knowing the platform posts exact text to agent chats, and
+  only to Telegram team chats today. The agent answering members in Slack does
+  not mean a workflow can post there.
 - **Instead:** the built-in `chat_post_message` through the agent's Telegram
   connection, with the chat found by `purpose`. Posts cannot be edited and
-  carry no buttons; link to the app.
+  carry no buttons; link to the app. With Slack, WhatsApp or no chat, email
+  the owner with `lead.emailOwner` and say in the plan that chat posts wait
+  for the platform.
 
 ## 7. A link in the chat that changes a record
 
@@ -130,7 +141,8 @@ Mistakes already made building CRMs on the platform, and what to do instead.
 - **Cause:** the foundation's merge did not know about the CRM's relationships
   to `Company`.
 - **Instead:** every relationship to `Company` that the CRM adds is moved by
-  `company.merge_into`; its test covers each one.
+  `company.mergeInto` in pages of at most 199 records of one kind (BLUEPRINT
+  section 10); its test covers each one.
 
 ## 15. A customer flag that drifts
 
@@ -141,3 +153,27 @@ Mistakes already made building CRMs on the platform, and what to do instead.
 - **Instead:** compute it: the Customers page lists companies with a won deal,
   and the `crm_customers` model feeds the numbers. Lifetime value, last
   activity and open deal counts are metrics, never properties.
+
+## 16. A non-author's correction is rejected instead of not found
+
+- **Symptom:** invariant 21 fails: `activity.correct` by another member answers
+  with a rejection message, not `404`.
+- **Cause:** the handler checks the author itself before writing. The role's
+  read is unscoped (`readsAll`), so the handler reads the activity, and its
+  own check answers before the scoped write can.
+- **Instead:** leave the rule to the scope `{ author: me }` on
+  `activity:correct`; the write answers `404` for anyone but the author
+  (BLUEPRINT section 10).
+
+## 17. The app build fails after adding navigation files
+
+- **Symptom:** `npm --prefix app run build` fails with
+  `page_catalog_not_prepared`, or after `generate` with
+  `page_catalog_source_mismatch`; `npx segmentstream-page-catalog` answers 404
+  from the registry.
+- **Cause:** `withPageCatalog` makes the build require a prepared catalog, the
+  Workflow plugin rewrites `app/src/app/.well-known/workflow/v1/` on every
+  build, and `npm ci` does not link the catalog's command.
+- **Instead:** before deploy, check the app with its typecheck and the
+  catalog's `generate` called through `node` (BLUEPRINT section 7);
+  `segmentstream deploy` prepares and verifies the catalog itself.

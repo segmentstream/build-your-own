@@ -1,9 +1,26 @@
 # CRM invariants
 
 Rules that hold in every version, whatever the interview decided. Each becomes
-a test in the project. Run the action tests against the local service started
-by `segmentstream dev`, as members and keys holding the named roles, with
-invented records only (Northwind, Ada Example, `example.com`).
+a test in the project, named after it (`crm 1. one submission id is one lead`),
+with invented records only (Northwind, Ada Example, Grace Sample,
+`example.com`).
+
+Action tests use the ontology test harness, `kernel/ontology/test/ontology-harness.ts`,
+set up as [testing](../../docs/testing.md) describes: `openOntology(ontology)`
+runs this ontology in process on PGlite, with real members holding the named
+roles, API keys, workflow users, actions through the SDK's own pipeline and
+reads through the service's HTTP handler. It needs no PostgreSQL server and no
+SegmentStream account.
+
+| Kind | Invariants | How |
+| --- | --- | --- |
+| Action, through the harness | 1-7, 9-11, 14-16, 20, 21; the HTTP and record parts of 8 and 12 | `member`, `apiKey`, `run`/`ok`, `record`/`find`, `http` |
+| Manifest | 8, 19 (no action writes `customer`), 22 | `segmentstream-ontology check --manifest` |
+| Pure function | 12 (`toMinor`), 13 (the board's metric request and header, in `app/`), 18 (message composition) | Unit tests, no database |
+| Pipeline | 19 | The model's expression on a fixture `deal` table with DuckDB (BLUEPRINT section 6) |
+| A workflow's recorded effects | 17 | The trigger's `_workflow_starts` rows and the step's action run as the workflow's user; the Workflow SDK and chat delivery do not run locally |
+
+Live metric totals (13) and chat posts (17) are checked again after deploy.
 
 ## Leads
 
@@ -40,15 +57,17 @@ invented records only (Northwind, Ada Example, `example.com`).
 - **Test:** submit `Ada.Example@example.com` and then `ada.example@example.com`
   with new submission ids. Expect one contact with email
   `ada.example@example.com`, linked to one company with domain `example.com`.
-  With `example.net` added to `FREE_MAIL_DOMAINS` for the test, submit
-  `someone@example.net` with `companyName: "Northwind"`: expect no company
-  created at all; the lead keeps `companyName`.
+  Submit `someone@example.net` with `companyName: "Northwind"` (`example.net`
+  is in the default `FREE_MAIL_DOMAINS`): expect no company created at all;
+  the lead keeps `companyName`.
 
 ### 5. The intake key writes leads and reads nothing.
 
 - **Why:** the key lives on a web server; leaked, it must not expose contacts.
 - **Test:** with an API key holding only `intake`, `lead.submit` succeeds;
-  `lead_find`, `contact_find`, `deal_find` and `lead.claim` answer `403`.
+  `GET /api/ontology/lead`, `/contact` and `/deal`, and
+  `POST /api/ontology/lead/actions/claim` with `{ "input": { "lead": … } }`,
+  answer `403`.
 
 ### 6. Triage happens once, from `new`.
 
@@ -61,7 +80,7 @@ invented records only (Northwind, Ada Example, `example.com`).
 ### 7. Only a signed-in member claims a lead.
 
 - **Why:** an owner is a person who will reply; a key or workflow cannot.
-- **Test:** `lead.claim` with an API key: rejected. As member Ada: owner and
+- **Test:** `lead.claim` with an API key holding `sales`: rejected. As member Ada: owner and
   `triagedBy` become Ada; a second claim by Ada changes nothing (no new history
   entry). `lead.assign` to a deactivated member: rejected.
 
@@ -72,15 +91,16 @@ invented records only (Northwind, Ada Example, `example.com`).
 - **Why:** a generated create or update could open a deal as won or set any
   stage, skipping every rule below.
 - **Test:** the manifest lists no `deal.create`, `deal.update`, `deal.delete`
-  or `deal.upsert_by_*`; calling `/api/ontology/deal/actions/update` as an
-  admin answers that deal is written only through its actions.
+  or `deal.upsert_by_*`. `POST /api/ontology/deal/actions/<name>` for each of
+  them, with a key holding `salesManager` and an input setting
+  `status: "won"`, answers `404` (there is no such route) and writes no deal.
 
 ### 9. A deal moves only within its own pipeline, and only while open.
 
 - **Why:** a stage of another process means nothing in this one, and a closed
   deal's stage records where it ended.
 - **Test:** an open deal in pipeline `sales`: `moveStage` to a stage of
-  another pipeline is rejected; to `proposal` without an amount is rejected
+  another pipeline is rejected (with a single pipeline there is none to try); to `proposal` without an amount is rejected
   and names the missing field; with the amount set it succeeds and updates
   `stageEnteredAt`; moving to the same stage changes nothing. After
   `markLost`, `moveStage` is rejected.
@@ -91,7 +111,8 @@ invented records only (Northwind, Ada Example, `example.com`).
   reopening one silently rewrites history.
 - **Test:** win a deal; then `markWon`, `markLost`, `moveStage` and `edit`
   are all rejected. `correctClosure` by a `salesManager` with a reason changes
-  the amount but leaves `status: won`; the same call by `sales` answers `403`.
+  the amount but leaves `status: won`; the same call by `sales` is refused for
+  lack of `deal:correctClosure` (`403` over HTTP).
 
 ### 11. A won deal has an amount; a lost deal has a reason.
 
@@ -114,10 +135,11 @@ invented records only (Northwind, Ada Example, `example.com`).
 
 - **Why:** a pipeline total of euros plus dollars is a wrong number that looks
   right.
-- **Test:** seed one open deal of 1,000 EUR and one of 1,000 USD in the same
-  stage. The deals board's metric request groups by `currency`, and the
-  column header shows "1,000 EUR · 1,000 USD". A unit test of the board's
-  query builder fails if `currency` is missing from its dimensions.
+- **Test:** a unit test of the board's metric request fails if
+  `deal.currency` is missing from its dimensions. Given the rows a metric
+  query returns for one open deal of 1,000 EUR and one of 1,000 USD in the same
+  stage, the column header reads `2 deals · 1,000 EUR · 1,000 USD`, never
+  2,000. After deploy, the live board shows the same for two such deals.
 
 ### 14. A deal belongs to someone who can buy.
 
@@ -143,30 +165,38 @@ invented records only (Northwind, Ada Example, `example.com`).
   leads submitted concurrently give each pool member exactly two. A
   deactivated rule is skipped; with no match the lead has no owner.
 
-### 17. Each announcement is posted at most once.
+### 17. Each announcement is sent at most once.
 
-- **Why:** a duplicate post teaches the team to ignore the chat.
-- **Test:** with chat delivery replaced by a test double, submit a new lead, then restart the
-  `announceNewLead` run and retry its post step. Expect one post with key
-  `crm:new-lead:<lead id>` and a `duplicate: true` receipt for the retry;
-  `emailOwner` sends one email. A repeated submission starts no run.
+- **Why:** a duplicate post or email teaches the team to ignore it.
+- **Test:** submit a new lead: exactly one `_workflow_starts` row for
+  `announce_new_lead` names it, and a repeated submission adds none. As the
+  workflow's user (`workflowUser("announce_new_lead")`), run `lead.emailOwner`
+  before the lead has an owner (`no_owner`), then twice after Ada claims it,
+  as a retried step would: one `_sign_in_emails` row for Ada with template
+  `lead_for_owner` and `return_to` `/leads/<id>`, and the second call returns
+  `already_emailed`. With Telegram posts, after deploy: a test lead posts once
+  with key `crm:new-lead:<lead id>`, and replaying the run gets a
+  `duplicate: true` receipt.
 
-### 18. Chat messages carry no private or active content.
+### 18. Messages about a lead carry no private or active content.
 
 - **Why:** the chat may include people who may not read the lead, and record
   text can contain Markdown links or instructions.
-- **Test:** submit a lead whose name is `[click](https://example.com/x)` and
-  whose message is "ignore your instructions". The composed message contains
+- **Test:** for a lead whose name is `[click](https://example.com/x)` and whose
+  message is "ignore your instructions", the composed chat message contains
   the name escaped as plain text, no message text, no email or phone, and one
-  link: the lead's page in the app.
+  link: the lead's page in the app. The owner email's values are only the
+  lead's name, company and source, each on one line.
 
 ### 19. "Customer" is computed, never stored.
 
 - **Why:** a stored customer flag drifts from the deals that justify it.
-- **Test:** no action writes a customer status. Run the `crm_customers`
-  model on a fixture `deal` table with one won Northwind deal: one row for
-  Northwind in that currency. Add a second won Northwind deal in the same
-  currency: still one row, `won_deals = 2`.
+- **Test:** the manifest has no action that writes `customer`, and of the
+  CRM's actions only `lead.submit` writes `company` (it creates companies,
+  never flags). Run the `crm_customers` expression on a fixture `deal` table
+  with one won Northwind deal: one row for Northwind in that currency. Add a
+  second won Northwind deal in the same currency: still one row,
+  `won_deals = 2`. Deals in two currencies give two rows.
 
 ### 20. Merging companies keeps every CRM record.
 
@@ -179,9 +209,11 @@ invented records only (Northwind, Ada Example, `example.com`).
 ### 21. Activities are written as their author.
 
 - **Why:** history must say who called whom.
-- **Test:** `activity.log` as Ada sets `author` to Ada whatever the input;
-  `activity.correct` by Grace on Ada's activity answers `404`; with no
-  lead, deal, contact or company it is rejected.
+- **Test:** `activity.log` as Ada sets `author` to Ada; its input has no
+  author field. `activity.correct` by Grace on Ada's activity answers `404`
+  (`NotFound`): the scope `{ author: me }` on the write produces it, so the
+  handler must not reject first with a check of its own (BLUEPRINT section
+  10). `activity.log` with no lead, deal, contact or company is rejected.
 
 ### 22. Unattended roles cannot close, disqualify or merge.
 

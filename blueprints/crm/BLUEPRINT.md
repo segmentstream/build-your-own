@@ -31,18 +31,23 @@ members, and member ids are never code.
 | `SOURCE_OPTIONS` | How a lead reached you. | `website`, `referral`, `event`, `outbound`, `partner`, `import`, `other` |
 | `PRODUCT_OPTIONS` | What a lead asks about and a deal sells. | One option, `general` |
 | `PIPELINE_OPTIONS`, `PIPELINES` | Each pipeline's label, ordered open stages, and the deal fields each stage requires. | One pipeline, `sales`: `discovery`, `proposal` (requires amount and expected close date), `negotiation` |
-| `STAGE_OPTIONS` | Every open stage of every pipeline, each with a description that says when a deal is in it. | As above |
+| `STAGE_OPTIONS` | Every open stage of every pipeline, each with a description that says when a deal is in it. A stage value belongs to exactly one pipeline: prefix a repeated name (`partner_negotiation`). | As above |
 | `CURRENCY_OPTIONS`, `MINOR_DIGITS`, `HOME_CURRENCY` | Allowed ISO 4217 currencies as lowercase select values (`eur`, label `EUR`), each with its minor-unit digits. | The home currency only |
 | `DISQUALIFY_REASONS` | Why a lead is not worth a deal. | `spam`, `duplicate`, `not_a_fit`, `no_response`, `other` |
 | `LOST_REASONS` | Why a deal was lost. | `price`, `competitor`, `no_decision`, `timing`, `not_a_fit`, `other` |
 | `ACTIVITY_KINDS` | What can be logged. | `note`, `call`, `meeting`, `email` |
-| `FREE_MAIL_DOMAINS` | Domains that never create or link a company. | The common global providers; add the ones of your market |
+| `FREE_MAIL_DOMAINS` | Domains that never create or link a company. | The common global providers and the reserved test domain `example.net`; add the ones of your market |
 | `RESPONSE_TARGET_HOURS` | How long a new lead may wait before the digest names it. | 24 |
 | `APP_URL` | The app's address, for links in chat messages. | Set at first deploy |
 
 Its helpers: `toMinor` (decimal text to minor units), `formatMinor` (minor
-units to text with the currency) and `plain` (escapes and cuts record text for
-a Markdown chat message).
+units to text with the currency: `12,000.50 EUR`, and `1,000 EUR` for a whole
+amount) and `plain` (escapes and cuts record text for a Markdown chat message).
+
+The app imports `ontology/` as types only, so screens cannot call these
+helpers. Keep the app's own copy of the currency digits, the pipelines' stage
+lists and `formatMinor` in one file, such as `app/src/features/crm/money.ts`,
+and change it with `crm-config.ts`.
 
 Won and lost are not stages. They are the deal's `status`, so every pipeline
 ends the same way and reports can compare pipelines.
@@ -51,7 +56,7 @@ ends the same way and reports can compare pipelines.
 
 The CRM adds no properties to them, only inverse relationships: a company's
 `leads`, `deals` and `activities`; a contact's `leads`, `deals` and
-`activities`. The foundation's `company.merge_into` must move every one of
+`activities`. The foundation's `company.mergeInto` must move every one of
 these to the kept company (see section 3).
 
 ### Lead
@@ -141,7 +146,7 @@ Who gets a new lead. Records, because they name members. `writes: "actions"`.
 | `active` | boolean, managed | Inactive rules are skipped. |
 | `source`, `product` | select, optional | Match leads of this source or product; empty matches any. |
 | `countryCodes` | json, optional | ISO 3166-1 alpha-2 codes matched against the contact's country. |
-| `method` | select | `owner` (always the same member) or `roundRobin` (the next member of the pool). |
+| `method` | select | `owner` (always the same member) or `round_robin` (the next member of the pool). |
 
 Relationships: `owner` (one `User`, optional), `pool` (many `User`),
 `lastAssigned` (one `User`, optional, managed by `lead.submit`). The first
@@ -154,7 +159,9 @@ A company, or a person buying without a company, with at least one won deal:
 one row per customer and deal currency, computed by the `crm_customers` model
 (section 6). Properties `customerKey`, `customerKind` (`company` or `person`),
 `companyId`, `currency`, `wonDeals`, `wonAmountMinor`, `firstWonOn`,
-`lastWonOn`; relationship `company`, matched on `companyId`. Nobody sets
+`lastWonOn`; relationship `company`, matched on `companyId`; metrics
+`customers` and `totalWonAmountMinor` (a metric cannot share a property's
+name). Nobody sets
 "customer" anywhere: the foundation's relationship flags on Company stay a
 person's declaration, and the CRM never sets `isCustomer`.
 
@@ -168,7 +175,7 @@ person's declaration, and the CRM never sets `isCustomer`.
 | Deal | `openAmountMinor`, `wonAmountMinor` | Sums of `amountMinor`, filtered on `status`. Always grouped by or filtered to one `currency`. |
 | Deal | `winRate` | won / (won + lost), a ratio. |
 | Customer | `customers` | Distinct `customerKey`. |
-| Customer | `wonAmountMinor` | Sum per currency. |
+| Customer | `totalWonAmountMinor` | Sum of `wonAmountMinor`, per currency. |
 
 Stored entities cannot declare currency metrics, so amount metrics are plain
 numbers in minor units whose descriptions say to group by `currency`.
@@ -207,7 +214,7 @@ starter's files before the first deploy.
 | `deal.correctClosure` | `salesManager` | `deal`, `reason`, `amount?`, `currency?`, `closedOn?`, `lostReason?` | Deal is closed; a reason | Those fields, never `status`; the reason becomes an activity |
 | `activity.log` | `sales`, and `member` if everyone may log | `kind`, `body`, `occurredAt?`, `lead?`, `deal?`, `contact?`, `company?` | At least one target | Creates it with `author` = caller |
 | `activity.correct` | The author (scoped permission) | `activity`, `kind?`, `body?`, `occurredAt?` | Caller is the author | Those fields |
-| `routingRule.configure` | `salesManager` | `name`, `priority`, `source?`, `product?`, `countryCodes?`, `method`, `owner?`, `pool?` | `owner` set for `owner`, a non-empty pool for `roundRobin`; every member active; priority free | Creates or replaces the rule by name, active |
+| `routingRule.configure` | `salesManager` | `name`, `priority`, `source?`, `product?`, `countryCodes?`, `method`, `owner?`, `pool?` | `owner` set for `owner`, a non-empty pool for `round_robin`; every member active; priority free | Creates or replaces the rule by name, active |
 | `routingRule.deactivate` | `salesManager` | `rule` | | `active: false` |
 
 Every action declares `writes` and `hints`. `emailOwner` lists `User` in
@@ -219,12 +226,15 @@ reversible, so the agent runs them when asked, except `qualify`, `disqualify`,
 stage moves run without one.
 
 Routing inside `submit`: read active rules by priority (limit 51, reject when
-the 51st comes back) and take the first match. For `roundRobin`, lock the rule
+the 51st comes back) and take the first match. For `round_robin`, lock the rule
 with `forUpdate`, take the active pool member after `lastAssigned` in id order,
 and write `lastAssigned`; the lock makes concurrent submissions rotate fairly.
+`configure` keeps a pool to 50 members, so one `find` with `include: ["pool"]`
+reads it (section 10).
 
-Extend the foundation's `company.merge_into` to move `Lead.company`,
-`Deal.company` and `Activity.company` before it deletes the duplicate.
+Extend the foundation's `company.mergeInto` to move `Contact.company`,
+`Lead.company`, `Deal.company` and `Activity.company` before it deletes the
+duplicate (section 10).
 
 ## 4. Roles
 
@@ -237,7 +247,12 @@ Extend the foundation's `company.merge_into` to move `Lead.company`,
 | `dealAnnouncer` | The `announceWonDeal` workflow | Reads of deal, company, contact and `user`; `agent_chat:read`, `agent_chat:post_message` |
 | `salesDigest` | The `salesDigest` workflow | Reads of lead, deal and `user`; `agent_chat:read`, `agent_chat:post_message` |
 
-`member` gets nothing from the CRM; whether every member reads CRM records is a
+`dealAnnouncer`, `salesDigest` and the `agent_chat` grants of `leadAnnouncer`
+exist only when the team chat is in Telegram (section 5). `activity:correct` is
+scoped to `{ author: me }`: the scope alone answers 404 to anyone but the
+author, so the handler does not check the author itself (section 10).
+
+`member` gets no CRM writes; whether every member reads CRM records is a
 variation. Never grant by default, to a workflow role, an agent task or an API
 key: `deal:markWon`, `deal:markLost`, `deal:correctClosure`, `lead:disqualify`,
 `routingRule:*`, `company:mergeInto` or any `user:*`. A lead's message can
@@ -245,6 +260,17 @@ carry text written to steer an agent, and an unattended role runs everything it
 holds without a card.
 
 ## 5. Workflows
+
+Workflows post to a team chat only in Telegram today: `AgentChat.actions.postMessage`
+delivers through the ontology's `chat.telegram.connection`. The company agent
+also answers paired members in Slack and WhatsApp, but no workflow can post
+there yet. So:
+
+- Team chat in Telegram: build the three workflows below.
+- Team chat in Slack, WhatsApp or none: build `announceNewLead` with its email
+  step only (it calls `lead.emailOwner`), and leave out its post step,
+  `announceWonDeal`, `salesDigest`, their roles and every `agent_chat` grant.
+  A plan never promises Slack or WhatsApp posts.
 
 | Workflow | Trigger | Steps | Idempotent because |
 | --- | --- | --- | --- |
@@ -270,6 +296,23 @@ replicated deal records (`ontology.deal`), read with
 `warehouse.table(name="deal", namespace="ontology")`. A `segmentstream dev`
 session writes to a private copy of the records and reads the live warehouse,
 so its seed deals never reach this table; test the model on a fixture table.
+
+- **Columns.** The sketch assumes the view uses the deal's wire names:
+  properties in snake_case (`status`, `currency`, `amount_minor`, `closed_on`)
+  and `<relationship>_id` keys (`company_id`, `primary_contact_id`). The
+  project's docs do not list the view's schema; confirm names and types with
+  `segmentstream warehouse preview ontology deal --schema-only` once
+  replication is published.
+- **Lineage.** A table read through `warehouse.table` is not an asset input:
+  `s.describe` shows the model with no dependencies, lineage does not link it
+  to the deals, and the job neither selects nor waits for replication. Its
+  daily schedule is the only coupling.
+- **Local test.** The asset's function reads through `warehouse.table`,
+  which the pipeline harness in [testing](../../docs/testing.md) does not
+  stand in for. Keep the expression in a plain function the asset calls,
+  `customers_from_deals(deals)`, and test that on invented rows:
+  `customers_from_deals(table(con, rows, DEALS))`, then `bigquery_sql` and
+  `rows` on the result.
 
 | Asset | Grain and key | Partitioning | Built from |
 | --- | --- | --- | --- |
@@ -297,9 +340,8 @@ Each page reads one `find` page or one metric query per section, and has a
 - **Deals** (`/deals`): one tab per pipeline, one column per open stage. Each
   column is one `find` page of open deals in that stage, ordered by expected
   close. Column headers show count and amount per currency from one metric
-  query (`openDeals`, `openAmountMinor` by `stage` and `currency`). Filters:
-  owner (mine, all), product. Move a card with a stage menu; Won and Lost open
-  dialogs.
+  query (below). Filters: owner (mine, all), product. Move a card with a stage
+  menu; Won and Lost open dialogs.
 - **Deal** (`/deals/[id]`): fields, next step, stage history from the record's
   history, leads, activities, and the actions the member may run.
 - **Contacts** and **Companies** (`/contacts`, `/companies`, and their detail
@@ -316,8 +358,51 @@ Each page reads one `find` page or one metric query per section, and has a
   with configure and deactivate.
 
 Amounts are formatted from minor units with the currency's digits, and the
-currency is always shown. Totals right after a change can lag by the
-replication delay; the page says "updating" rather than adding cards up.
+currency is always shown: `12,000.50 EUR`, `1,000 EUR`. A column header reads
+`2 deals · 1,000 EUR · 1,000 USD`. Totals right after a change can lag by the
+replication delay, and are unavailable before replication is published; the
+page says "updating" rather than adding cards up.
+
+The board's totals are one model-level metric query. The per-entity shorthand
+`segmentstream.ontology.deal.queryMetrics()` exists only for warehouse-backed
+entities; a stored entity's metrics are requested by `entity.metric` name, and
+rows are keyed the same way:
+
+```ts
+const { rows } = await segmentstream.ontology.queryMetrics({
+  metrics: ["deal.openDeals", "deal.openAmountMinor"],
+  dimensions: ["deal.stage", "deal.currency"],
+  filters: [{ dimension: "deal.pipeline", operator: "equals", value: "sales" }],
+});
+// rows: [{ "deal.stage": "proposal", "deal.currency": "eur", "deal.openDeals": "1", "deal.openAmountMinor": "100000" }, …]
+```
+
+Metric queries never follow a relationship to `User`, so there is no owner
+dimension. With "mine", each column's `find` filters `ownerId` to the signed-in
+member, and the headers keep the whole team's totals under the label "All
+owners".
+
+`find` with `include` returns related records the client's types do not show;
+read them as the foundation's platform notes describe.
+
+Each page with a `page.navigation.json` needs `withPageCatalog` in
+`next.config.ts`. From then on `npm --prefix app run build` needs a prepared
+page catalog, which `segmentstream deploy` prepares and verifies itself. A
+local build cannot pass today (app SDK 0.38.1): without a catalog it fails with
+`page_catalog_not_prepared`, and with one it fails with
+`page_catalog_source_mismatch`, because the catalog fingerprints every file
+under `app/src/app` and the Workflow plugin rewrites
+`app/src/app/.well-known/workflow/v1/` on every build. Before deploy, check the
+pages with the app's typecheck and validate the navigation files against the
+ontology with the catalog's `generate`. Call its CLI through `node`: after
+`npm ci` the `segmentstream-page-catalog` command is not linked, and `npx`
+looks for it on the registry.
+
+```sh
+(cd ontology && npx segmentstream-ontology check --manifest) > /tmp/ontology-manifest.json
+node app/node_modules/@segmentstream/app/dist/navigation/cli.js generate \
+  --project-dir app --ontology /tmp/ontology-manifest.json --source-hash local
+```
 
 ## 8. The company agent
 
@@ -351,14 +436,17 @@ hand. With company-agent's `Question` entity, the CRM may add an optional
    "12000.50" EUR to 1200050 and reject "12.345" EUR.
 3. **Leads.** `Lead`, `Activity`, `lead.submit`, `claim`, `disqualify`,
    `activity.log`; roles `sales` and `intake`; remove or evolve the starter's
-   lead. Check: the lead invariants pass against `segmentstream dev`.
+   lead. Check: the lead invariants pass in the ontology test harness
+   ([testing](../../docs/testing.md)).
 4. **Deals.** `Deal` and its actions, `lead.qualify`, the metrics, the merge
-   extension. Check: the deal invariants pass; the manifest has no generated
-   deal writes.
+   extension. Check: the deal and merge invariants pass; the manifest has no
+   generated deal writes.
 5. **Routing.** `RoutingRule`, its actions, routing in `submit`, role
-   `salesManager`. Check: round-robin test over three members.
+   `salesManager`. Check: invariant 16, six concurrent leads over three members.
 6. **App.** Inbox, lead, deals board, deal, contacts, companies, routing,
-   with navigation files. Check: `segmentstream dev`, sign in, triage a lead.
+   with navigation files. Check: typecheck, the board's unit test (invariant
+   13) and the page catalog's `generate` (section 7); with a linked
+   workspace, `segmentstream dev`, sign in, triage a lead.
 7. **Demo data.** A seed script that calls `lead.submit`, `qualify`,
    `moveStage`, `markWon` and `markLost` with invented records (Northwind,
    Ada Example, `example.com`) against the dev service only; it refuses a
@@ -367,15 +455,17 @@ hand. With company-agent's `Question` entity, the CRM may add an optional
    with `segmentstream ontology api-key create website --role intake`, give it
    to the website's server, invite members with roles. Check: one test
    submission with an `example.com` address appears once after two retries.
-9. **Notifications.** The three workflows and their roles, once the agent and
-   its Telegram connection exist (company-agent); an admin sets the sales
-   chat's purpose to `sales`. Check: a test lead posts once; a replay posts
+9. **Notifications.** With Telegram: the three workflows and their roles,
+   once the agent and its Telegram connection exist (company-agent); an admin
+   sets the sales chat's purpose to `sales`. With Slack, WhatsApp or no chat:
+   `announceNewLead` with its email step only (section 5). Check: invariant 17
+   locally; after deploy, a test lead posts or emails once and a replay sends
    nothing new.
 10. **Customer view.** Model, check, job, schedule, the `Customer` entity, the
-    Customers and Reports pages. Check: a test runs the model on a fixture
-    `deal` table with two won deals of one company in one currency and gets
-    one row with `won_deals = 2`; after deploy, once deal replication is
-    published, the job succeeds.
+    Customers and Reports pages. Check: invariant 19's fixture test (section
+    6); after deploy, once deal replication is published,
+    `segmentstream warehouse preview ontology deal --schema-only` matches the
+    model's columns and the job succeeds.
 11. **Agent.** Instructions and descriptions. Check: "what is in the pipeline?"
     answers per currency.
 
@@ -494,6 +584,116 @@ if (existing !== undefined) {
 // A concurrent duplicate fails on the unique submissionId and rolls back; the caller's retry lands above.
 ```
 
+The foundation's merge, extended, in `ontology/company.ts`. Lead, Deal and
+Activity import Company, and the merge reads them, so the thunks in `writes`
+and the helper's result are typed (the foundation's platform notes explain
+why); without them `tsc` reports TS7022:
+
+```ts
+import { action, ActionRejected, type AnyEntity } from "@segmentstream/ontology";
+import { Effect, Schema } from "effect";
+
+import type { RecordEffect } from "./effects"; // the foundation's platform notes define it
+
+const MERGE_PAGE = 199; // one more is read to detect an overflow; a find page holds at most 200
+
+// in Company's .actions((self) => ({ … })):
+mergeInto: action({
+  description:
+    "Merge a duplicate company into the one to keep: move its contacts, leads, deals and activities, then " +
+    "delete it. Refused for different registration numbers or tax ids, and above 199 records of one kind.",
+  input: Schema.Struct({ duplicate: self.ref, keep: self.ref }),
+  writes: [self, (): AnyEntity => Contact, (): AnyEntity => Lead, (): AnyEntity => Deal, (): AnyEntity => Activity],
+  hints: { destructive: true, irreversible: true, idempotent: false },
+  handler: ({ input }): RecordEffect<{ readonly companyId: string }> =>
+    Effect.gen(function* () {
+      if (input.duplicate === input.keep) {
+        return yield* new ActionRejected({ message: "A company cannot be merged into itself." });
+      }
+      const duplicate = yield* self.get(input.duplicate, { forUpdate: true });
+      const keep = yield* self.get(input.keep, { forUpdate: true });
+      // …refuse when both carry a different registrationNumber or taxId
+      const leads = yield* Lead.find({ where: { companyId: duplicate.id }, limit: MERGE_PAGE + 1 });
+      const deals = yield* Deal.find({ where: { companyId: duplicate.id }, limit: MERGE_PAGE + 1 });
+      // …contacts and activities the same way
+      if ([leads, deals].some((page) => page.length > MERGE_PAGE)) {
+        return yield* new ActionRejected({ message: `More than ${MERGE_PAGE} records of one kind; the merge is refused.` });
+      }
+      for (const lead of leads) yield* Lead.update(lead, { company: keep.id });
+      for (const deal of deals) yield* Deal.update(deal, { company: keep.id }); // restrict: move before the delete
+      yield* self.delete(duplicate);
+      return { companyId: keep.id };
+    }),
+}),
+
+/** lead.submit and contact.findOrCreateByEmail share it; a concurrent create fails on the unique domain. */
+export function findOrCreateCompany(
+  domain: string,
+  name: string | undefined,
+): RecordEffect<{ readonly id: string; readonly created: boolean }> {
+  return Effect.gen(function* () {
+    const [existing] = yield* Company.find({ where: { domain }, limit: 1 });
+    if (existing !== undefined) return { id: existing.id, created: false };
+    const created = yield* Company.create({ domain, name: name ?? domain });
+    return { id: created.id, created: true };
+  });
+}
+```
+
+The round-robin pool, in `ontology/routing-rule.ts`. `include` results are not
+in the record type, so the pool is narrowed from `unknown`:
+
+```ts
+/** The rule's active member ids, in id order. configure keeps a pool to 50 members. */
+export function activePool(ruleId: string): RecordEffect<ReadonlyArray<string>> {
+  return Effect.gen(function* () {
+    const [rule] = yield* RoutingRule.find({ where: { id: ruleId }, include: ["pool"], limit: 1 });
+    const pool: unknown = rule !== undefined && "pool" in rule ? rule.pool : [];
+    const ids = Array.isArray(pool)
+      ? pool.flatMap((member: unknown) =>
+          typeof member === "object" && member !== null && "id" in member && typeof member.id === "string" ? [member.id] : [],
+        )
+      : [];
+    const active: string[] = [];
+    for (const id of ids.sort()) {
+      const user = yield* User.get(id);
+      if (user.kind === "member" && user.active) active.push(id);
+    }
+    return active;
+  });
+}
+
+// In lead.submit, for the first matching round_robin rule:
+const locked = yield* RoutingRule.get(rule.id, { forUpdate: true });
+const pool = yield* activePool(locked.id);
+const next = pool.find((id) => locked.lastAssignedId === null || id > locked.lastAssignedId) ?? pool[0];
+if (next !== undefined) yield* RoutingRule.update(locked, { lastAssigned: next });
+```
+
+`activity.correct` leaves the author rule to the role's scope
+(`{ author: me }`, in `roles.ts` below). Reads are unscoped (`readsAll`), so the
+handler finds anyone's activity, and the scoped write answers 404 to anyone
+but its author. A check of its own in the handler would answer first, with a
+rejection instead of the 404 (invariant 21):
+
+```ts
+correct: action({
+  description: "Correct an activity's kind, body or time. Only its author may; anyone else gets not found.",
+  input: Schema.Struct({
+    activity: self.ref,
+    body: p.text({ optional: true, maxLength: 10000, description: "The corrected text." }),
+  }),
+  writes: [self],
+  hints: { destructive: false, irreversible: false, idempotent: true },
+  handler: ({ input }) =>
+    Effect.gen(function* () {
+      const activity = yield* self.get(input.activity, { forUpdate: true });
+      const updated = yield* self.update(activity, { body: input.body ?? activity.body });
+      return { activityId: updated.id };
+    }),
+}),
+```
+
 Roles, in `ontology/roles.ts`:
 
 ```ts
@@ -517,9 +717,10 @@ export const intake = role("intake", {
 });
 ```
 
-The announcement's trigger and post, in
+The announcement's trigger and Telegram post, in
 `ontology/workflows/announce-new-lead.ts` (the step that composes the text and
-the one that calls `lead.emailOwner` are left out):
+the one that calls `lead.emailOwner` are left out; with Slack, WhatsApp or no
+chat, the run calls only the email step):
 
 ```ts
 import { AgentChat } from "@segmentstream/ontology";
@@ -570,13 +771,31 @@ export default workflow("announceNewLead", {
 ```
 
 The customer view, `pipeline/models/crm_customers.py`. `Customer` maps it with
-`source: warehouse("gold/crm_customers", { key: ["customer_key", "currency"] })`
-and `company: rel.one(Company, { on: { companyId: "id" }, … })`.
+`source: warehouse("gold/crm_customers", { key: ["customer_key", "currency"] })`,
+`company: rel.one(Company, { on: { companyId: "id" }, … })` and the metric
+`totalWonAmountMinor: m.sum("wonAmountMinor", …)`. The expression is a plain
+function, so a test runs it on invented rows (section 6):
 
 ```python
 import ibis
 import ibis.expr.types as ir
 import segmentstream as s
+
+
+def customers_from_deals(deals: ir.Table) -> ir.Table:
+    """Won deals grouped by customer and currency."""
+    won = deals.filter(deals.status == "won")
+    won = won.mutate(
+        customer_key=ibis.coalesce(won.company_id, won.primary_contact_id),
+        customer_kind=ibis.ifelse(won.company_id.isnull(), "person", "company"),
+    )
+    return won.group_by("customer_key", "customer_kind", "currency").aggregate(
+        company_id=won.company_id.max(),
+        won_deals=won.count(),
+        won_amount_minor=won.amount_minor.sum(),
+        first_won_on=won.closed_on.min(),
+        last_won_on=won.closed_on.max(),
+    )
 
 
 @s.model(
@@ -596,17 +815,12 @@ import segmentstream as s
 )
 def crm_customers(warehouse: s.WarehouseResource) -> ir.Table:
     """One row per customer and currency, from won deals. Replaced in full on every run."""
-    deals = warehouse.table(name="deal", namespace="ontology")
-    won = deals.filter(deals.status == "won")
-    won = won.mutate(
-        customer_key=ibis.coalesce(won.company_id, won.primary_contact_id),
-        customer_kind=ibis.ifelse(won.company_id.isnull(), "person", "company"),
-    )
-    return won.group_by("customer_key", "customer_kind", "currency").aggregate(
-        company_id=won.company_id.max(),
-        won_deals=won.count(),
-        won_amount_minor=won.amount_minor.sum(),
-        first_won_on=won.closed_on.min(),
-        last_won_on=won.closed_on.max(),
-    )
+    return customers_from_deals(warehouse.table(name="deal", namespace="ontology"))
+
+
+@s.asset_check(asset=crm_customers)
+def crm_customers_unique_key(crm_customers: ir.Table, warehouse: s.WarehouseResource) -> s.CheckResult:
+    keys = crm_customers.group_by("customer_key", "currency").aggregate(rows=crm_customers.count())
+    repeated = int(warehouse.execute(keys.filter(keys.rows > 1).count()))
+    return s.CheckResult(passed=repeated == 0, metadata={"repeated_keys": repeated})
 ```

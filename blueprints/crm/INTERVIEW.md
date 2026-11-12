@@ -61,9 +61,12 @@ routing rules and the roles; none of them is ever a real customer record.
   mean, and entry rules keep forecasts honest.
 - **What changes:** `STAGE_OPTIONS` with a description per stage that says when
   a deal is in it, the stage order, and each stage's required fields (amount,
-  expected close date). Won and lost are never stages.
+  expected close date). Won and lost are never stages. Ask once per pipeline:
+  each pipeline has its own stages, and a stage value belongs to one pipeline
+  only, so a repeated name gets a prefix (`partner_negotiation`).
 - **Default:** discovery, proposal, negotiation; proposal and negotiation need
-  an amount and an expected close date.
+  an amount and an expected close date. A second pipeline with no answer gets
+  the same steps, prefixed with its name.
 
 ## 7. Which currencies do you price in, and when do you know a deal's value?
 
@@ -95,12 +98,16 @@ routing rules and the roles; none of them is ever a real customer record.
 
 - **Why it matters:** a notification is useful only where people look, and a
   group chat often includes people who should not read a lead's message.
-- **What changes:** whether the announcement and digest workflows are built,
-  the chat whose purpose is `sales`, whether owners also get an email, and the
-  fields the message may carry.
-- **Default:** if the company agent runs in Telegram, post to the `sales` chat
-  with name, company, source and a link, and email the owner; otherwise email
-  the owner only.
+- **What the platform can do today:** the company agent answers paired members
+  in Telegram, Slack and WhatsApp, but workflows post to team chats only in
+  Telegram. With Slack, WhatsApp or no team chat, the plan offers owner emails
+  and never promises chat posts.
+- **What changes:** with Telegram, whether the announcement and digest
+  workflows are built, the chat whose purpose is `sales`, whether owners also
+  get an email, and the fields the message may carry. Otherwise only the owner
+  email.
+- **Default:** in Telegram, post to the `sales` chat with name, company, source
+  and a link, and email the owner; otherwise email the owner only.
 
 ## 11. What do you have today that must come over?
 

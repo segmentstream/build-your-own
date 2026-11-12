@@ -42,7 +42,7 @@ a list of disposable email domains that `lead.submit` rejects.
 | Option | Changes | |
 | --- | --- | --- |
 | One pipeline, stages in code | `PIPELINES` in `crm-config.ts`; a change is a reviewed deploy. | **Default** |
-| Several pipelines | One per product, team or region, each with its own stages; a deal's pipeline is set when it opens. Add `deal.changePipeline` (first stage of the new one, reason kept) only if teams hand deals over. | |
+| Several pipelines | One per product, team or region, each with its own stages; a stage value belongs to one pipeline only (`partner_negotiation`, not a second `negotiation`). A deal's pipeline is set when it opens. Add `deal.changePipeline` (first stage of the new one, reason kept) only if teams hand deals over. | |
 | Stages as records | A `Stage` entity managed by `salesManager`, for teams that change their process weekly. Costs: descriptions are no longer reviewed code, and removing a stage needs an action that moves its deals first. | |
 | Stage history for analytics | A `DealStageChange` record written by `moveStage`, `markWon` and `markLost`: from, to, when, by whom. Enables time-in-stage and stage-to-stage conversion in a model. Record history alone is not in the warehouse. | |
 | Forecast | A probability per stage in config, applied in a warehouse model to give a weighted pipeline per currency. Never stored on the deal. | |
@@ -78,12 +78,16 @@ a list of disposable email domains that `lead.submit` rejects.
 
 ## Notifications
 
+Workflows post to team chats only in Telegram today. The company agent also
+answers paired members in Slack and WhatsApp, but a workflow cannot post
+there yet, so with those channels only the owner email is available.
+
 | Option | Changes | |
 | --- | --- | --- |
-| Team chat and owner email | `announceNewLead`, `announceWonDeal`, `salesDigest` post to the chat with purpose `sales`; owners get a sign-in-link email. | **Default** when the agent runs in a chat |
-| Owner email only | No chat workflows; `lead.emailOwner` only. | **Default** otherwise |
-| Updates in thread | On qualify or disqualify, a reply to the original post (`replyTo` with its message id stored on the lead) saying who did what. The original post is never edited. | |
-| Per-owner direct messages | The digest goes to each owner's private chat (`telegram:private:<member id>`) instead of the group. | |
+| Team chat and owner email | `announceNewLead`, `announceWonDeal`, `salesDigest` post to the Telegram chat with purpose `sales`; owners get a sign-in-link email. | **Default** when the team chat is Telegram |
+| Owner email only | `announceNewLead` calls `lead.emailOwner` only; no `announceWonDeal`, no `salesDigest`, no `agent_chat` grants. | **Default** otherwise, including Slack and WhatsApp |
+| Updates in thread | Telegram only. On qualify or disqualify, a reply to the original post (`replyTo` with its message id stored on the lead) saying who did what. The original post is never edited. | |
+| Per-owner direct messages | Telegram only. The digest goes to each owner's private chat (`telegram:private:<member id>`) instead of the group. | |
 
 ## Talking to leads
 

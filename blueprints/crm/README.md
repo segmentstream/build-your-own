@@ -10,8 +10,9 @@ similar sales CRMs.
 
 - Every form submission becomes one lead, exactly once, however often the
   website retries. The person and their company are found or created for you.
-- New leads reach the right owner by your routing rules, and the team chat
-  hears about each one once, with a link to it.
+- New leads reach the right owner by your routing rules. The owner gets one
+  email with a link to the lead; a Telegram team chat also hears about each
+  lead once.
 - Triage in a few clicks: take a lead, qualify it into a deal, or disqualify it
   with a reason you can report on later.
 - Deal pipelines with your own stages and entry rules. Won and lost are final,
@@ -34,8 +35,9 @@ Build our CRM from the crm blueprint.
 
 - **foundation** (required): the CRM builds on its companies, contacts and
   members, and never creates a second copy of them.
-- **company-agent**: the team chat for lead and deal announcements, and the
-  agent that answers pipeline questions and logs activities.
+- **company-agent**: the agent that answers pipeline questions and logs
+  activities in Telegram, Slack or WhatsApp, and lead and deal announcements
+  in a Telegram team chat (workflows cannot post to Slack or WhatsApp yet).
 - **marketing-analytics**: joins each lead to the website session and campaign
   that brought it, by the lead's submission id.
 - **email-marketing**: audiences built from leads, deals and customers; consent

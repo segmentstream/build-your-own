@@ -79,7 +79,8 @@ person to approve or change it.
 A build reaches three milestones; `docs/testing.md` lists what runs at each.
 
 - **M1, local:** `npm --prefix ontology run check` with no errors or warnings,
-  the ontology's typecheck, build and tests, the app's typecheck and build,
+  the ontology's typecheck, build and tests, the app's typecheck and build
+  (see `docs/testing.md` for apps with page navigation),
   pipeline validation and tests, and the agent's typecheck. M1 needs no
   SegmentStream account. Run these checks after every meaningful step.
 - **M2, linked:** with a linked workspace, exercise every changed screen and
