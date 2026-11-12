@@ -71,6 +71,12 @@ says which exist.
   most widely used first. Each becomes an entry in `docs/alternatives.md` and a
   search term ("<product> alternative"); list every well-known one.
 - `dependsOn`: blueprints, or `foundation`, that must exist in the project first.
+- `connections`: the keys of the connections the build declares in
+  `connections/connections.py`, `required` and `optional`. A key names a
+  declaration the agent writes, not a ready-made connector: it may use a
+  platform preset (such as `GoogleAdsConnection`) or a generic declaration (such
+  as a public, read-only API with no credentials). BLUEPRINT.md says which, with
+  the declaration's code.
 - `components`: which project folders the blueprint touches: `ontology`, `app`,
   `pipeline`, `connections`, `events`, `agent`.
 - `authors`: GitHub handles of the people or organizations who wrote it. Also
