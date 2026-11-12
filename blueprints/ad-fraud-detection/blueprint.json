@@ -1,0 +1,42 @@
+{
+  "id": "ad-fraud-detection",
+  "title": "Ad fraud and bot detection",
+  "tagline": "A verdict with its evidence for every website session: bots, automation, data-centre traffic and AI agents, reported by channel and campaign.",
+  "replaces": [
+    "ClickCease",
+    "CHEQ",
+    "TrafficGuard"
+  ],
+  "status": "stable",
+  "dependsOn": [
+    "marketing-analytics"
+  ],
+  "worksWith": [
+    "crm",
+    "company-agent"
+  ],
+  "connections": {
+    "required": [],
+    "optional": [
+      "google_ads",
+      "microsoft_ads",
+      "public_ip_ranges"
+    ]
+  },
+  "components": [
+    "pipeline",
+    "connections",
+    "ontology",
+    "app",
+    "agent"
+  ],
+  "sdks": [
+    "@segmentstream/ontology",
+    "@segmentstream/app",
+    "@segmentstream/web-tracker",
+    "segmentstream-pipeline",
+    "segmentstream-connections"
+  ],
+  "reference": false,
+  "screens": []
+}

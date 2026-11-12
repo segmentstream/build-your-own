@@ -1,0 +1,17 @@
+{
+  "id": "crm",
+  "title": "CRM",
+  "tagline": "Leads from your forms, triage, deal pipelines and customers on your own companies and contacts, shaped to how you sell.",
+  "replaces": ["HubSpot", "Salesforce", "Zoho CRM"],
+  "status": "preview",
+  "dependsOn": ["foundation"],
+  "worksWith": ["email-marketing", "marketing-analytics", "company-agent", "e-signature"],
+  "connections": {
+    "required": [],
+    "optional": ["telegram", "hubspot", "gmail"]
+  },
+  "components": ["ontology", "app", "agent", "pipeline"],
+  "sdks": ["@segmentstream/ontology", "@segmentstream/app", "segmentstream-pipeline"],
+  "reference": false,
+  "screens": []
+}

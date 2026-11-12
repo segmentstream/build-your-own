@@ -1,0 +1,29 @@
+name: Build problem
+description: An agent built something wrong from a blueprint, or a blueprint contradicts the platform.
+labels: ["build problem"]
+body:
+  - type: input
+    id: blueprint
+    attributes:
+      label: Blueprint
+      placeholder: crm
+    validations:
+      required: true
+  - type: input
+    id: agent
+    attributes:
+      label: Coding agent
+      placeholder: Claude Code, Codex, Cursor…
+  - type: textarea
+    id: asked
+    attributes:
+      label: What you asked the agent
+    validations:
+      required: true
+  - type: textarea
+    id: happened
+    attributes:
+      label: What went wrong
+      description: Error messages, the step where it failed, what you expected. Never paste credentials, customer data or exports.
+    validations:
+      required: true

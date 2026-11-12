@@ -1,0 +1,23 @@
+{
+  "id": "bookkeeping",
+  "title": "Bookkeeping",
+  "tagline": "One general ledger for invoices, bills, expenses with receipts, fixed assets and multi-currency, with the reports your accountant reads.",
+  "replaces": ["Xero", "QuickBooks", "FreshBooks", "Zoho Books"],
+  "status": "stable",
+  "dependsOn": ["foundation"],
+  "worksWith": ["crm", "drive", "company-agent"],
+  "connections": {
+    "required": [],
+    "optional": ["exchange-rates", "xero", "telegram"]
+  },
+  "components": ["ontology", "app", "pipeline", "connections", "agent"],
+  "sdks": [
+    "@segmentstream/ontology",
+    "@segmentstream/app",
+    "@segmentstream/agent",
+    "segmentstream-pipeline",
+    "segmentstream-connections"
+  ],
+  "reference": false,
+  "screens": []
+}

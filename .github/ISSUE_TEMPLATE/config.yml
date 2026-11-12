@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Request a blueprint
+    url: https://github.com/segmentstream/build-your-own/discussions/categories/blueprint-requests
+    about: Ask for a new blueprint and upvote the ones you need.
+  - name: Have it built for you
+    url: https://segmentstream.com/enterprise
+    about: Our engineers build the first version on your data in a fixed-price pilot.

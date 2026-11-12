@@ -1,0 +1,424 @@
+{
+  "name": "SegmentStream Build Your Own",
+  "description": "Blueprints for building a company's own software with a coding agent on SegmentStream. Read AGENTS.md first.",
+  "procedure": "AGENTS.md",
+  "foundation": "foundation/FOUNDATION.md",
+  "blueprints": [
+    {
+      "id": "marketing-analytics",
+      "title": "Marketing analytics",
+      "tagline": "Your own tracker, sessions, identity graph, ad costs, conversions and attribution in a warehouse you own, with reports on people, channels, spend and the AI agents that read your site.",
+      "replaces": [
+        "Google Analytics",
+        "Google Ads attribution reports",
+        "Meta Ads Manager attribution"
+      ],
+      "status": "stable",
+      "dependsOn": [],
+      "worksWith": [
+        "crm",
+        "ad-fraud-detection",
+        "email-marketing",
+        "company-agent"
+      ],
+      "connections": {
+        "required": [],
+        "optional": [
+          "google_ads",
+          "meta_ads",
+          "microsoft_ads",
+          "linkedin_ads",
+          "tiktok_ads",
+          "ga4_bigquery",
+          "google_sheets"
+        ]
+      },
+      "components": [
+        "events",
+        "pipeline",
+        "connections",
+        "ontology",
+        "app",
+        "agent"
+      ],
+      "sdks": [
+        "@segmentstream/web-tracker",
+        "segmentstream-pipeline",
+        "segmentstream-connections",
+        "@segmentstream/ontology",
+        "@segmentstream/app"
+      ],
+      "reference": false,
+      "screens": [],
+      "path": "blueprints/marketing-analytics",
+      "files": {
+        "readme": "blueprints/marketing-analytics/README.md",
+        "blueprint": "blueprints/marketing-analytics/BLUEPRINT.md",
+        "interview": "blueprints/marketing-analytics/INTERVIEW.md",
+        "invariants": "blueprints/marketing-analytics/INVARIANTS.md",
+        "variations": "blueprints/marketing-analytics/VARIATIONS.md",
+        "pitfalls": "blueprints/marketing-analytics/PITFALLS.md"
+      }
+    },
+    {
+      "id": "crm",
+      "title": "CRM",
+      "tagline": "Leads from your forms, triage, deal pipelines and customers on your own companies and contacts, shaped to how you sell.",
+      "replaces": [
+        "HubSpot",
+        "Salesforce",
+        "Zoho CRM"
+      ],
+      "status": "preview",
+      "dependsOn": [
+        "foundation"
+      ],
+      "worksWith": [
+        "email-marketing",
+        "marketing-analytics",
+        "company-agent",
+        "e-signature"
+      ],
+      "connections": {
+        "required": [],
+        "optional": [
+          "telegram",
+          "hubspot",
+          "gmail"
+        ]
+      },
+      "components": [
+        "ontology",
+        "app",
+        "agent",
+        "pipeline"
+      ],
+      "sdks": [
+        "@segmentstream/ontology",
+        "@segmentstream/app",
+        "segmentstream-pipeline"
+      ],
+      "reference": false,
+      "screens": [],
+      "path": "blueprints/crm",
+      "files": {
+        "readme": "blueprints/crm/README.md",
+        "blueprint": "blueprints/crm/BLUEPRINT.md",
+        "interview": "blueprints/crm/INTERVIEW.md",
+        "invariants": "blueprints/crm/INVARIANTS.md",
+        "variations": "blueprints/crm/VARIATIONS.md",
+        "pitfalls": "blueprints/crm/PITFALLS.md"
+      }
+    },
+    {
+      "id": "email-marketing",
+      "title": "Email marketing",
+      "tagline": "Consent by topic, audiences on your own customer records, campaigns with a separate approval, and delivery events that keep your list clean.",
+      "replaces": [
+        "Mailchimp",
+        "Klaviyo",
+        "Brevo"
+      ],
+      "status": "stable",
+      "dependsOn": [
+        "foundation"
+      ],
+      "worksWith": [
+        "crm",
+        "company-agent"
+      ],
+      "connections": {
+        "required": [
+          "resend"
+        ],
+        "optional": [
+          "amazon-ses",
+          "postmark",
+          "sendgrid",
+          "mailgun",
+          "mailchimp"
+        ]
+      },
+      "components": [
+        "ontology",
+        "app",
+        "connections",
+        "agent",
+        "pipeline"
+      ],
+      "sdks": [
+        "@segmentstream/ontology",
+        "@segmentstream/app",
+        "segmentstream-connections",
+        "segmentstream-pipeline"
+      ],
+      "reference": false,
+      "screens": [],
+      "path": "blueprints/email-marketing",
+      "files": {
+        "readme": "blueprints/email-marketing/README.md",
+        "blueprint": "blueprints/email-marketing/BLUEPRINT.md",
+        "interview": "blueprints/email-marketing/INTERVIEW.md",
+        "invariants": "blueprints/email-marketing/INVARIANTS.md",
+        "variations": "blueprints/email-marketing/VARIATIONS.md",
+        "pitfalls": "blueprints/email-marketing/PITFALLS.md"
+      }
+    },
+    {
+      "id": "bookkeeping",
+      "title": "Bookkeeping",
+      "tagline": "One general ledger for invoices, bills, expenses with receipts, fixed assets and multi-currency, with the reports your accountant reads.",
+      "replaces": [
+        "Xero",
+        "QuickBooks",
+        "FreshBooks",
+        "Zoho Books"
+      ],
+      "status": "stable",
+      "dependsOn": [
+        "foundation"
+      ],
+      "worksWith": [
+        "crm",
+        "drive",
+        "company-agent"
+      ],
+      "connections": {
+        "required": [],
+        "optional": [
+          "exchange-rates",
+          "xero",
+          "telegram"
+        ]
+      },
+      "components": [
+        "ontology",
+        "app",
+        "pipeline",
+        "connections",
+        "agent"
+      ],
+      "sdks": [
+        "@segmentstream/ontology",
+        "@segmentstream/app",
+        "@segmentstream/agent",
+        "segmentstream-pipeline",
+        "segmentstream-connections"
+      ],
+      "reference": false,
+      "screens": [],
+      "path": "blueprints/bookkeeping",
+      "files": {
+        "readme": "blueprints/bookkeeping/README.md",
+        "blueprint": "blueprints/bookkeeping/BLUEPRINT.md",
+        "interview": "blueprints/bookkeeping/INTERVIEW.md",
+        "invariants": "blueprints/bookkeeping/INVARIANTS.md",
+        "variations": "blueprints/bookkeeping/VARIATIONS.md",
+        "pitfalls": "blueprints/bookkeeping/PITFALLS.md"
+      }
+    },
+    {
+      "id": "ad-fraud-detection",
+      "title": "Ad fraud and bot detection",
+      "tagline": "A verdict with its evidence for every website session: bots, automation, data-centre traffic and AI agents, reported by channel and campaign.",
+      "replaces": [
+        "ClickCease",
+        "CHEQ",
+        "TrafficGuard"
+      ],
+      "status": "stable",
+      "dependsOn": [
+        "marketing-analytics"
+      ],
+      "worksWith": [
+        "crm",
+        "company-agent"
+      ],
+      "connections": {
+        "required": [],
+        "optional": [
+          "google_ads",
+          "microsoft_ads",
+          "public_ip_ranges"
+        ]
+      },
+      "components": [
+        "pipeline",
+        "connections",
+        "ontology",
+        "app",
+        "agent"
+      ],
+      "sdks": [
+        "@segmentstream/ontology",
+        "@segmentstream/app",
+        "@segmentstream/web-tracker",
+        "segmentstream-pipeline",
+        "segmentstream-connections"
+      ],
+      "reference": false,
+      "screens": [],
+      "path": "blueprints/ad-fraud-detection",
+      "files": {
+        "readme": "blueprints/ad-fraud-detection/README.md",
+        "blueprint": "blueprints/ad-fraud-detection/BLUEPRINT.md",
+        "interview": "blueprints/ad-fraud-detection/INTERVIEW.md",
+        "invariants": "blueprints/ad-fraud-detection/INVARIANTS.md",
+        "variations": "blueprints/ad-fraud-detection/VARIATIONS.md",
+        "pitfalls": "blueprints/ad-fraud-detection/PITFALLS.md"
+      }
+    },
+    {
+      "id": "company-agent",
+      "title": "Company agent",
+      "tagline": "An AI agent in your team's chats that works on your own records, with the permissions of whoever asks.",
+      "replaces": [
+        "Microsoft 365 Copilot",
+        "Slack AI",
+        "Lindy"
+      ],
+      "status": "preview",
+      "dependsOn": [
+        "foundation"
+      ],
+      "worksWith": [
+        "crm",
+        "bookkeeping",
+        "drive",
+        "e-signature",
+        "email-marketing",
+        "marketing-analytics",
+        "ad-fraud-detection"
+      ],
+      "connections": {
+        "required": [],
+        "optional": [
+          "telegram",
+          "slack",
+          "whatsapp"
+        ]
+      },
+      "components": [
+        "agent",
+        "ontology",
+        "app",
+        "connections"
+      ],
+      "sdks": [
+        "@segmentstream/agent",
+        "@segmentstream/ontology",
+        "@segmentstream/app",
+        "segmentstream-connections"
+      ],
+      "reference": false,
+      "screens": [],
+      "path": "blueprints/company-agent",
+      "files": {
+        "readme": "blueprints/company-agent/README.md",
+        "blueprint": "blueprints/company-agent/BLUEPRINT.md",
+        "interview": "blueprints/company-agent/INTERVIEW.md",
+        "invariants": "blueprints/company-agent/INVARIANTS.md",
+        "variations": "blueprints/company-agent/VARIATIONS.md",
+        "pitfalls": "blueprints/company-agent/PITFALLS.md"
+      }
+    },
+    {
+      "id": "drive",
+      "title": "Drive",
+      "tagline": "Company files and online documents in one folder tree, with versions, PDFs, sharing, comments and an access log.",
+      "replaces": [
+        "Google Drive",
+        "Google Docs",
+        "Dropbox",
+        "Microsoft SharePoint"
+      ],
+      "status": "stable",
+      "dependsOn": [
+        "foundation"
+      ],
+      "worksWith": [
+        "e-signature",
+        "crm",
+        "bookkeeping",
+        "company-agent"
+      ],
+      "connections": {
+        "required": [],
+        "optional": [
+          "google-drive",
+          "gmail"
+        ]
+      },
+      "components": [
+        "ontology",
+        "app",
+        "agent"
+      ],
+      "sdks": [
+        "@segmentstream/ontology",
+        "@segmentstream/app"
+      ],
+      "reference": false,
+      "screens": [],
+      "path": "blueprints/drive",
+      "files": {
+        "readme": "blueprints/drive/README.md",
+        "blueprint": "blueprints/drive/BLUEPRINT.md",
+        "interview": "blueprints/drive/INTERVIEW.md",
+        "invariants": "blueprints/drive/INVARIANTS.md",
+        "variations": "blueprints/drive/VARIATIONS.md",
+        "pitfalls": "blueprints/drive/PITFALLS.md"
+      }
+    },
+    {
+      "id": "e-signature",
+      "title": "E-signature",
+      "tagline": "Envelopes, signers, a signing page and sealed, timestamped PDFs.",
+      "replaces": [
+        "DocuSign",
+        "Adobe Acrobat Sign",
+        "Dropbox Sign"
+      ],
+      "status": "stable",
+      "dependsOn": [
+        "drive"
+      ],
+      "worksWith": [
+        "crm",
+        "bookkeeping",
+        "company-agent"
+      ],
+      "connections": {
+        "required": [
+          "timestamp-authority"
+        ],
+        "optional": [
+          "resend",
+          "sms"
+        ]
+      },
+      "components": [
+        "ontology",
+        "app",
+        "connections",
+        "agent"
+      ],
+      "sdks": [
+        "@segmentstream/ontology",
+        "@segmentstream/app",
+        "segmentstream-connections"
+      ],
+      "reference": false,
+      "screens": [],
+      "path": "blueprints/e-signature",
+      "files": {
+        "readme": "blueprints/e-signature/README.md",
+        "blueprint": "blueprints/e-signature/BLUEPRINT.md",
+        "interview": "blueprints/e-signature/INTERVIEW.md",
+        "invariants": "blueprints/e-signature/INVARIANTS.md",
+        "variations": "blueprints/e-signature/VARIATIONS.md",
+        "pitfalls": "blueprints/e-signature/PITFALLS.md"
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "id": "email-marketing",
+  "title": "Email marketing",
+  "tagline": "Consent by topic, audiences on your own customer records, campaigns with a separate approval, and delivery events that keep your list clean.",
+  "replaces": ["Mailchimp", "Klaviyo", "Brevo"],
+  "status": "stable",
+  "dependsOn": ["foundation"],
+  "worksWith": ["crm", "company-agent"],
+  "connections": {
+    "required": ["resend"],
+    "optional": ["amazon-ses", "postmark", "sendgrid", "mailgun", "mailchimp"]
+  },
+  "components": ["ontology", "app", "connections", "agent", "pipeline"],
+  "sdks": [
+    "@segmentstream/ontology",
+    "@segmentstream/app",
+    "segmentstream-connections",
+    "segmentstream-pipeline"
+  ],
+  "reference": false,
+  "screens": []
+}

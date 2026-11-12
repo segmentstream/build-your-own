@@ -1,0 +1,23 @@
+{
+  "id": "marketing-analytics",
+  "title": "Marketing analytics",
+  "tagline": "Your own tracker, sessions, identity graph, ad costs, conversions and attribution in a warehouse you own, with reports on people, channels, spend and the AI agents that read your site.",
+  "replaces": ["Google Analytics", "Google Ads attribution reports", "Meta Ads Manager attribution"],
+  "status": "stable",
+  "dependsOn": [],
+  "worksWith": ["crm", "ad-fraud-detection", "email-marketing", "company-agent"],
+  "connections": {
+    "required": [],
+    "optional": ["google_ads", "meta_ads", "microsoft_ads", "linkedin_ads", "tiktok_ads", "ga4_bigquery", "google_sheets"]
+  },
+  "components": ["events", "pipeline", "connections", "ontology", "app", "agent"],
+  "sdks": [
+    "@segmentstream/web-tracker",
+    "segmentstream-pipeline",
+    "segmentstream-connections",
+    "@segmentstream/ontology",
+    "@segmentstream/app"
+  ],
+  "reference": false,
+  "screens": []
+}

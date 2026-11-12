@@ -1,0 +1,20 @@
+title: "Blueprint: "
+labels: ["blueprint request"]
+body:
+  - type: textarea
+    id: job
+    attributes:
+      label: The job it does
+      description: What should this software do for your company, and who uses it?
+    validations:
+      required: true
+  - type: input
+    id: replaces
+    attributes:
+      label: What it would replace
+      placeholder: A SaaS product, a spreadsheet, a manual process
+  - type: textarea
+    id: musts
+    attributes:
+      label: Rules it must follow
+      description: Approvals, compliance, things that must never happen.

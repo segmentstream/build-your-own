@@ -1,0 +1,26 @@
+# SegmentStream Build Your Own
+
+> Blueprints for building your company's own software with a coding agent: marketing analytics, CRM, email marketing, bookkeeping, ad fraud detection, a company agent, a document drive and e-signature. Each blueprint is a design, an interview, invariants with tests, variations and pitfalls. An agent builds the company's own version on SegmentStream; nothing is installed or forked.
+
+## Start here
+
+- [AGENTS.md](https://raw.githubusercontent.com/segmentstream/build-your-own/main/AGENTS.md): the build procedure a coding agent follows
+- [registry.json](https://raw.githubusercontent.com/segmentstream/build-your-own/main/registry.json): every blueprint with its metadata
+- [Foundation](https://raw.githubusercontent.com/segmentstream/build-your-own/main/foundation/FOUNDATION.md): shared companies, contacts, members and conventions
+- [SDKs](https://raw.githubusercontent.com/segmentstream/build-your-own/main/SDKS.md): the public SDKs and where they are documented
+
+## Blueprints
+
+- [Marketing analytics](https://raw.githubusercontent.com/segmentstream/build-your-own/main/blueprints/marketing-analytics/BLUEPRINT.md): Your own tracker, sessions, identity graph, ad costs, conversions and attribution in a warehouse you own, with reports on people, channels, spend and the AI agents that read your site. Replaces Google Analytics, Google Ads attribution reports, Meta Ads Manager attribution.
+- [CRM](https://raw.githubusercontent.com/segmentstream/build-your-own/main/blueprints/crm/BLUEPRINT.md): Leads from your forms, triage, deal pipelines and customers on your own companies and contacts, shaped to how you sell. Replaces HubSpot, Salesforce, Zoho CRM.
+- [Email marketing](https://raw.githubusercontent.com/segmentstream/build-your-own/main/blueprints/email-marketing/BLUEPRINT.md): Consent by topic, audiences on your own customer records, campaigns with a separate approval, and delivery events that keep your list clean. Replaces Mailchimp, Klaviyo, Brevo.
+- [Bookkeeping](https://raw.githubusercontent.com/segmentstream/build-your-own/main/blueprints/bookkeeping/BLUEPRINT.md): One general ledger for invoices, bills, expenses with receipts, fixed assets and multi-currency, with the reports your accountant reads. Replaces Xero, QuickBooks, FreshBooks, Zoho Books.
+- [Ad fraud and bot detection](https://raw.githubusercontent.com/segmentstream/build-your-own/main/blueprints/ad-fraud-detection/BLUEPRINT.md): A verdict with its evidence for every website session: bots, automation, data-centre traffic and AI agents, reported by channel and campaign. Replaces ClickCease, CHEQ, TrafficGuard.
+- [Company agent](https://raw.githubusercontent.com/segmentstream/build-your-own/main/blueprints/company-agent/BLUEPRINT.md): An AI agent in your team's chats that works on your own records, with the permissions of whoever asks. Replaces Microsoft 365 Copilot, Slack AI, Lindy.
+- [Drive](https://raw.githubusercontent.com/segmentstream/build-your-own/main/blueprints/drive/BLUEPRINT.md): Company files and online documents in one folder tree, with versions, PDFs, sharing, comments and an access log. Replaces Google Drive, Google Docs, Dropbox, Microsoft SharePoint.
+- [E-signature](https://raw.githubusercontent.com/segmentstream/build-your-own/main/blueprints/e-signature/BLUEPRINT.md): Envelopes, signers, a signing page and sealed, timestamped PDFs. Replaces DocuSign, Adobe Acrobat Sign, Dropbox Sign.
+
+## Optional
+
+- [How it works](https://raw.githubusercontent.com/segmentstream/build-your-own/main/docs/how-it-works.md)
+- [Blueprint format](https://raw.githubusercontent.com/segmentstream/build-your-own/main/docs/blueprint-format.md)
