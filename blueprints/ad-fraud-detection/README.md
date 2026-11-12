@@ -2,27 +2,27 @@
 
 Your own invalid-traffic detection, running in your warehouse next to your conversions:
 every request, session and conversion on your site gets a verdict with the evidence
-behind it, replacing click-fraud tools such as ClickCease and black-box traffic
-verification contracts.
+behind it, built to replace click-fraud tools such as ClickCease and traffic
+verification contracts whose rules you cannot inspect.
 
 **Alternative to** ClickCease, CHEQ, TrafficGuard, Spider AF, Fraud Blocker, ClickGUARD, HUMAN Security, DoubleVerify, Integral Ad Science, Anura and Polygraph: built by your own coding agent on [SegmentStream](https://segmentstream.com), shaped to how your company works.
 
 ## What you get
 
-- SegmentStream's complete production rule set, published in full: 17 hard rules in a
+- The full rule set SegmentStream runs in production, as of this version: 17 hard rules in a
   fixed precedence, 9 weighted weak rules (one reserved), every threshold, and the
   class, verdict and GIVT/SIVT logic, recalculated over all your history on each run.
 - Every session classed as human, likely human, unverified, AI assistant, autonomous
   agent, crawler, spoofed, script or internal, with a verdict (valid, suspicious,
   invalid) and the rules that decided it.
-- A proof for any session or lead: each rule that fired, on which request, with the
+- The evidence for any session or lead: each rule that fired, on which request, with the
   values it saw (user agent against client hints, TLS fingerprint, Fetch Metadata,
   network, script runs, per-address volume).
 - Claims checked against 21 public reference lists: a "GPTBot" or "ChatGPT-User" from an
   address its vendor does not publish is caught as spoofed; cloud, hosting and iCloud
   Private Relay ranges are told apart.
-- Form submissions judged with their own request and their session, so bots never count
-  as leads and real people behind a VPN still do.
+- Form submissions judged with their own request and their session, so detected bots do
+  not count as leads and real people behind a VPN still can.
 - Invalid traffic by reason, class, channel, platform, network and country, and the AI
   agents and crawlers that read your pages, verified.
 

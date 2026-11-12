@@ -6,5 +6,5 @@ the wrong role, please do not describe it in a public issue.
 
 Use **Report a vulnerability** on this repository's Security tab. If that
 button is not available, open an issue titled "Security contact request" with no
-details, and we will contact you privately. We acknowledge reports within three
+details, and we will contact you privately. We aim to acknowledge reports within three
 working days.

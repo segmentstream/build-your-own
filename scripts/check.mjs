@@ -130,7 +130,7 @@ const llms = [
   ...blueprints.map(
     (meta) =>
       `- [${meta.title}](${RAW}/blueprints/${meta.id}/BLUEPRINT.md): ${meta.tagline}${
-        meta.replaces.length ? ` Replaces ${meta.replaces.join(", ")}.` : ""
+        meta.replaces.length ? ` Alternative to ${meta.replaces.join(", ")}.` : ""
       }`,
   ),
   "",
@@ -145,10 +145,10 @@ const llms = [
 const alternatives = [
   "# Alternatives to popular business software",
   "",
-  "Each product below can be replaced by software your coding agent builds from a",
+  "For each product below, your coding agent can build your own alternative from a",
   "blueprint in this repository, shaped to your company and running on",
   "[SegmentStream](https://segmentstream.com). Give your agent",
-  "[AGENTS.md](../AGENTS.md) and name the tool you want to replace.",
+  "[AGENTS.md](../AGENTS.md) and name the tool you want an alternative to.",
   "",
   "| Instead of | Build your own | Blueprint |",
   "| --- | --- | --- |",
@@ -158,7 +158,8 @@ const alternatives = [
     .map(({ product, meta }) => `| ${product} | ${meta.title} | [${meta.id}](../blueprints/${meta.id}/) |`),
   "",
   "Product names are trademarks of their owners. They are named only to describe",
-  "what a blueprint can replace; no affiliation or endorsement is implied.",
+  "what a blueprint can be compared with; no affiliation or endorsement is implied.",
+  "See the [disclaimer](../DISCLAIMER.md).",
   "",
 ].join("\n");
 

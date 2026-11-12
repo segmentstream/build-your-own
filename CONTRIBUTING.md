@@ -4,7 +4,7 @@ This repository grows through people who know a business from the inside. If
 you have run, built or implemented the software an industry depends on (an ERP,
 a booking system, a practice management tool, the books of a particular kind of
 company), you know what a generic SaaS product gets wrong about it. A blueprint
-is the way to share that knowledge so anyone's coding agent can build it right.
+is the way to share that knowledge so anyone's coding agent can build from it.
 
 There are four ways to help, from smallest to largest.
 
@@ -40,7 +40,7 @@ first.
 
 Open an issue with the **Propose a blueprint** form before you write. Say what
 the software does, who you are in that business, and what you would include and
-leave out. A maintainer replies within a week: whether it overlaps an existing
+leave out. A maintainer aims to reply within a week: whether it overlaps an existing
 blueprint, what it should depend on, and anything to settle first. This saves
 you from writing something that has to be split or merged later.
 
@@ -76,7 +76,7 @@ A blueprint is merged when it is:
 - **Universal.** It serves any company in that business. Choices that differ by
   country, size or customer type are written down as variations with a default,
   not built into the design.
-- **Safe.** Every rule that would be a bug if broken is an invariant with a test.
+- **Guarded.** Every rule that would be a bug if broken is an invariant with a test.
   Money, messages to customers, signatures, deletion and access always need a
   human decision.
 - **Built on the platform and the foundation.** It uses the shared Company,
@@ -93,13 +93,15 @@ A maintainer reviews the design, the invariants and the platform details, and
 may try building it with an agent. New blueprints are merged as `preview`. A
 blueprint becomes `stable` once a version of it runs in production on
 SegmentStream for at least one company, whether ours, a customer's or yours.
+Review and status are editorial; they are not a certification (see the
+[disclaimer](DISCLAIMER.md)).
 
 ### Credit and ownership
 
 Add yourself to `authors` in the blueprint's `blueprint.json` with your GitHub
 handle; the blueprint's README credits its authors. The author of a new
 blueprint is asked to review later changes to it. Blueprints are maintained in
-this repository; we keep them current as the platform changes.
+this repository; we aim to keep them current as the platform changes.
 
 ## Licence
 

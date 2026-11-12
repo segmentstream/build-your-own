@@ -1,9 +1,9 @@
 # Company agent: build your own AI agent for your business
 
 An AI agent that lives in your team's Slack, Telegram or WhatsApp and works on
-your company's own records, with the permissions of whoever asks. It replaces
-"AI agent for business" products and Copilot-style assistants that run on a
-shared account and someone else's copy of your data.
+your company's own records, with the permissions of whoever asks. It is built to replace
+"AI agent for business" products and Copilot-style assistants, and runs on your
+own records with each person's permissions.
 
 **Alternative to** Microsoft 365 Copilot, ChatGPT Enterprise, Gemini for Google Workspace, Slack AI, Glean, Lindy, Dust and Zapier Agents: built by your own coding agent on [SegmentStream](https://segmentstream.com), shaped to how your company works.
 
@@ -57,7 +57,7 @@ agent picks up their actions when they deploy.
 ## What it is not
 
 - Not a general chatbot. It has no web browsing, and its file sandbox has no
-  network, so nothing it reads can send company data out.
+  network, which is designed so that what it reads cannot send company data out.
 - Not an autopilot. It sends nothing to customers, signs nothing and moves no
   money unless a person asks and confirms. Unattended routines get a narrow role
   and mostly propose.

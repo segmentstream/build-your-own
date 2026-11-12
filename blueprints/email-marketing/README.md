@@ -1,7 +1,7 @@
 # Email marketing: build your own Mailchimp and Klaviyo alternative
 
-Campaign email to the people in your own records, sent only to those who agreed
-to each topic, with a separate approval before anything goes out. It replaces
+Campaign email to the people in your own records, sent only to contacts with a
+recorded consent for the topic, with a separate approval before anything goes out. It is built to replace
 Mailchimp, Klaviyo and similar tools for newsletters and one-off campaigns.
 
 **Alternative to** Mailchimp, Klaviyo, HubSpot Marketing Hub, ActiveCampaign, Brevo, Kit (formerly ConvertKit), MailerLite, Campaign Monitor and Omnisend: built by your own coding agent on [SegmentStream](https://segmentstream.com), shaped to how your company works.
@@ -35,8 +35,8 @@ Mailchimp, Klaviyo and similar tools for newsletters and one-off campaigns.
 - Durable workflows that prepare and send each campaign, survive restarts, and
   record every run.
 - Webhook endpoints for unsubscribe links and the provider's delivery events.
-- A history of every consent change, with who made it, which is what a regulator
-  or an unhappy recipient asks for.
+- A history of every consent change, with who made it, the record you will want
+  when a regulator or an unhappy recipient asks.
 
 ## Build it
 

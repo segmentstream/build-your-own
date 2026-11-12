@@ -1,9 +1,9 @@
 # E-signature: build your own DocuSign alternative
 
-Send documents for signature and get back a sealed PDF that anyone can verify:
+Send documents for signature and get back a sealed PDF whose timestamp anyone can check:
 envelopes, signing order, a signing page for people outside your company, an
 audit trail of every view and action, and a trusted timestamp on the final file.
-It replaces DocuSign, Adobe Acrobat Sign and similar tools.
+It is built to replace DocuSign, Adobe Acrobat Sign and similar tools.
 
 **Alternative to** DocuSign, Adobe Acrobat Sign, Dropbox Sign (formerly HelloSign), PandaDoc, SignNow, Zoho Sign, BoldSign, Yousign, SignWell and OneSpan Sign: built by your own coding agent on [SegmentStream](https://segmentstream.com), shaped to how your company works.
 
@@ -15,10 +15,10 @@ It replaces DocuSign, Adobe Acrobat Sign and similar tools.
 - People outside your company sign from an emailed link on any device. They
   need no account and see only what was sent to them.
 - What people sign is frozen when you send it. Each signature records the
-  fingerprint of every document the signer saw, so nobody can later swap a page.
+  fingerprint of every document the signer saw, so a swapped page is detected.
 - Every send, email, view, signature, decline, void and seal is recorded with
-  its time, the person, their IP address and browser. The record cannot be
-  edited.
+  its time, the person, their IP address and browser. The record is
+  append-only: no action edits it.
 - Envelopes that need a manager's or lawyer's approval wait for it before they
   go out, and the approval is tied to the exact content that was approved.
 - When the last person signs, each document becomes one sealed PDF: the
@@ -64,8 +64,9 @@ Build our E-signature from the e-signature blueprint.
 ## What it is not
 
 - Not legal advice. The default is a simple electronic signature with strong
-  evidence. Advanced or qualified signatures (for example under eIDAS) need a
-  certificate provider; see the variations.
+  evidence; whether that is enough for a given document or country is for your
+  lawyer to confirm. Advanced or qualified signatures (for example under eIDAS)
+  need a certificate provider; see the variations.
 - Not a certificate authority. Your company holds no signing key by default;
   the seal comes from a public timestamp authority.
 - No in-person signing, witnesses, notaries or bulk sending to thousands of

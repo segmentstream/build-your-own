@@ -1,7 +1,7 @@
 # CRM: build your own HubSpot and Salesforce alternative
 
 Leads, deals and customers on your own company records, with the pipeline,
-stages and rules your team actually uses. It replaces HubSpot, Salesforce and
+stages and rules your team actually uses. It is built to replace HubSpot, Salesforce and
 similar sales CRMs.
 
 **Alternative to** Salesforce, HubSpot, Microsoft Dynamics 365, Zoho CRM, Monday Sales CRM, Freshsales, Attio and Close CRM: built by your own coding agent on [SegmentStream](https://segmentstream.com), shaped to how your company works.

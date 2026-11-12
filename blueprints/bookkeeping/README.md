@@ -2,7 +2,7 @@
 
 Your company's own books: one general ledger behind sales invoices, supplier bills,
 expenses with their receipts, payments, fixed assets and foreign currencies, with the
-reports an accountant reads. It replaces the bookkeeping core of Xero, QuickBooks and
+reports an accountant reads. It is built to replace the bookkeeping core of Xero, QuickBooks and
 similar small-business accounting tools.
 
 **Alternative to** QuickBooks, Xero, Sage, FreshBooks, Zoho Books and Wave Accounting: built by your own coding agent on [SegmentStream](https://segmentstream.com), shaped to how your company works.
@@ -10,12 +10,12 @@ similar small-business accounting tools.
 ## What you get
 
 - Every money event, from an invoice to depreciation, is one balanced journal in one
-  ledger, so the trial balance, profit and loss and balance sheet always agree.
+  ledger, so the trial balance, profit and loss and balance sheet are built from the same entries and agree.
 - Posted entries never change. Mistakes are corrected by reversal, and every change
   keeps its author and reason.
 - Closed periods stay closed: a lock date stops anything from posting into a month
   your accountant has signed off.
-- Invoices are numbered without gaps, and each one shows what is still owed. Aged
+- Invoice numbers are issued in sequence, designed to leave no gaps, and each one shows what is still owed. Aged
   receivables and payables come from the same ledger.
 - Expenses carry their receipts, and each shows whether its evidence is complete,
   partial or missing, so the gaps are known long before year end.

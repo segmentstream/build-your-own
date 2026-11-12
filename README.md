@@ -9,7 +9,7 @@
 
 Companies no longer have to rent software built for someone else's process, or
 install someone else's code and bend it to fit. With a good example, a coding
-agent can build software that fits your company exactly. These blueprints are
+agent can build software shaped to your company. These blueprints are
 those examples: each one is the design, the questions to ask, the rules that
 must always hold and the mistakes to avoid, taken from software already running
 in production.
@@ -45,14 +45,14 @@ Paste that into Claude Code, Codex or Cursor. Other things to ask for:
 | [CRM](blueprints/crm/) | Companies, contacts, leads and a deal pipeline shaped to how you sell | HubSpot, Salesforce | preview |
 | [Email marketing](blueprints/email-marketing/) | Consent, audiences on your own CRM data, campaigns with approval, delivery events | Mailchimp, Klaviyo | stable |
 | [Bookkeeping](blueprints/bookkeeping/) | One journal, invoices, bills, fixed assets, multi-currency, P&L and balance sheet | Xero, QuickBooks | stable |
-| [Ad fraud detection](blueprints/ad-fraud-detection/) | A verdict with evidence for every website session: bots, automation, data-centre and proxy traffic, AI agents; the complete production rule set | ClickCease, traffic verification vendors | stable |
+| [Ad fraud detection](blueprints/ad-fraud-detection/) | A verdict with evidence for every website session: bots, automation, data-centre and proxy traffic, AI agents; the full rule set we run in production | ClickCease, traffic verification vendors | stable |
 | [Company agent](blueprints/company-agent/) | An AI agent in Slack, Telegram or WhatsApp that works on your records with each person's permissions | Microsoft 365 Copilot, Slack AI | preview |
 | [Drive](blueprints/drive/) | Folders, online documents, versions, sharing and comments, linked to your records | Google Drive, Google Docs | stable |
 | [E-signature](blueprints/e-signature/) | Envelopes, signers, a signing page and sealed, timestamped PDFs | DocuSign | stable |
 
 Replacing a specific tool? The [alternatives list](docs/alternatives.md) maps
 more than 70 products, from DocuSign and HubSpot to QuickBooks and Google
-Analytics, to the blueprint that replaces them.
+Analytics, to the blueprint built to replace them.
 
 Most blueprints build on the shared [foundation](foundation/FOUNDATION.md):
 companies, contacts, members and the conventions they all follow.
@@ -114,7 +114,7 @@ The full procedure your agent follows is in [AGENTS.md](AGENTS.md).
 
 ## Why blueprints, not open source
 
-In April 2026 Andrej Karpathy suggested that, with coding agents, there is less
+In April 2026 Andrej Karpathy [suggested](https://x.com/karpathy/status/2040470801506541998) that, with coding agents, there is less
 point in sharing code: share the idea, and the other person's agent builds a
 version for their needs. We agree, with one change. For a ledger, an
 e-signature or an identity graph, an idea is not enough: some rules must never
@@ -140,9 +140,10 @@ them freely. They are written for the SegmentStream platform, which runs the
 software your agent builds. The designs, invariants and interviews are useful
 on any stack.
 
-**Do I need to be a developer?** No. You need a coding agent and the ability to
-answer questions about how your company works. The agent writes, tests and
-deploys the code.
+**Do I need to be a developer?** No, to get a first version. You need a coding
+agent and the ability to answer questions about how your company works. The
+agent writes, tests and deploys the code. Before you rely on it, have someone
+who can read code review it.
 
 **Can I try it before I have access?** Yes, up to deployment. Your agent builds
 the project and runs every invariant test locally, on invented data; deploying
@@ -151,7 +152,7 @@ it and opening the screens needs a SegmentStream workspace.
 **What does it cost?** The blueprints are free. Running your software on
 SegmentStream is billed by usage: see [pricing](https://segmentstream.com/pricing).
 
-**Does anything here touch my data?** No. Blueprints contain designs and
+**Does anything here touch my data?** No: this repository contains only designs and
 invented demo data. Your data reaches only your own workspace, through
 connections you authorize.
 
@@ -181,7 +182,7 @@ Know a business from the inside? If you have built or implemented the software
 an industry runs on (an ERP, a booking or practice management system, a field
 service tool, the books of a particular kind of company), you know what generic
 SaaS gets wrong about it. Write it down as a blueprint and every company's
-coding agent can build it right. Your agent does the formatting: it interviews
+coding agent can build it from what you know. Your agent does the formatting: it interviews
 you and writes the files. See [CONTRIBUTING.md](CONTRIBUTING.md) and the
 [wanted blueprints](docs/wanted.md), from booking and hotel operations to
 property management, legal practice and ERP-lite.
@@ -203,4 +204,4 @@ warranties of any kind; software built from them is the responsibility of
 whoever builds and runs it. Read the [disclaimer](DISCLAIMER.md) before you rely
 on anything here. Screenshots show invented demo data. Product
 names are trademarks of their owners, named only to describe what a blueprint
-can replace.
+can be compared with.

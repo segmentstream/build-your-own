@@ -12,7 +12,7 @@ version of it:
 - **the interview**: what to ask you, and what each answer changes;
 - **the invariants**: rules that must hold in every version, each with a test;
 - **the variations**: where companies legitimately differ, and the default;
-- **the pitfalls**: mistakes agents already made, so yours does not.
+- **the pitfalls**: mistakes agents already made, so yours is warned.
 
 Your agent reads the blueprint, asks you the questions, shows you a plan, and
 writes the software into your own repository. Two companies that build from the
@@ -62,13 +62,13 @@ Every blueprint marked `stable` describes custom software running in production
 on the SegmentStream platform: for our own team, for our customers, or for the
 company of the expert who contributed it. The blueprints are extracted from that
 code, generalized, and stripped of anything specific to one company. `preview`
-means the design is sound but details are still moving; every new blueprint
+means the design is not yet taken from production and details are still moving; every new blueprint
 starts there. A status describes where a design comes from. It is not a
 certification or a warranty of any software built from it.
 
 ## What stays with SegmentStream
 
-Blueprints describe complete, working software. A few things remain products or
+Blueprints describe software that runs in production. A few things remain products or
 services of SegmentStream rather than blueprints: advanced attribution models,
 budget optimization and incrementality experiments for marketing analytics, and
 engineers who build the first version with you. See https://segmentstream.com.

@@ -2,7 +2,7 @@
 
 Web, product and marketing analytics as one data chain you own: your own tracker,
 sessions, an identity graph, ad costs stitched to visits, declared conversions and
-attribution. It replaces Google Analytics and the attribution reports inside ad
+attribution. It is built to replace Google Analytics and the attribution reports inside ad
 platforms.
 
 **Alternative to** Google Analytics (GA4), Adobe Analytics, Mixpanel, Heap, Matomo, Plausible, PostHog, Triple Whale, Northbeam, Rockerbox, Hyros, Dreamdata, HockeyStack and Google Ads and Meta Ads attribution reports: built by your own coding agent on [SegmentStream](https://segmentstream.com), shaped to how your company works.
@@ -69,6 +69,9 @@ Build our Marketing analytics from the marketing-analytics blueprint.
   ad platforms settle the previous day's costs.
 - Advanced attribution models, budget and portfolio optimization, and incrementality
   experiments are not part of this blueprint; SegmentStream offers them as a service.
+- Not legal advice. Tracking, cookies and identity matching are regulated (GDPR,
+  ePrivacy and others); your version follows the consent rules you choose, so
+  check them with whoever advises you on privacy.
 
 ## Authors
 
