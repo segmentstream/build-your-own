@@ -214,9 +214,9 @@ to repeat. Ibis and SDK mistakes that every pipeline blueprint shares (self-join
   before creating a new one, so a cookie from an earlier Accept kept identifying the
   visitor; or the banner never called `consentChanged()`.
 - **Instead**: read, create and renew the cookie only with consent, remove it on a
-  refusal (BLUEPRINT 10), and call `consentChanged()` after every choice. Test a request
-  that carries an old `ss_aid` with a declined choice: no anonymous ID, and the cookie is
-  removed.
+  refusal (BLUEPRINT 10), and call `consentChanged()` after every choice. Test it as
+  invariant 27 describes: a request that carries an old `ss_aid` with a declined choice
+  gets no anonymous ID, and the cookie is removed.
 
 ## 22. A landing view split from its visitor
 

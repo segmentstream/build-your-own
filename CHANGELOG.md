@@ -23,7 +23,7 @@ Collection follows the visitor's consent with `@segmentstream/web-tracker` 0.2.
   sessions with consent (PITFALLS 23).
 - The middleware sketch read an existing `ss_aid` without checking consent. It now reads,
   creates and renews the cookie only with consent and removes it on a refusal
-  (BLUEPRINT 10, PITFALLS 21).
+  (BLUEPRINT 10, PITFALLS 21), and invariant 27 tests it.
 
 A project built from 1.0.0:
 
@@ -34,6 +34,8 @@ A project built from 1.0.0:
    the banner, and store `tracker.anonymousId()` in `ss_aid` on Accept.
 4. Add `consent` to `web_events` and `webSession`, and the consent share to the data
    quality page.
+5. Add the test for the new invariant 27: without consent, the site keeps no anonymous
+   ID.
 
 Changing consent or cookie behavior on a live site needs the person's approval
 (INTERVIEW, "Decisions that need a person every time").

@@ -13,7 +13,7 @@ once` (in pytest, `test_marketing_analytics_03_retried_event_counts_once`).
   A model that calls `JSON_QUERY_ARRAY` needs its DuckDB macro in that test
   ([pipeline notes](../../docs/pipeline-notes.md#ibis-that-runs-on-bigquery-and-duckdb)).
 - **Ontology rules** run at M1 on the ontology harness; metric queries run at M2.
-- **Site rules** (1 and 2) are tested in the site's repository, or in
+- **Site rules** (1, 2 and 27) are tested in the site's repository, or in
   `site-integration/` when the agent wrote the site's code there (BLUEPRINT 6.2).
 - [`fixtures/`](fixtures/) is one invented day with its expected sessions, stitching,
   conversions and attribution. Run it as one more test; it covers parts of 6, 8, 14, 18,
@@ -217,3 +217,16 @@ at M1.
       match a cost row of that day is matched with `match_strategy = 'click_id'` and the
       click view's ad group and ad. A `gclid` with two ad identities in `click_view` gives
       `conflicting_click_id`, and no other strategy matches that session.
+
+## Consent
+
+27. **Without consent, the site keeps no anonymous ID.** Where the site asks for consent
+    (INTERVIEW 9).
+    - Why: an ID kept or sent without consent identifies a visitor who declined or has not
+      chosen yet, which the consent variations promise never happens (VARIATIONS,
+      "Consent, cookies and retention").
+    - Test: in the site's middleware, a document request with an old `ss_aid` and a
+      declined choice sends `anonymousId: null` with `consent: "denied"` and removes the
+      cookie; with a pending choice it sends no ID and sets no cookie; with consent it
+      keeps the ID it received. In the browser code, a decline leaves no `ss_aid`, and an
+      Accept stores the ID the page's views already carried (`tracker.anonymousId()`).

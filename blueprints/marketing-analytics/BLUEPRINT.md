@@ -233,8 +233,8 @@ admission) and **IP capture**. Without IP capture the collector removes
 
 The tracker code lives in the site's own repository, not in the workspace project: the
 project deploys only its components (`app/`, `ontology/`, `pipeline/`, `connections/`,
-`events/`, `agent/`). Write the site's changes and their tests (invariants 1 and 2) in
-the site's repository. When the agent cannot reach it, it writes them into a
+`events/`, `agent/`). Write the site's changes and their tests (invariants 1, 2 and 27)
+in the site's repository. When the agent cannot reach it, it writes them into a
 `site-integration/` folder in the project, outside every component, for the person to copy.
 
 The site uses `@segmentstream/web-tracker` 0.2 or later:
@@ -676,8 +676,8 @@ person's approval) and their job has run.
    (M1): validation and an empty test run pass.
 2. **Stream and tracker.** `events/events.py` with its own `events/pyproject.toml`; the
    tracker, middleware and server events in the site's repository (6.2). Check (M1):
-   `python -m segmentstream.events inspect` and the site's tests for invariants 1 and 2;
-   (M3) `segmentstream events verify web` reports `delivered`.
+   `python -m segmentstream.events inspect` and the site's tests for invariants 1, 2 and
+   27; (M3) `segmentstream events verify web` reports `delivered`.
 3. **Events, hits, sessions on sample data.** Calendar, both event adapters, `hits`,
    `sessions`, `session_report`. Check (M1): the `fixtures/` day gives the expected
    `sessions`, and tests turn invented visits into the expected channels and classes.
