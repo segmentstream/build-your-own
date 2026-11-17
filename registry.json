@@ -6,7 +6,7 @@
   "blueprints": [
     {
       "id": "marketing-analytics",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "title": "Marketing analytics",
       "tagline": "Your own tracker, sessions, identity graph, ad costs, conversions and attribution in a warehouse you own, with reports on people, channels, spend and the AI agents that read your site.",
       "replaces": [

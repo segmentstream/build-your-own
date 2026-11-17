@@ -205,3 +205,33 @@ to repeat. Ibis and SDK mistakes that every pipeline blueprint shares (self-join
   `unwrap_as("string")`, which BigQuery compiles to `SAFE.STRING`, NULL for a JSON number.
 - **Instead**: send money as a decimal string (`"120.50"`) with its `currency`, and cast it
   to `decimal(38, 9)` in the adapter.
+
+## 21. An anonymous ID kept after consent ends
+
+- **Symptom**: visitors who declined still show up as returning visitors, with the same
+  anonymous ID before and after Decline.
+- **Cause**: the middleware read `ss_aid` whenever it was present and checked consent only
+  before creating a new one, so a cookie from an earlier Accept kept identifying the
+  visitor; or the banner never called `consentChanged()`.
+- **Instead**: read, create and renew the cookie only with consent, remove it on a
+  refusal (BLUEPRINT 10), and call `consentChanged()` after every choice. Test a request
+  that carries an old `ss_aid` with a declined choice: no anonymous ID, and the cookie is
+  removed.
+
+## 22. A landing view split from its visitor
+
+- **Symptom**: paid first visits look like one-page sessions, and their later pages start
+  a second session without the campaign.
+- **Cause**: on Accept the site created a new ID, or left it to the server on the next
+  page, instead of keeping the page-load ID the views before consent carried.
+- **Instead**: on Accept store `tracker.anonymousId()` in `ss_aid` (a tracker-written
+  cookie does this itself), and let the server create an ID only when none arrives.
+
+## 23. Page loads without consent counted as visitors
+
+- **Symptom**: visitors and new people jump after cookieless views are switched on, while
+  sessions barely change.
+- **Cause**: a visitor without consent gets a new anonymous ID on every page load, and
+  `visitors` counts distinct IDs.
+- **Instead**: show visitors and people with consent (`consent` = `granted`) next to the
+  totals, and say on the page which one a number is.

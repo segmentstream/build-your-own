@@ -89,12 +89,15 @@ already said.
 - **Why**: the anonymous ID is a first-party cookie; in many countries it needs consent.
   Raw captures hold user agents, and IP addresses when SegmentStream has switched on IP
   capture for the workspace, which verifying AI agents needs (BLUEPRINT 6.2, 6.5).
-- **Answers change**: the middleware sets `ss_aid` only after consent, or never
-  (cookieless mode); the stream's `retention_days`; a deletion procedure for a visitor's
-  data on request.
-- **Default**: set the cookie only when the site's consent banner allows it; without
-  consent, events still arrive with no anonymous ID and each hit is its own session.
-  Keep raw captures as long as the privacy policy says; no expiry if it says nothing.
+- **Answers change**: the tracker's `consent` and `withoutConsent`: send views without a
+  cookie until Accept, hold them until Accept, or never set a cookie (VARIATIONS,
+  "Consent, cookies and retention"); whether the site's server or the tracker writes
+  `ss_aid`; the stream's `retention_days`; a deletion procedure for a visitor's data on
+  request.
+- **Default**: a banner with Accept and Decline. Until a visitor accepts, views arrive
+  with an ID for that page load only and no cookie (`withoutConsent: "cookieless"`); on
+  Accept the site's server keeps that ID in `ss_aid`. Keep raw captures as long as the
+  privacy policy says; no expiry if it says nothing.
 
 ## 10. Are you replacing another analytics tool, and for how long can it run alongside?
 
