@@ -53,7 +53,15 @@ server events. Default: not built.
   (BLUEPRINT 2, `webSession`).
 - **Hold until consent**: `withoutConsent: "nothing"`. Nothing leaves the page until the
   visitor accepts; held views are then sent with the stored ID, and the views of visitors
-  who decline or leave first are never sent. Fewer sessions, every one with consent.
+  who decline or leave first are never sent. The middleware's `http_request` events are a
+  separate choice, since they are what records crawlers and AI agents, which never accept
+  (BLUEPRINT 6.5):
+  - Kept (default): each document a visitor without consent loads still arrives as a
+    `server_only` hit, a session of its own with no anonymous ID and its `consent`
+    (BLUEPRINT 6.4, 6.6). Report sessions with consent apart from the rest.
+  - Sent only with consent: nothing of a visitor who has not accepted reaches the stream,
+    landing views have no server request to pair with, and the AI agents and crawlers
+    report stays empty.
 - **Cookieless**: never set `ss_aid` and give the tracker no `consent`; hits carry no
   anonymous ID and each forms its own session. Reports keep sessions and channels per hit
   but lose returning visitors, journeys and most attribution beyond the landing visit.
