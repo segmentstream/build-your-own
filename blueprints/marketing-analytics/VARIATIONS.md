@@ -43,10 +43,32 @@ server events. Default: not built.
 
 ## Consent, cookies and retention (country law)
 
-- **Consent-gated cookie** (default): `ss_aid` is set only when the site's consent banner
-  allows analytics; without it, hits carry no anonymous ID and each forms its own session.
-- **Cookieless**: never set `ss_aid`; reports keep sessions and channels per hit but lose
-  returning visitors, journeys and most attribution beyond the landing visit.
+- **Consent with cookieless views** (default): the tracker gets the banner's choice
+  (`consent`) and `withoutConsent: "cookieless"`. Until a visitor accepts, `ss_aid` is
+  neither read nor written, and views arrive at once with an ID for that page load only,
+  fewer device details and their `consent`. On Accept, a first visit keeps that ID in
+  `ss_aid`, so its landing view and campaign stay with the visitor. A returning visitor's
+  views before Accept keep the page-load ID, since the cookie cannot be read before
+  consent. Visitors and people then count a visitor without consent once per page load
+  (BLUEPRINT 2, `webSession`).
+- **Hold until consent**: `withoutConsent: "nothing"`. Nothing leaves the page until the
+  visitor accepts; held views are then sent with the stored ID, and the views of visitors
+  who decline or leave first are never sent. The middleware's `http_request` events are a
+  separate choice, since they are what records crawlers and AI agents, which never accept
+  (BLUEPRINT 6.5):
+  - Kept (default): each document a visitor without consent loads still arrives as a
+    `server_only` hit, a session of its own with no anonymous ID and its `consent`
+    (BLUEPRINT 6.4, 6.6). Report sessions with consent apart from the rest.
+  - Sent only with consent: nothing of a visitor who has not accepted reaches the stream,
+    landing views have no server request to pair with, and the AI agents and crawlers
+    report stays empty.
+- **Cookieless**: never set `ss_aid` and give the tracker no `consent`; hits carry no
+  anonymous ID and each forms its own session. Reports keep sessions and channels per hit
+  but lose returning visitors, journeys and most attribution beyond the landing visit.
+- **Tracker-written cookie**: for a site with no server code, `cookie: { writer:
+  "tracker", domain }` makes the tracker create, renew and, on a refusal, remove `ss_aid`
+  itself. Safari keeps a cookie written by script for at most seven days, so returning
+  Safari visitors are recognised for a shorter time than with a server-written cookie.
 - **Exempt audience measurement**: some regulators exempt first-party analytics that meet
   strict conditions from consent. Whether that applies is a legal decision for the
   company, recorded in its privacy policy, not a default here.

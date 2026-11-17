@@ -34,6 +34,7 @@ stored entity holds what people decide. IPs, user agents and email hashes stay i
 | --- | --- | --- |
 | `sessionId`, `sessionDate` | text, date | The first hit's ID (stable); start day in the reporting time zone. |
 | `visitorId`, `personId` | text | The browser's anonymous ID (null when none); its person in the current identity snapshot, not permanent. |
+| `consent` | text | `granted` when any hit was sent with consent, else the first hit's choice; null where the site records none. |
 | `startedAt`, `endedAt`, `hits`, `isFirstSession` | timestamp, integer, boolean | First and last hit (UTC), hit count, the person's earliest retained session. |
 | `channelGroup`, `source`, `medium`, `utmCampaign` | text | Acquisition, by the rules in 6.6. |
 | `clickIdType`, `landingPath`, `referrerHost`, `country` | text | Click ID type (never the value), first page, external referrer, ISO country. |
@@ -44,7 +45,9 @@ Relationship `campaign` on `campaignKey`, declared without `optional` or a delet
 relationships of warehouse-backed entities take neither (`check` refuses them), and an
 unmatched session's null key simply matches nothing. Metrics: `sessions`, `newPeople`
 (count where `isFirstSession`), `visitors` and `people` (`m.countDistinct`; non-additive,
-as described).
+as described). A visitor without consent has a new anonymous ID on every page load, so
+these count each of their page loads; filter on `consent` = `granted` for returning
+visitors.
 
 ### campaign, adCost
 
@@ -230,16 +233,28 @@ admission) and **IP capture**. Without IP capture the collector removes
 
 The tracker code lives in the site's own repository, not in the workspace project: the
 project deploys only its components (`app/`, `ontology/`, `pipeline/`, `connections/`,
-`events/`, `agent/`). Write the site's changes and their tests (invariants 1 and 2) in
-the site's repository. When the agent cannot reach it, it writes them into a
+`events/`, `agent/`). Write the site's changes and their tests (invariants 1, 2 and 27)
+in the site's repository. When the agent cannot reach it, it writes them into a
 `site-integration/` folder in the project, outside every component, for the person to copy.
 
-The site uses `@segmentstream/web-tracker`:
+The site uses `@segmentstream/web-tracker` 0.2 or later:
 
-- **Anonymous ID.** The site's server sets a first-party cookie `ss_aid` (random UUID) on
-  document navigations when it is missing and consent allows: `Secure`, `SameSite=Lax`,
-  on the registrable domain, long-lived, and not `HttpOnly`, since the browser tracker
-  reads it. The tracker never sets it.
+- **Anonymous ID.** A first-party cookie `ss_aid` (random UUID) recognises a returning
+  browser: `Secure`, `SameSite=Lax`, on the registrable domain, long-lived, and not
+  `HttpOnly`, since the browser tracker reads it. By default the site's server writes it:
+  on document navigations, and only while consent allows, it creates the cookie when it
+  is missing and renews it, since Safari keeps a cookie written by script for at most
+  seven days. A site with no server code lets the tracker write it instead
+  (`cookie: { writer: "tracker", domain }`; VARIATIONS, "Consent, cookies and retention").
+- **Consent.** Where the site asks for consent (INTERVIEW 9), the browser tracker gets
+  `consent`, a reader of the site's banner returning `granted`, `denied` or `pending`, and
+  `withoutConsent` (`cookieless` by default). The banner calls `consentChanged()` after
+  every choice. Until consent is granted the tracker reads and writes no cookie and sends
+  views with an ID for that page load only. On consent the site stores
+  `tracker.anonymousId()` in `ss_aid`, so a first visit's landing view and its campaign
+  stay with the visitor; a tracker-written cookie does this itself. A refusal removes the
+  cookie. Views record the choice as `payload.context.consent`; server events pass the
+  server's reading of the same choice as `consent`, and `anonymousId: null` without it.
 - **Browser page views.** The site calls `pageView()` of a `createBrowserTracker` after
   each navigation; views are origin-admitted, with no key in the browser. `flush()` runs on
   an interval and `flush(true)` (a beacon) when the page is hidden.
@@ -266,8 +281,9 @@ secret store, never in a public environment variable.
 `silver/web_events`, daily on `event_date`, one row per logical event, key `event_id`:
 `event_type`, `event_time` (producer time, else receipt), `event_date` (the reporting day
 of `event_time`), `received_at`, `adapter`, `admission` (`origin`, `write_key`),
-`anonymous_id`, `user_id`, `email_sha256`, `request_id` (the site's request ID),
-`seq`, `navigation_type`, `page_url`, `page_host`, `page_path`, `referrer_url`, six
+`anonymous_id`, `consent` (`granted`, `denied` or `pending` when the event was sent; null
+where the site handles no consent), `user_id`, `email_sha256`, `request_id` (the site's
+request ID), `seq`, `navigation_type`, `page_url`, `page_host`, `page_path`, `referrer_url`, six
 `utm_*`, `click_id_type` and `click_id` (the first paid catalogue parameter present),
 `click_ids` (JSON object of every catalogued parameter present, markers included), `ip`,
 `user_agent`, `country`, `client` (JSON browser signals), `request_evidence` (JSON:
@@ -287,12 +303,13 @@ and requires a partition filter. Its `request_id` column is the collector's own 
 never the site's. The collector removes `payload.visitor` from origin submissions (and sets
 `untrusted_visitor_context`), and removes `payload.visitor.ip` unless IP capture is on.
 
-Where the contract's columns come from, as `@segmentstream/web-tracker` 0.1 sends them:
+Where the contract's columns come from, as `@segmentstream/web-tracker` 0.2 sends them:
 
 | Contract column | From |
 | --- | --- |
 | `admission` | `auth_mode` |
 | `anonymous_id`, `seq` | `body.payload.context.anonymous_id`, `.seq` |
+| `consent` | `body.payload.context.consent` (page views and server events) |
 | `request_id` | `body.payload.context.request_id` (page views, from `Server-Timing: ssreq`), else `body.payload.visitor.request_id` (server events) |
 | `navigation_type` | `body.payload.client.navigation_type` (`navigate`, `reload`, …; `spa` for in-app navigations) |
 | `page_url`, `page_path`, `page_host` | `body.payload.context.page.url`; the path is `.page.path` on page views and the URL's path on server events; the host is the URL's host |
@@ -622,8 +639,9 @@ Pages check the read permissions of what they show, take a date range (default: 
    one each model credited, the key names that linked them).
 4. **AI agents and crawlers**: verified assistant fetches, crawler hits by class and
    vendor, pages agents read most, spoofed claims, human sessions from AI assistants.
-5. **Data quality**: tracking health, stitching diagnostics, identity coverage and
-   conflicts, cost freshness, failing checks, annotations.
+5. **Data quality**: tracking health, the share of sessions with consent, stitching
+   diagnostics, identity coverage and conflicts, cost freshness, failing checks,
+   annotations.
 6. **Parity** (while the kit has data): daily comparison with status filters and the
    annotations that explain differences.
 7. **Setup** (read-only): conversion declarations, counting, windows, channel rules and
@@ -658,8 +676,8 @@ person's approval) and their job has run.
    (M1): validation and an empty test run pass.
 2. **Stream and tracker.** `events/events.py` with its own `events/pyproject.toml`; the
    tracker, middleware and server events in the site's repository (6.2). Check (M1):
-   `python -m segmentstream.events inspect` and the site's tests for invariants 1 and 2;
-   (M3) `segmentstream events verify web` reports `delivered`.
+   `python -m segmentstream.events inspect` and the site's tests for invariants 1, 2 and
+   27; (M3) `segmentstream events verify web` reports `delivered`.
 3. **Events, hits, sessions on sample data.** Calendar, both event adapters, `hits`,
    `sessions`, `session_report`. Check (M1): the `fixtures/` day gives the expected
    `sessions`, and tests turn invented visits into the expected channels and classes.
@@ -690,22 +708,38 @@ person's approval) and their job has run.
 Invented names and data; the full API is in your project's `docs/` and `.agents/skills/`.
 
 ```ts
-// The site's Next.js proxy (middleware). consentAllows is the site's own consent check.
+// The site's Next.js proxy (middleware). consentOf reads the site's banner choice from its own cookie.
 export function proxy(request: NextRequest, event: NextFetchEvent) {
   const response = NextResponse.next();
   if (!isDocumentRequest(request)) return response; // helpers from @segmentstream/web-tracker/server
+  const consent = consentOf(request); // "granted" | "denied" | "pending"
   const navigating = request.headers.get("sec-fetch-mode") === "navigate";
-  const existing = requestAnonymousId(request);
-  const anonymousId = existing ?? (navigating && consentAllows(request) ? crypto.randomUUID() : null);
-  if (anonymousId && !existing) response.cookies.set("ss_aid", anonymousId, { path: "/", domain: "example.com", maxAge: 15_552_000, secure: true, sameSite: "lax" });
+  // Only with consent is the ID read, created or renewed; a refusal removes it.
+  const anonymousId = consent === "granted" ? (requestAnonymousId(request) ?? (navigating ? crypto.randomUUID() : null)) : null;
+  const cookie = { name: "ss_aid", path: "/", domain: "example.com" };
+  if (anonymousId) response.cookies.set({ ...cookie, value: anonymousId, maxAge: 15_552_000, secure: true, sameSite: "lax" });
+  else if (consent === "denied" && request.cookies.has("ss_aid")) response.cookies.delete(cookie);
   const requestId = request.headers.get("x-vercel-id");
   if (requestId) response.headers.append("Server-Timing", `ssreq;desc="${requestId.replace(/["\\]/g, "\\$&")}"`);
   event.waitUntil(sendEvents([requestEvent(request, {
-    eventType: "http_request", anonymousId, page: true, sdk: { name: "northwind-site", version: "1" },
+    eventType: "http_request", anonymousId, consent, page: true, sdk: { name: "northwind-site", version: "1" },
     fields: { request: { method: request.method, host: request.headers.get("host"), path: request.nextUrl.pathname } },
   })], { endpoint: process.env.WEB_EVENTS_ENDPOINT!, writeKey: process.env.WEB_EVENTS_WRITE_KEY! }));
   return response;
 }
+```
+
+```ts
+// The site's browser code, once per page load. readBanner returns the visitor's choice; onBannerChoice
+// is the banner's own callback. The tracker never needs the write key.
+const tracker = createBrowserTracker({ endpoint: WEB_EVENTS_ENDPOINT, consent: readBanner, withoutConsent: "cookieless" });
+onBannerChoice(() => {
+  tracker.consentChanged();
+  // Keep the ID this page load's views carry, so the landing view stays with the visitor; the
+  // server renews the cookie from the next page on. Any other choice removes it.
+  const id = readBanner() === "granted" ? tracker.anonymousId() : null;
+  document.cookie = `ss_aid=${id ?? ""}; Path=/; Domain=example.com; Max-Age=${id ? 15_552_000 : 0}; SameSite=Lax; Secure`;
+});
 ```
 
 ```python
