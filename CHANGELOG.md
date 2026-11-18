@@ -42,32 +42,47 @@ exclusions, expect those fields in the warehouse, and check who can query it.
 
 ## Email marketing 2.0.0
 
-An unsubscribe token is stored only as its hash (new invariant 25).
+An unsubscribe token is stored only as its hash, and every unsubscribe link of every
+delivered email works (new invariant 25).
 
-- `EmailMessage.unsubscribeToken` is replaced by `unsubscribeTokenHash`, the SHA-256
-  hex of the token, written by `send`. `plan` no longer makes tokens.
+- `EmailMessage.unsubscribeToken` is replaced by a new entity, `UnsubscribeKey`: the
+  SHA-256 hex of one token (`tokenHash`, unique) and its `message`. A message has a
+  key for every token it was sent with. `plan` no longer makes tokens.
 - `sendCampaign` draws a random seed for the run in its first step and gives each
-  message the HMAC-SHA256 of its id under the seed as its token. `send` takes the
-  token, refuses a malformed one and renders it into the link. The seed stays in the
-  run, so a retried page resends the same email.
-- `unsubscribe` hashes the token it is given to find the message.
+  message the HMAC-SHA256 of its id under the seed as its token. For each message it
+  first records the token's hash with the new action `emailMessage.issueToken`
+  (granted to `campaignSender` only), then calls `send` with the token.
+- `send` refuses a malformed token or one whose hash is not a key of the message,
+  renders the token into the link, and posts with
+  `Idempotency-Key: campaign-message-<id>-<first 12 hex characters of the token's hash>`.
+  A retried page within a run repeats the same request; a run the clock resumes
+  sends a new one.
+- `unsubscribe` hashes the token it is given and finds the key, then its message.
+- Invariant 14 now says what a resumed run may do: when the provider accepted an
+  email and recording it failed, the resumed run sends the message again with a new
+  token, and both links work. A duplicate is preferred to a link that unsubscribes
+  nobody (PITFALLS 4 and the new 15).
 - Replication excludes nothing: addresses, consent records and messages reach the
   warehouse, and warehouse access goes only to people who may read all of them.
 - Invariant 18's test uses the token the message was sent with. The double opt-in
-  variation keeps its confirmation token only as a hash.
+  variation records its confirmation token's hash before the email is sent and
+  stores no token; the large-list variation issues keys before a batch.
 
-A hash beside the token would leave the token in every replicated row, so this
-replaces the field rather than adding one. A project built from 1.0.0:
+A token kept beside its hash would still reach every replicated row, so the field
+is removed, not kept. A project built from 1.0.0:
 
-1. Add `unsubscribeTokenHash` (text, unique, optional, managed) to `EmailMessage`.
-   Make `unsubscribe` find the message by the token's hash, falling back to
-   `unsubscribeToken` until step 3. Change `send` and `sendCampaign` as in the
-   sketch, stop `plan` from making tokens, and deploy.
+1. Add `UnsubscribeKey` (written only by actions), `emailMessage.issueToken`, and
+   `email_message:issueToken` in `campaignSender`. Make `unsubscribe` find the key by
+   the token's hash, falling back to `unsubscribeToken` until step 3. Change `send`
+   and `sendCampaign` as in the sketch, stop `plan` from making tokens, and deploy.
 2. Run a one-time workflow that pages through messages with an `unsubscribeToken`
-   and, through an action, sets each one's `unsubscribeTokenHash` to the token's
-   SHA-256 hex and clears the token, so links in emails already sent keep working.
-3. Remove the fallback and the `unsubscribeToken` property. Pass a token wherever a
-   test runs `send`, and add the test for invariant 25.
+   and, through an action, adds a key with the token's SHA-256 hex unless that key
+   exists, then clears the token, so links in emails already sent keep working. It
+   never replaces or removes a key: a message sent after step 1 already has the key
+   of the token it was sent with.
+3. Remove the fallback and the `unsubscribeToken` property. Wherever a test runs
+   `send`, issue the token's key first and pass the token. Update the test for
+   invariant 14 and add the test for invariant 25.
 
 Do it soon: once the platform removes exclusions, every value still stored
 replicates, the tokens included. Clearing a token does not remove it from the

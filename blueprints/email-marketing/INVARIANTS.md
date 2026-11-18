@@ -5,7 +5,8 @@ the actions on the harness in [testing](../../docs/testing.md), with the email
 provider replaced by `Connections.test({ <provider>: (request) => … })` that
 records every request. Data is invented: Northwind, Ada Example
 (`ada@example.com`), Grace Sample (`grace@example.com`). A test that runs `send`
-passes a token of 43 base64url characters, the same one on a repeat.
+first records the token's hash with `emailMessage.issueToken`, as the workflow
+does, and passes a token of 43 base64url characters, the same one on a repeat.
 
 ### 1. Consent is checked again just before each message is sent.
 
@@ -131,14 +132,19 @@ endpoint with `t=tok-1&scope=topic`) and `List-Unsubscribe-Post:
 List-Unsubscribe=One-Click`. With a sender whose `unsubscribeEndpoint` is empty,
 `sendTest` and `approve` are refused.
 
-### 14. A person receives a campaign at most once.
+### 14. A retried send repeats the same request, and a message recorded as sent is never sent again.
 
-**Why.** Retries, resumed runs and re-preparations must never mail anyone twice.
+**Why.** Retries and re-preparations must never mail anyone twice. One duplicate
+is accepted: when the provider accepted an email and recording it failed, a run
+that the clock resumes sends the message again with a new token, so that every
+delivered link works (25, PITFALLS 15).
 
-**Test.** Run `send` twice for one planned message with a stub answering `200`.
-Expect one provider request, carrying `Idempotency-Key: campaign-message-<id>`,
-and status `sent`. Prepare the campaign again: the message stays `sent`, and a
-second `plan` for the same contact creates no second message.
+**Test.** Issue the key of a token `T` for Ada's planned message. With a stub
+answering `503`, then `200`, run `send` with `T` three times. Expect two provider
+requests with the same body, both carrying
+`Idempotency-Key: campaign-message-<id>-<first 12 hex characters of T's SHA-256>`,
+status `sent`, and no third request. Prepare the campaign again: the message
+stays `sent`, and a second `plan` for the same contact creates no second message.
 
 ### 15. A throttle or outage leaves the message planned; only a permanent refusal fails it.
 
@@ -236,14 +242,21 @@ integer property except `preparation` and `frequencyCapDays`; after three sends
 and two `delivered` events, `EmailMessage.queryMetrics` for the campaign returns
 `sent` 3 and `delivered` 2.
 
-### 25. An unsubscribe token is stored only as its hash.
+### 25. Every unsubscribe link of every delivered email works, and no token is stored in plain form.
 
-**Why.** Every stored field reaches the warehouse. A token there would let any
-reader unsubscribe a person in their name, recorded as `changedBy: contact`.
+**Why.** A person must be able to leave from every email they received, including
+one that a resumed run sent again. Every stored field reaches the warehouse; a
+token there would let any reader unsubscribe a person in their name, recorded as
+`changedBy: contact`.
 
-**Test.** Send Ada's planned message with token `T` and a stub answering `200`.
-Expect the request's link and `List-Unsubscribe` header to carry `T`,
-`unsubscribeTokenHash` to equal the SHA-256 hex of `T`, and no field or history
-row of the message to contain `T`. `unsubscribe` with `T`: Ada is unsubscribed.
-With the stored hash as the token: no change. `send` with a token of 10
-characters: refused, zero provider requests.
+**Test.** Ada's planned message on a `sending` campaign, a stub answering `200`.
+`send` with a token whose key was never issued, or with a token of 10 characters:
+refused, zero provider requests. `issueToken` twice with the SHA-256 hex of a
+token `T1`: one `UnsubscribeKey`. Leave the message `planned`, as when the
+provider accepted the email and recording it failed. Issue `T2` and `send` with
+`T2`: the request's link and `List-Unsubscribe` header carry `T2`, and its
+idempotency key ends with the first 12 hex characters of `T2`'s hash.
+`unsubscribe` with `T1` and scope `topic`: Ada's topic record is `unsubscribed`.
+With `T2` and scope `all`: her `marketingOptOutAt` is set. No field or history
+row of the message or its keys contains `T1` or `T2`, and `unsubscribe` with a
+stored hash as the token changes nothing.

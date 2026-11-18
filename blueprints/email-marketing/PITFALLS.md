@@ -33,10 +33,14 @@ to do instead.
 - **Symptom:** some people receive the same campaign two or three times.
 - **Cause:** the provider call happened, the transaction that records `sent`
   failed, and the retried step sent again with a new or missing idempotency key.
-- **Instead:** derive the key from the message, `campaign-message-<id>`, never from
-  the request. Provider deduplication windows are limited (Resend keeps keys for
-  24 hours), so resume a stalled campaign within hours, and on providers without
-  keys use the `sending` status described in VARIATIONS.md.
+- **Instead:** give a message one token for the whole run (the run's seed) and
+  derive the key from the message and its token,
+  `campaign-message-<id>-<first 12 hex characters of the token's hash>`, never from
+  the attempt, so a retried step repeats the same request. Deduplication covers
+  only retries within a run: provider windows are limited (Resend keeps keys for
+  24 hours), and a run the clock resumes draws a new token and sends a new
+  request; pitfall 15 says why that rare duplicate is accepted. On providers
+  without keys use the `sending` status described in VARIATIONS.md.
 
 ### 5. Throttling treated as failure, or failure treated as throttling
 
@@ -131,3 +135,22 @@ to do instead.
 - **Instead:** allow `prepare` from `preparing`. The new preparation number
   supersedes the stuck run: its next page sees the new number and stops, and its
   `completePreparation`, if it gets that far, changes nothing.
+
+### 15. An unsubscribe link that finds nothing
+
+- **Symptom:** a person uses the unsubscribe link of an email they received and
+  nothing changes, or a campaign stalls because the provider refuses every
+  resumed send.
+- **Cause:** each run drew a new token for a message, and `send` stored its hash
+  only after the provider accepted the email. When recording failed, the message
+  stayed planned, and the resumed run sent another token under the same
+  idempotency key: the provider either answered with the first email, so the
+  stored hash matched a link nobody received, or refused the changed request.
+- **Instead:** record the token's hash as an `UnsubscribeKey` with `issueToken`
+  before `send` can post the email, keep every key a message was sent with, and
+  put the hash's first 12 hex characters in the idempotency key. In the rare case
+  the provider accepted an email that could not be recorded, the resumed run sends
+  it again: the person receives the campaign twice, and both links work. A
+  duplicate is better than a link that unsubscribes nobody. Never keep the seed or
+  the token in a record to make them stable: every stored record reaches the
+  warehouse.

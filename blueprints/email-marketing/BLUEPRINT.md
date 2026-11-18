@@ -15,8 +15,9 @@ runs this design in production, with Resend as the provider.
 ```text
 Contact (foundation) ──< Subscription            one per contact and topic
         └──< EmailMessage >── Campaign ──> EmailSender
-                                  ├──> Audience           the main audience
-                                  └──< extra audiences    up to 10
+               │                  ├──> Audience           the main audience
+               │                  └──< extra audiences    up to 10
+               └──< UnsubscribeKey               one per token the message was sent with
 Suppression                       addresses and domains, independent of contacts
 EmailEngagement (warehouse)       opens and clicks per message, optional
 ```
@@ -152,7 +153,6 @@ One campaign email to one contact, written by workflows through actions.
 | `providerMessageId` | text, optional, unique | The provider's id once sent. Joins delivery and engagement events; unique, because `EmailEngagement`'s relationship is matched on it. |
 | `sentAt` | timestamp, optional | When the provider accepted it. |
 | `delivery` | select, optional | `delivered`, `bounced`, `complained`, from provider events. Opens and clicks are not kept here. |
-| `unsubscribeTokenHash` | text, unique, optional, managed | SHA-256 hex of the token in this message's unsubscribe link, written by `send`. The token itself is never stored: the link carries it, and `unsubscribe` hashes it to find the message. |
 | `unsubscribedAt`, `unsubscribeScope` | timestamp, select (`topic`, `all`) | Set when the person used this message's link. |
 
 Relationships: `campaign` (cascade), `contact` (cascade). Unique index on
@@ -161,6 +161,24 @@ preparation. Metrics (filtered counts): `planned`, `excluded`, `sent`, `skipped`
 `failed`, `delivered`, `bounced`, `complained`, `unsubscribed`. A campaign's
 results filter to the campaign; planned and left-out counts also filter to its
 current `preparation`.
+
+### UnsubscribeKey
+
+One token that a message's unsubscribe link may carry, kept only as its hash.
+`issueToken` writes it before `send` can post the email, so the link of every
+email the provider accepts finds its message. A message usually has one key; a
+run the clock resumed adds another to each message it found still planned
+(PITFALLS 15). The token itself is never stored: the link carries it, and
+`unsubscribe` hashes it to find the key. A key whose email never went out opens
+nothing, since no one holds its token.
+
+| Property | Type | Meaning |
+| --- | --- | --- |
+| `tokenHash` | text, unique, managed | SHA-256 hex of the token. |
+
+Relationship `message` (to EmailMessage, cascade, inverse `unsubscribeKeys`). No
+action changes or removes a key: every link of a message works while the message
+exists.
 
 ### EmailEngagement (warehouse-backed, optional)
 
@@ -240,9 +258,10 @@ the From domain is verified (with Resend, a key that may read domains).
 | Action | Caller | Input | Checks | Changes |
 | --- | --- | --- | --- | --- |
 | `plan` | `campaignPreparer` | `campaign`, `preparation`, `contact` | Campaign still `preparing` with that number | Upserts the message by `(campaign, contact)`: `planned`, or `excluded` with the first reason. A message already `sent` stays sent. Idempotent. |
-| `send` | `campaignSender` | `message`, `token` (43 base64url characters, from the workflow) | A malformed token is refused. In `prepare`: campaign `sending`, message `planned` and of the current preparation, else no-op; consent and suppression again; renders with the token in the unsubscribe link and posts to the provider with `Idempotency-Key: campaign-message-<id>` | Handler, locked: `sent` with `providerMessageId`, `sentAt` and `unsubscribeTokenHash`; `skipped` with the reason; `failed` on a permanent refusal. A throttle or outage fails the call so the step retries; the message stays `planned`. |
+| `issueToken` | `campaignSender` | `message`, `tokenHash` (the SHA-256 hex of the token the workflow will send) | Campaign `sending`, message `planned` and of the current preparation, else no-op; a hash that is not 64 lowercase hex characters, or is another message's key, is refused | Creates an `UnsubscribeKey` for the message with that hash, unless it exists. Idempotent. |
+| `send` | `campaignSender` | `message`, `token` (43 base64url characters, from the workflow) | A malformed token is refused. In `prepare`: campaign `sending`, message `planned` and of the current preparation, else no-op; a token whose hash is not a key of the message is refused; consent and suppression again; renders with the token in the unsubscribe link and posts to the provider with `Idempotency-Key: campaign-message-<id>-<the first 12 hex characters of the token's hash>` | Handler, locked: `sent` with `providerMessageId` and `sentAt`; `skipped` with the reason; `failed` on a permanent refusal. A throttle or outage fails the call so the step retries; the message stays `planned`. |
 | `recordDelivery` | `emailEvents` workflow | `providerMessageId`, `email`, `event` (`delivered`, `bounced`, `complained`), `detail` | Ranks `complained` over `bounced` over `delivered`; a late event never lowers a higher one | Sets `delivery` on the message if one matches. A bounce or complaint also sets the contact's `emailStatus` and `emailStatusReason`, for campaign and other email alike. Idempotent. |
-| `unsubscribe` | `emailUnsubscriber` workflow | `token`, `scope` (`topic`, `all`) | Finds the message by the token's SHA-256 hex; unknown: no-op | Topic: the campaign's topic `unsubscribed`, explicit, `changedBy: contact`. All: `marketingOptOutAt`. Records `unsubscribedAt` and scope on the message. Idempotent. |
+| `unsubscribe` | `emailUnsubscriber` workflow | `token`, `scope` (`topic`, `all`) | Finds the `UnsubscribeKey` by the token's SHA-256 hex, then its message; unknown: no-op | Topic: the campaign's topic `unsubscribed`, explicit, `changedBy: contact`. All: `marketingOptOutAt`. Records `unsubscribedAt` and scope on the message. Idempotent. |
 
 `sendTest` and `send` share one pure renderer, `ontology/email-layout.ts`: it
 fills `{{firstName|there}}` and `{{company|your team}}` (HTML-escaped in the body),
@@ -259,7 +278,7 @@ the personal unsubscribe link and the RFC 8058 headers `List-Unsubscribe` and
 | `emailAdmin` | Whoever owns deliverability | `email_sender:*`, `audience:setSuppression`, `suppression:lift`, `contact:resetEmailStatus`. |
 | `intake` (foundation) | The website's API key | Adds `contact:subscribe`. |
 | `campaignPreparer` | `prepareCampaign` workflow | Reads the rule's entities; `email_message:plan`, `campaign:completePreparation`. |
-| `campaignSender` | `sendCampaign` workflow | `campaign:read`, `email_message:read`, `email_message:send`, `campaign:completeSending`. |
+| `campaignSender` | `sendCampaign` workflow | `campaign:read`, `email_message:read`, `email_message:issueToken`, `email_message:send`, `campaign:completeSending`. |
 | `campaignClock` | `campaignClock` workflow | `campaign:read`, `email_message:read`, `campaign:startScheduled`, `campaign:resumeSending`. |
 | `emailUnsubscriber` | `emailUnsubscribe` workflow | `email_message:unsubscribe` only. |
 | `emailEvents` | `emailEvents` workflow | `email_message:recordDelivery` only. |
@@ -272,17 +291,19 @@ converts both to the snake_case wire form. Keep one spelling within a code file.
 If `member` holds `*:read` (the starter's default), list its reads by name so
 that subscriptions, messages and suppressions are read only through these roles.
 Never grant by default: `campaign:approve` outside `campaignApprover`, and never to
-an API key or workflow role; `email_message:send` outside `campaignSender`;
-`suppression:lift`, `contact:resetEmailStatus` and `email_sender:*` outside
-`emailAdmin`. A workflow that hands the agent a task gets no sending, approving or
-consent-writing permission: a prompt can carry a stranger's text.
+an API key or workflow role; `email_message:issueToken` and `email_message:send`
+outside `campaignSender` (a key issued for a token someone holds lets them
+unsubscribe that message's recipient); `suppression:lift`,
+`contact:resetEmailStatus` and `email_sender:*` outside `emailAdmin`. A workflow
+that hands the agent a task gets no sending, approving or consent-writing
+permission: a prompt can carry a stranger's text.
 
 ## 5. Workflows
 
 | Workflow | Trigger | Steps | Repeat-safe because |
 | --- | --- | --- | --- |
 | `prepareCampaign` | `after(campaign.prepare)` | One step per page of members (200 contacts) of the main audience, then each extra audience: reads the page by the rule's filter, calls `emailMessage.plan` for each contact. Stops if the campaign left this preparation. Last step: `completePreparation`. | `plan` upserts by `(campaign, contact)`; a person in two audiences is planned once. |
-| `sendCampaign` | `after(campaign.approve)` to `sending`, `after(campaign.startScheduled)`, `after(campaign.resumeSending)` | A first step draws a random seed for the run. Then one step per page of 50 planned messages of the current preparation, each sent by its own `emailMessage.send` call with its token: the HMAC-SHA256 of the message id under the seed. Stops when the campaign is no longer `sending`. Ends after 5,000 messages; the clock resumes the rest. Last step: `completeSending`. | Sending takes a message out of the find; `send` is a no-op for a message that is not planned, and the provider deduplicates the idempotency key. The seed is kept with the run and in no record, so a retried page renders the same tokens and resends the same email. |
+| `sendCampaign` | `after(campaign.approve)` to `sending`, `after(campaign.startScheduled)`, `after(campaign.resumeSending)` | A first step draws a random seed for the run. Then one step per page of 50 planned messages of the current preparation. For each message: its token is the HMAC-SHA256 of the message id under the seed; `emailMessage.issueToken` records the token's hash; then `emailMessage.send` sends it with the token. Stops when the campaign is no longer `sending`. Ends after 5,000 messages; the clock resumes the rest. Last step: `completeSending`. | Sending takes a message out of the find; `send` is a no-op for a message that is not planned. The seed is kept with the run and in no record, so a retried page issues no new key and repeats the same request, which the provider deduplicates by its idempotency key. A resumed run draws a new seed: a message still planned gets another key and a new idempotency key, so when the provider had accepted the first email and recording it failed, the person receives it twice and both links work (PITFALLS 15). |
 | `campaignClock` | `cron("*/15 * * * *")` | Starts each due scheduled campaign (`startScheduled`), then resumes each `sending` campaign with planned messages and no send in 15 minutes (`resumeSending`). | Both actions are no-ops when not due. |
 | `emailUnsubscribe` | `webhook("emailUnsubscribe")`, token URL | Reads `t` and `scope` from the query, calls `emailMessage.unsubscribe`. | The action is idempotent; an unknown token changes nothing. |
 | `emailEvents` | `webhook("emailEvents")` from the provider | Parses the event. Keeps `delivered`, permanent bounces and complaints; ignores transient bounces, opens and clicks. Calls `recordDelivery`. | Ranked, idempotent action; deliveries may repeat and arrive in any order. |
@@ -299,9 +320,9 @@ posts the choice. Nothing unsubscribes on a GET: link scanners open every link.
 `email_message`. Every entity here replicates with all its fields, as the
 foundation describes: recipients' addresses, consent records with their
 evidence, campaigns. Grant warehouse access only to people who may read all of
-them. Suppressed addresses are kept only as digests (INVARIANTS 7) and messages
-keep only the hash of their unsubscribe token (INVARIANTS 25), so no working link
-reaches the warehouse. A sender's `unsubscribeEndpoint` carries the webhook's token, which
+them. Suppressed addresses are kept only as digests (INVARIANTS 7) and unsubscribe
+keys only as the hash of a token (INVARIANTS 25), so no working link reaches the
+warehouse. A sender's `unsubscribeEndpoint` carries the webhook's token, which
 every email shows anyway; without a message's token it unsubscribes nobody.
 
 **Engagement (optional).** Opens and clicks are reported by the provider, read in
@@ -381,9 +402,9 @@ anyone without the person's own request.
 4. **Audiences.** Rule schema, rule-to-filter function, read-only actions, with
    tests that a rule reaches exactly what `contact_find` returns. Check: preview a
    segment on seeded contacts.
-5. **Campaigns and messages.** Both entities, the renderer, every action, tests
-   with the provider stubbed through `Connections.test`. Check: every invariant
-   test passes.
+5. **Campaigns and messages.** `Campaign`, `EmailMessage`, `UnsubscribeKey`, the
+   renderer, every action, tests with the provider stubbed through
+   `Connections.test`. Check: every invariant test passes.
 6. **Workflows** and their roles. Deploy; print URLs with `segmentstream workflow
    webhooks`; register `emailEvents` with the provider; set each sender's
    `unsubscribeEndpoint`. Check: `segmentstream workflow list` shows the triggers.
@@ -499,8 +520,14 @@ A workflow's role, holding only what it calls:
 ```ts
 // ontology/roles.ts
 export const campaignSender = role("campaignSender", {
-  description: "Held by the sendCampaign workflow: sends planned messages, marks the campaign sent.",
-  permissions: ["campaign:read", "emailMessage:read", "emailMessage:send", "campaign:completeSending"],
+  description: "Held by the sendCampaign workflow: issues unsubscribe keys, sends messages, marks the campaign sent.",
+  permissions: [
+    "campaign:read",
+    "emailMessage:read",
+    "emailMessage:issueToken",
+    "emailMessage:send",
+    "campaign:completeSending",
+  ],
 });
 ```
 
@@ -509,7 +536,7 @@ The send workflow, one page per step, started by the approval (the
 
 ```ts
 // ontology/workflows/send-campaign.ts
-import { createHmac, randomBytes } from "node:crypto";
+import { createHash, createHmac, randomBytes } from "node:crypto";
 
 import { after, changed, p, run, workflow } from "@segmentstream/ontology/workflows";
 import { Effect, Schema } from "effect";
@@ -520,14 +547,16 @@ import { EmailMessage } from "../email-message";
 const PAGE = 50;
 const MAX_PER_RUN = 5_000; // campaignClock resumes what one run leaves
 
-// The seed stays in the run, never in a record; only send stores a token's hash.
+// The seed stays in the run, never in a record; only a token's hash is stored.
 async function drawSeed() {
   "use step";
   return randomBytes(32).toString("base64url");
 }
 
-// send is idempotent: a retried page re-sends nothing that already went, and the
-// same seed gives each message the same token, so a resent request is the same email.
+// send is a no-op for a message that already went. Within a run the seed gives each
+// message the same token, so a retried page issues no new key and repeats the same
+// request. issueToken commits the key before send can post the email, so the link of
+// every email the provider accepts finds its message.
 async function sendPage(campaignId: string, seed: string) {
   "use step";
   return run(
@@ -542,6 +571,8 @@ async function sendPage(campaignId: string, seed: string) {
       let handled = 0;
       for (const message of messages) {
         const token = createHmac("sha256", seed).update(message.id).digest("base64url");
+        const tokenHash = createHash("sha256").update(token).digest("hex");
+        yield* EmailMessage.actions.issueToken({ message: message.id, tokenHash });
         const result = yield* EmailMessage.actions.send({ message: message.id, token });
         if (result.status !== "planned") handled += 1;
       }
