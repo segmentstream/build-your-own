@@ -78,9 +78,9 @@ One sending of one to ten PDFs to one to twenty recipients.
 
 Relationships: `sender` (User, required, the member who created it),
 `company` (foundation Company, optional: the other side), `ownCompany`
-(foundation Company with `isOwn`, the party on our side; optional in a draft,
-defaulted to the only own company when there is exactly one, required at
-`submit`), `deal` (CRM Deal, optional, only when the CRM is built). Index
+(foundation Company with `isOwn`, optional, `restrict`: the party on our side,
+set by `submit` to the `signsFor` of the first `ownCompany` signer in order, and
+empty when nobody signs for one of ours), `deal` (CRM Deal, optional, only when the CRM is built). Index
 `[status, createdAt]`.
 
 ### EnvelopeDocument
@@ -250,8 +250,8 @@ The emails are the workspace's own templates in `defineOntology({ emails })`:
 
 | Action | Input | Checks | Changes |
 | --- | --- | --- | --- |
-| `envelope.createDraft` | title?, message?, company?, ownCompany?, deal? | `ownCompany`, when given, is own | A `draft` with the caller as sender; `ownCompany` defaults to the only own company when there is exactly one. Drafts have history but no events; the audit trail starts at `submit`. |
-| `envelope.updateDraft` | envelope, title?, message?, ownCompany?, dueAt?, remindEveryDays?, value? | Draft; the caller is its sender; `ownCompany` is own; dueAt in the future. | The fields. |
+| `envelope.createDraft` | title?, message?, company?, deal? | none beyond permission | A `draft` with the caller as sender. Drafts have history but no events; the audit trail starts at `submit`. |
+| `envelope.updateDraft` | envelope, title?, message?, dueAt?, remindEveryDays?, value? | Draft; the caller is its sender; dueAt in the future. | The fields. |
 | `envelope.addDocument` | envelope, document; call options carry an idempotency key and a create intent | Draft and sender. In `prepare`: the caller may read the drive document; its lock is `none` or `final`; its latest version has signable PDF bytes (above); the PDF opens, is not password-protected, carries no digital signature (new pages would break it), fits the size and page limits. The document is not out in another envelope, nor already in this one. | Copies the bytes into a new `EnvelopeDocument.frozenPdf` with their SHA-256, page count and sizes; links `sourceVersion`; stores `sealIntent`. |
 | `envelope.removeDocument` | envelope, item | Draft and sender. | Deletes the item and its fields. |
 | `envelope.setRecipients` | envelope, recipients[] | Draft and sender; 1 to 20; valid, distinct emails; at least one signer; `party` only on signers; `signsFor` given exactly for `ownCompany` signers, naming an own company; an `ownCompany` signer is an active member with an active `CompanySignatory` record for that company. | Replaces the list. Links `contact` by email when one exists. |
@@ -262,7 +262,7 @@ The emails are the workspace's own templates in `defineOntology({ emails })`:
 
 | Action | Who | Checks | Changes |
 | --- | --- | --- | --- |
-| `envelope.submit` | Sender | Draft. At least one document. Each item's `sourceVersion` is still the drive document's latest version; the document is not trashed and its lock is `none` or `final`. Every field's party has exactly one signer; every signer has a party with at least one `signature` field; approvers and viewers have none. `ownCompany` is set and own. Each `ownCompany` signer is still an active member with an active `CompanySignatory` record for `signsFor`, which is still own and has a `legalName`. `dueAt` in the future. Refuses a deactivated member among recipients: an administrator decides whether they come back. | Sets `ownCompanyLegalName` and each `ownCompany` recipient's `signsForLegalName` from the companies, then `fingerprint`, `submittedAt`, `dueAt`. If an active rule applies: status `awaitingApproval`, one `EnvelopeApproval` per approver role, drive locks `signing`, `approvalRequest` emails to the role's active holders (at most 50), events. Otherwise runs **the send** below. Answers `{ envelope, status, url }`. Irreversible: it emails outside people. |
+| `envelope.submit` | Sender | Draft. At least one document. Each item's `sourceVersion` is still the drive document's latest version; the document is not trashed and its lock is `none` or `final`. Every field's party has exactly one signer; every signer has a party with at least one `signature` field; approvers and viewers have none. Each `ownCompany` signer is still an active member with an active `CompanySignatory` record for `signsFor`, which is still own and has a `legalName`. `dueAt` in the future. Refuses a deactivated member among recipients: an administrator decides whether they come back. | Sets `ownCompany` from the first `ownCompany` signer, `ownCompanyLegalName` and each `ownCompany` recipient's `signsForLegalName` from the companies, then `fingerprint`, `submittedAt`, `dueAt`. If an active rule applies: status `awaitingApproval`, one `EnvelopeApproval` per approver role, drive locks `signing`, `approvalRequest` emails to the role's active holders (at most 50), events. Otherwise runs **the send** below. Answers `{ envelope, status, url }`. Irreversible: it emails outside people. |
 | `envelope_approval.grant` | Holder of `approverRole` | Pending; envelope `awaitingApproval`; its fingerprint unchanged; the caller is not the envelope's sender (see VARIATIONS.md). | `granted`, `decidedBy`, event `approvalGranted`. When no approval is pending, runs **the send** in the same transaction. |
 | `envelope_approval.returnForChanges` | Holder of `approverRole` | Pending; note required. | This approval `returned`, the envelope's other pending approvals `superseded`, envelope back to `draft` (fingerprint and legal-name snapshots cleared), drive locks restored, sender emailed, event. |
 | `envelope.void` | Sender, `esignAdmin` | Status `awaitingApproval` or `sent`, or a draft returned from approval; reason required. | `voided`, `endedAt`, `endReason`; drive locks restored; `envelopeEnded` to the sender and to recipients already notified; event. Signatures stay. Destructive, irreversible. |

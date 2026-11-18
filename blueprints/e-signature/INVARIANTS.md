@@ -286,8 +286,10 @@ active: refused.
 
 ## 21. An envelope keeps the legal name it was submitted with
 
-**Rule:** `submit` copies the legal name of the envelope's `ownCompany` into
-`ownCompanyLegalName` and of each `ownCompany` recipient's `signsFor` into
+**Rule:** `submit` sets the envelope's `ownCompany` from its first `ownCompany`
+signer and copies that company's legal name into
+`ownCompanyLegalName`, and the legal name of each `ownCompany` recipient's
+`signsFor` into
 `signsForLegalName`; they are part of the fingerprint, and no later change to the
 company or to a signatory record changes them, the signature's capacity or the
 certificate.

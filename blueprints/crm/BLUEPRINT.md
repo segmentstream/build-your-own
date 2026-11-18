@@ -609,7 +609,7 @@ const MERGE_PAGE = 199; // one more is read to detect an overflow; a find page h
 mergeInto: action({
   description:
     "Merge a duplicate company into the one to keep: move its contacts, leads, deals and activities, then " +
-    "delete it. Refused for different registration numbers or tax ids, when only one of the two is one of our own " +
+    "delete it. Refused for different registration numbers or tax ids, when the duplicate is one of our own " +
     "companies, and above 199 records of one kind.",
   input: Schema.Struct({ duplicate: self.ref, keep: self.ref }),
   writes: [self, (): AnyEntity => Contact, (): AnyEntity => Lead, (): AnyEntity => Deal, (): AnyEntity => Activity],
@@ -621,7 +621,7 @@ mergeInto: action({
       }
       const duplicate = yield* self.get(input.duplicate, { forUpdate: true });
       const keep = yield* self.get(input.keep, { forUpdate: true });
-      // …refuse when both carry a different registrationNumber or taxId, or when duplicate.isOwn !== keep.isOwn
+      // …refuse when both carry a different registrationNumber or taxId, or when duplicate.isOwn
       const leads = yield* Lead.find({ where: { companyId: duplicate.id }, limit: MERGE_PAGE + 1 });
       const deals = yield* Deal.find({ where: { companyId: duplicate.id }, limit: MERGE_PAGE + 1 });
       // …contacts and activities the same way

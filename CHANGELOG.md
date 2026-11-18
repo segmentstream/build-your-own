@@ -24,7 +24,8 @@ The business's own legal entities are modelled once, as foundation companies.
   invoice, a sent envelope) keeps a snapshot of what it printed.
 - Job roles hold `company:update` scoped to `{ isOwn: false }`; `admin` holds it
   unscoped, so only an admin edits an own company's identity.
-- `company.mergeInto` also refuses when only one of the two companies is own.
+- `company.mergeInto` also refuses when the duplicate is own: a stray copy of our
+  company may be merged into it, but our company is never folded away.
 
 A project built on the earlier foundation:
 
@@ -96,7 +97,8 @@ role.
   recipient names the own company in a new relationship, `signsFor`.
   `setRecipients`, `submit` and `sign` check that an `ownCompany` signer is an
   active member with an active signatory record for `signsFor`, which is own.
-- `Envelope` gains `ownCompany` (the party on our side, required at `submit`) and
+- `Envelope` gains `ownCompany` (the party on our side, set by `submit` from the
+  first signer who signs for one of ours, empty otherwise) and
   `ownCompanyLegalName`; the recipient gains `signsForLegalName`. `submit` copies
   the companies' legal names into them and into the fingerprint, and a returned
   envelope clears them. The certificate and the signature's capacity read the

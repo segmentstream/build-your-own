@@ -95,7 +95,7 @@ the wire (`company.find_or_create_by_domain`, MCP tool
 | `company.findOrCreateByDomain` | job roles | Finds the company by normalized domain or creates it. Refuses a free mail domain. Idempotent. |
 | `company.update` | job roles | The generated update: changes descriptive properties. Managed flags stay out of it. |
 | `company.setRelationships` | job roles | Sets the relationship flags given, and `relationshipsNote` when a reason is given. |
-| `company.mergeInto` | `admin` | Moves every related record from a duplicate to the kept company, then deletes the duplicate. Each blueprint that relates its records to Company extends it to move them. Refuses when legal identities conflict, or when only one of the two is own. |
+| `company.mergeInto` | `admin` | Moves every related record from a duplicate to the kept company, then deletes the duplicate. Each blueprint that relates its records to Company extends it to move them. Refuses when legal identities conflict, or when the duplicate is own: a stray copy of our company may be merged into it, never the other way. |
 | `company.setOwn` | `admin` | Sets or clears `isOwn`, with a required reason written to `ownNote`. Refused when the flag already has that value, and when clearing it while a blueprint's record needs the company to be own (a book, a signatory record). |
 | `contact.findOrCreateByEmail` | job roles | Finds the contact by lowercased email or creates it, filling only empty fields; links a company found by the email's domain when the domain is not a free mail provider. Idempotent. |
 | `contact.update` | job roles | The generated update: changes descriptive properties. |

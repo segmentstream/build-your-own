@@ -34,8 +34,8 @@ Each of the business's own legal entities is a foundation Company marked
 
 | Option | Changes |
 | --- | --- |
-| One own company (default) | As designed: `ownCompany` defaults to it, and signatory records name it. |
-| Several own companies | Nothing in code. An admin marks each company own; signatory records are granted per company; the sender picks the envelope's `ownCompany` and each signer's `signsFor`. An agreement between two own companies has a signer for each. |
+| One own company (default) | As designed: signatory records name it, and an `ownCompany` signer signs for it. |
+| Several own companies | Nothing in code. An admin marks each company own; signatory records are granted per company; the sender picks each `ownCompany` signer's `signsFor`, and the envelope's `ownCompany` follows the first of them. |
 | Signing limits | `limitMinor` and `limitCurrency` on the signatory record, granted with it; `submit` refuses an envelope above the signer's limit, and fails closed on a missing value or another currency. |
 | Two company signatures required | A rule in `submit`: above a value, at least two `ownCompany` signers for the same `signsFor`. |
 

@@ -311,8 +311,8 @@ its own series, then allocated to the invoice or refunded with `recordPayment`.
 | `payment_instruction.register`, `retire` | finance owner | Retired instructions stay on issued invoices. |
 
 The foundation's `company.setOwn` is extended to refuse clearing `isOwn` on a
-company that has a book, and `company.mergeInto` to refuse when both companies have a
-book; a book moves to the kept company only when the duplicate's book is the only one.
+company that has a book. `company.mergeInto` needs nothing more: it refuses an own
+duplicate, so the duplicate never has a book.
 
 ### Month-end revaluation
 
