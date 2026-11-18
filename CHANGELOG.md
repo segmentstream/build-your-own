@@ -29,13 +29,14 @@ The business's own legal entities are modelled once, as foundation companies.
 
 A project built on the earlier foundation:
 
-1. Add `isOwn`, `ownNote` and `registeredAddress` to `Company`, and the
+1. Add `isOwn`, `ownNote` and `registeredAddress` to `Company`, `company.createOwn` for an
+   own entity without a domain of its own (several entities often share one), and the
    `company.setOwn` action, granted to `admin`.
 2. Scope job roles' `company:update` to `{ isOwn: false }` and grant `admin` the
-   unscoped `company:update` and `company:setOwn`.
+   unscoped `company:update`, `company:createOwn` and `company:setOwn`.
 3. Add the `isOwn` check to `company.mergeInto`.
-4. An admin marks the business's own companies with `company.setOwn`, creating a
-   company first where none exists for an entity. Then follow the Bookkeeping 3.0.0
+4. An admin marks the business's own companies with `company.setOwn`, or creates
+   one with `company.createOwn` where none exists for an entity. Then follow the Bookkeeping 3.0.0
    and E-signature 2.0.0 entries below, which move their copies onto the company.
 
 ## Bookkeeping 3.0.0
@@ -127,10 +128,18 @@ major version. A project built from 1.1.0:
    entities, one record per entity they could sign for.
 3. Add `signsFor`, `signsForLegalName`, `ownCompany` and `ownCompanyLegalName`,
    and `ownCompany` to the capacity options. In drafts, a one-time action sets each
-   `ourCompany` recipient to `ownCompany` with its `signsFor`, and sets the
-   envelope's `ownCompany`. Keep `ourCompany` as a retired option that no action
-   accepts: recipients of envelopes already submitted keep it, unchanged, as
-   invariant 2 requires.
+   `ourCompany` recipient to `ownCompany` with its `signsFor`. Keep `ourCompany` as
+   a retired option that `setRecipients` no longer accepts: recipients of
+   envelopes already submitted keep it, unchanged, as invariant 2 requires.
+   Envelopes still `sent` or `awaitingApproval` have `ourCompany` signers who have
+   not signed yet. Before the upgrade, list them and choose for each: let it finish
+   (wait, or remind its signers), or void it and send it again after the upgrade.
+   When one stays open across the upgrade, `sign` accepts an `ourCompany` signer
+   only while the envelope was submitted before the upgrade and the signer holds an
+   active signatory record for the own company the configuration named then (with
+   one own company, that company); the capacity printed is the one stored at
+   submit. Remove this allowance once no such envelope is `sent` or
+   `awaitingApproval`.
 4. Change the checks in `setRecipients`, `submit` and `sign` to the signatory
    record, then remove the `companySignatory` role.
 5. Existing envelopes keep their stored snapshots: signatures' `capacity`, sealed
