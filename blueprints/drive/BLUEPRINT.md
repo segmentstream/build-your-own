@@ -11,8 +11,8 @@ an MCP client. SegmentStream runs this design in production for its own document
 ## 2. Records (ontology)
 
 Every Drive entity is stored and `writes: "actions"`, except `document_type` and
-`drive_settings`, which admins edit with generated writes. All are excluded from
-replication before their first deploy (section 6). "Managed" values are set by actions.
+`drive_settings`, which admins edit with generated writes. Like every stored
+entity, all replicate to the warehouse (section 6). "Managed" values are set by actions.
 
 ### Folder (`document_folder`)
 
@@ -333,15 +333,25 @@ Emails are the workspace's own templates in `defineOntology({ emails })`, sent w
 
 ## 6. Data flow (pipeline)
 
-Drive writes nothing to the warehouse and has no ingestion, model or job.
+Drive has no ingestion, model or job; its records reach the warehouse only by
+replication.
 
-- **Replication.** Before the deploy that first adds them, exclude every Drive
-  entity from ontology replication. Exclusions are a workspace setting, not
-  code, and name each entity by its stable `id` (`ent_document`,
-  `ent_document_section`, …); the foundation describes the steps and your
-  project's docs/ontology-replication.md the mechanism. Raw warehouse SQL ignores ontology permissions, so
-  exclusion is the one protection that holds on every path. After the deploy,
-  check that the warehouse's `ontology` dataset has no Drive view.
+- **Replication.** Every Drive entity replicates to the warehouse with all its
+  fields, as the foundation describes: titles, `data`, online content (sections
+  and version snapshots), comments, share addresses and the access log, of
+  every class and personal folder. Warehouse SQL applies neither `accessOf` nor
+  the fence, so whoever can query the warehouse reads every document.
+- **Warehouse access.** Grant it only to people who may open every document,
+  every confidential class included. Never read Drive in the app through
+  `segmentstream.warehouse`: guests are app users too, and the app's warehouse
+  credential is not theirs (INVARIANTS 22).
+- **Secrets and private content.** Link tokens are stored only as `tokenHash`
+  (INVARIANTS 17), so a warehouse reader cannot open a link. `linkWebhookToken`
+  is no secret from them: every link carries it, and it opens nothing without a
+  link's token. An uploaded file's bytes stay in file storage, while its title,
+  file name and `data` replicate: content that must not reach warehouse readers
+  is uploaded as a file under a title that says nothing private, never written
+  online.
 - **Counts.** Folder counts would be metrics over replicated rows, and metric
   queries refuse scopes that follow paths from `me` or to-many relationships, as
   the fence does.
@@ -416,9 +426,10 @@ messages, not group chats.
 ## 9. Build order
 
 1. **Roles and fence first.** `team`, `guest`, `drive_admin`, one class role; take
-   `*:read` out of `member` (other blueprints' reads move to their roles); set the
-   replication exclusions. Check: `npm --prefix ontology run check` passes and a
-   manifest test finds no wildcard or unscoped Drive read.
+   `*:read` out of `member` (other blueprints' reads move to their roles); agree
+   with the person who may query the warehouse, since it holds every class
+   (section 6). Check: `npm --prefix ontology run check` passes and a manifest test finds
+   no wildcard or unscoped Drive read.
 2. **Folders** with `ancestors`, personal folders. Check: moving `Clients/Northwind`
    under `Archive` rewrites paths and ancestors below it.
 3. **Files**: `upload`, `addFileVersion`, versions, download route, PDF preview.

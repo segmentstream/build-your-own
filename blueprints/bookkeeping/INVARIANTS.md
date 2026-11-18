@@ -207,9 +207,10 @@ below are minor units.
 ### 25. Finance records are readable only through finance roles
 
 - **Why**: books hold salaries, margins and personal data; the platform's default
-  member read covers every entity.
+  member read covers every entity. The warehouse is outside this rule: whoever can
+  query it reads every finance record, so only people who may read them all get
+  warehouse access.
 - **Test**: a member with no finance role calls `journal_find`, `query_metrics` on
   `journal_line.balance` and `book.trialBalance`: each is refused. A `financeViewer`
   reads them and cannot post. Only a role that names `restricted_document:read` (or
-  Drive's role for the confidential class) reads a restricted document, and that
-  entity is absent from warehouse replication.
+  Drive's role for the confidential class) reads a restricted document.

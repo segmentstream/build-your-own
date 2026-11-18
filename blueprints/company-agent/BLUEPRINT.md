@@ -209,9 +209,12 @@ runs <name>` shows each run's steps and errors.
 ## 6. Data flow (pipeline)
 
 None: the agent reads warehouse data through other blueprints' metrics and
-warehouse-backed entities. Exclude `question` and `routine_run` from ontology
-replication before the first deploy; they can carry personal details.
-Exclusions are a workspace setting, not code; the foundation describes the steps.
+warehouse-backed entities. `question` and `routine_run` replicate to the
+warehouse like every stored entity (see the foundation), so whoever can query it
+reads every question, answer and routine message, those of a finance-only
+routine included. Grant warehouse access only to people who may read all of
+them. An answer is kept verbatim, so a question never asks for a password, a
+sign-in code or a card number; `question.raise`'s description says so.
 
 ## 7. Screens (app)
 
@@ -384,8 +387,8 @@ The agent calls what its instructions name. Add a `test` script to
    passes and no sending or deleting action is unclassified.
 5. Deploy, authorize the chat connection, pair in a direct message. Check: "who
    am I and what can I do?" answers with your name and roles.
-6. Add `question` and `routine_run` with actions, roles and screens, excluded
-   from replication. Check: the same key raised twice gives one question.
+6. Add `question` and `routine_run` with actions, roles and screens. Check: the
+   same key raised twice gives one question.
 7. Add the agent to each group (Telegram: privacy mode off, or admin) and set
    each purpose. Check: colleagues talking get no reply; a request does.
 8. Connect file intake to the `drive` blueprint's upload. Check: an invented PDF

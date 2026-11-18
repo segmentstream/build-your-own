@@ -84,7 +84,7 @@
     },
     {
       "id": "crm",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "title": "CRM",
       "tagline": "Leads from your forms, triage, deal pipelines and customers on your own companies and contacts, shaped to how you sell.",
       "replaces": [
@@ -150,7 +150,7 @@
     },
     {
       "id": "email-marketing",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "title": "Email marketing",
       "tagline": "Consent by topic, audiences on your own customer records, campaigns with a separate approval, and delivery events that keep your list clean.",
       "replaces": [
@@ -214,7 +214,7 @@
     },
     {
       "id": "bookkeeping",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "title": "Bookkeeping",
       "tagline": "One general ledger for invoices, bills, expenses with receipts, fixed assets and multi-currency, with the reports your accountant reads.",
       "replaces": [
@@ -350,7 +350,7 @@
     },
     {
       "id": "company-agent",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "title": "Company agent",
       "tagline": "An AI agent in your team's chats that works on your own records, with the permissions of whoever asks.",
       "replaces": [
@@ -413,7 +413,7 @@
     },
     {
       "id": "drive",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "title": "Drive",
       "tagline": "Company files and online documents in one folder tree, with versions, PDFs, sharing, comments and an access log.",
       "replaces": [
@@ -468,7 +468,7 @@
     },
     {
       "id": "e-signature",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "title": "E-signature",
       "tagline": "Envelopes, signers, a signing page and sealed, timestamped PDFs.",
       "replaces": [

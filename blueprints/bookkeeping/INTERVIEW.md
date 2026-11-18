@@ -107,7 +107,8 @@ that their accountant should review the setup before they rely on it.
 - **Why**: payslips, identity papers and medical receipts must not be visible to
   everyone who can see the books.
 - **Changes**: a confidential class in Drive, or without Drive a `restricted_document`
-  entity, who may read it, and its exclusion from warehouse replication.
+  entity, and who may read it. The files stay in file storage; their titles reach
+  the warehouse like every record.
 - **Default**: no restricted documents until one is needed; then only the finance
   owner reads them.
 

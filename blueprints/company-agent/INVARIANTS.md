@@ -197,15 +197,12 @@ Every backticked tool name in `instructions.md` exists (see the sketch in
 BLUEPRINT.md, section 10). Input: an instruction naming `deal_mark_won` after
 the action was renamed. Expected: failure naming it.
 
-### 20. Questions and routine runs never replicate to the warehouse.
+### 20. Retired: questions and routine runs never replicate to the warehouse.
 
-Why: answers and summaries carry personal and financial details that the
-warehouse's readers may not see.
-
-Test (after each deploy): exclusions are a workspace setting, not code, so check
-the deployed workspace: its replication settings exclude `question` and
-`routine_run` (see your project's `docs/ontology-replication.md`), and the
-warehouse's `ontology` dataset has no view for either.
+Retired in 0.2.0: every stored entity replicates to the warehouse, and the
+platform is removing replication exclusions, so the rule cannot hold. Delete its
+test. What protects questions and routine runs now is who may query the
+warehouse (BLUEPRINT.md, section 6).
 
 ## Acceptance scenarios
 

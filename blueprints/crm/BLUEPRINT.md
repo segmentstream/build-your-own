@@ -180,13 +180,15 @@ person's declaration, and the CRM never sets `isCustomer`.
 Stored entities cannot declare currency metrics, so amount metrics are plain
 numbers in minor units whose descriptions say to group by `currency`.
 
-### What stays out of the warehouse
+### What reaches the warehouse
 
+Every CRM record replicates to the warehouse with all its fields, as the
+foundation describes; metrics and the customer model read the structural ones.
 Lead `name`, `message`, `answers` and `attribution`, and Activity `body`, hold
-personal free text: exclude these fields from ontology replication before the
-first deploy. Exclusions are a workspace setting, not code; the foundation
-describes the steps. Keep the structural fields replicated;
-metrics and the customer model need them.
+personal free text, and whoever can query the warehouse reads them. Grant
+warehouse access only to people who may read every lead and activity, and show
+leads and activities on screens through the ontology, never through warehouse
+SQL.
 
 ### The starter's lead
 

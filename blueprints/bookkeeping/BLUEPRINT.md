@@ -187,9 +187,10 @@ several records, and a record may have several files.
 
 Sensitive files (identity papers, payslips, medical receipts) go to a confidential
 class with Drive; without it, to a separate `restricted_document` entity with its own
-read permission, excluded from warehouse replication before its first deploy (a
-workspace setting, not code; the foundation describes the steps). Their
-contents are never copied into descriptions, notes or questions.
+read permission. Both replicate to the warehouse like every stored record (see the
+foundation): the file's bytes stay in file storage, but its title and other fields
+reach whoever can query the warehouse. Their contents are never copied into
+titles, descriptions, notes or questions.
 
 ### FinanceQuestion
 

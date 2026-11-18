@@ -153,19 +153,20 @@ changes, and the default this blueprint takes.
 
 - **Options:** titles and details (default); full text across documents.
 - **Changes:** full text keeps a bounded `searchText` on each document, written by
-  the saving actions and by text extraction from uploaded PDFs, and stays out of
-  replication like everything else in Drive.
+  the saving actions and by text extraction from uploaded PDFs. It replicates
+  like every field, so it carries an uploaded file's text into the warehouse:
+  extract no text in a class whose content must not reach warehouse readers.
 - **Default:** titles and details; text search inside one document through
   `readContent`.
 
 ## Reporting
 
 - **Options:** none (default); counts of documents by type and month for admins.
-- **Changes:** replicate only `document` without `title`, `data` and file names,
-  and declare count metrics for admin roles, whose reads are scoped by a plain
-  property that metric queries apply; they refuse the team and guest fences'
-  paths from `me`.
-- **Default:** no replication of Drive.
+- **Changes:** count metrics on `document` for admin roles, whose reads are
+  scoped by a plain property (`confidentiality`) that metric queries apply.
+  Metric queries refuse the team and guest fences' paths from `me`, so `team`
+  and `guest` get no Drive metrics.
+- **Default:** none.
 
 ## File size
 

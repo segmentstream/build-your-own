@@ -52,9 +52,14 @@ legal name and postal address, opt-outs applied at once.
 
 - **Single opt-in** (default): `contact.subscribe` records `subscribed` with its
   source and evidence.
-- **Double opt-in:** `subscribe` records `pending` and sends one confirmation
-  email through its own small action (not a campaign); the link carries a token
-  that a webhook workflow passes to `contact.confirmSubscription`, which records
+- **Double opt-in:** `subscribe` records `pending`, and a workflow it triggers
+  sends one confirmation email through its own small action (not a campaign). As
+  in `sendCampaign`, the workflow draws the token in a step of its own, records its
+  SHA-256 hash on the pending record through an action before the email can reach
+  the provider, and puts the hash's first 12 hex characters in the idempotency
+  key; the token itself is never stored. A later confirmation email replaces the
+  hash, so only the latest link confirms. The link carries the token to a webhook
+  workflow that passes it to `contact.confirmSubscription`, which records
   `subscribed` with the confirmation time in `evidence`. Pending records expire
   after a set number of days and never receive campaigns.
 
@@ -124,8 +129,9 @@ legal name and postal address, opt-outs applied at once.
 - **Default pace:** pages of 50, 5,000 messages per run, the clock resuming
   every 15 minutes. Comfortable up to tens of thousands of recipients.
 - **Large lists:** use the provider's batch endpoint with a `sendBatch` action
-  over a fixed set of message ids and one idempotency key per batch; ramp volume
-  up over weeks on a new domain.
+  over a fixed set of message ids, each with its key issued first, and one
+  idempotency key per batch made from those ids and their tokens' hashes; ramp
+  volume up over weeks on a new domain.
 - **Local send time:** `plan` sets a `sendAfter` per message from the contact's
   time zone; `sendPage` skips messages not yet due and the clock resumes them.
 - **Frequency cap:** company default (3 days), per campaign, or per topic.

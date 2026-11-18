@@ -67,9 +67,11 @@ Build our Drive from the drive blueprint.
   is shown, never lost.
 - Not an Office editor. Word, Excel and other files are stored, versioned,
   shared and downloaded, not edited in place.
-- Not a vault against your own builders. People who write the workspace's code
-  or run its pipelines can reach stored content; confidential areas protect
-  documents from colleagues and outsiders, not from them.
+- Not a vault against your own builders. People who write the workspace's code,
+  run its pipelines or query its warehouse can reach stored content: every Drive
+  record replicates to the warehouse, where Drive's access rules do not apply.
+  Confidential areas protect documents from colleagues and outsiders, not from
+  them.
 
 ## Authors
 

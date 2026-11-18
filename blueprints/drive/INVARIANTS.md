@@ -139,7 +139,16 @@ invented files. "Fixtures" below means that set.
     `document_find` filtered by `links: { some: { companyId } }` returns nothing
     and the company page shows no title.
 
-21. **Drive content never reaches the warehouse.**
-    Why: raw warehouse SQL and app credentials ignore ontology permissions.
-    Test: after deploying, list the warehouse's `ontology` dataset. Expected: no
-    view for any Drive entity id.
+21. **Retired: Drive content never reaches the warehouse.**
+    Retired in 2.0.0: every stored entity replicates to the warehouse, and the
+    platform is removing replication exclusions, so the rule cannot hold. Delete
+    its test. Invariants 17 and 22 and BLUEPRINT.md, section 6, say what protects
+    Drive content now.
+
+22. **The app never reads Drive records with warehouse SQL.**
+    Why: every Drive record replicates to the warehouse, where neither `accessOf`
+    nor the fence applies, and the app's warehouse credential answers whoever
+    triggers the query, guests included.
+    Test: scan the app's source for queries through `segmentstream.warehouse`.
+    Expected: none names a Drive entity's view (`ontology.document`,
+    `ontology.document_…`, `ontology.drive_settings`).

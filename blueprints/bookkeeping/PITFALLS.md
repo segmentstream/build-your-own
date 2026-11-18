@@ -122,9 +122,9 @@ cause and what to do instead.
   restricted documents included.
 - **Instead**: list `member`'s reads by name, give finance reads through finance
   roles, put sensitive files in Drive's confidential class or a `restricted_document`
-  entity with a named permission, excluded from warehouse replication before its
-  first deploy. Never copy a restricted file's contents into a description or a
-  question.
+  entity with a named permission, and grant warehouse access only to people who may
+  read every finance record. Never copy a restricted file's contents into a title, a
+  description or a question: every field reaches the warehouse.
 
 ## 14. Month ends computed in UTC
 

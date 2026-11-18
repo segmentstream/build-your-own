@@ -104,12 +104,16 @@ instead.
     Instead: deduplicate within a folder (or one entity's books), answer the
     existing document there, and keep the platform's idempotency key for retries.
 
-14. **Drive content replicated to the warehouse.**
-    Symptom: contract text and HR titles appear in warehouse tables that every
-    pipeline and raw SQL query can read.
-    Cause: stored entities replicate by default after deploy.
-    Instead: exclude every Drive entity, by its stable id, before the deploy that
-    first adds it, then check the warehouse.
+14. **Drive content read through the warehouse.**
+    Symptom: contract text and HR titles show on a screen or report built on
+    warehouse SQL, or reach people who query the warehouse but may not open
+    those documents.
+    Cause: every stored entity replicates to the warehouse, and warehouse SQL
+    applies neither `accessOf` nor the fence.
+    Instead: grant warehouse access only to people who may open every document,
+    read Drive in the app only through actions and fenced finds, and upload
+    content that must not reach warehouse readers as a file whose title says
+    nothing private.
 
 15. **Confidential content through the agent.**
     Symptom: an HR document summarised in a group chat; outsiders' comments steer
