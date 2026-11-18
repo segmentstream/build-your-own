@@ -45,7 +45,8 @@ Build our Bookkeeping from the bookkeeping blueprint.
 ## How it fits
 
 - **CRM**: customers and suppliers are the shared Company records, so a company's
-  page can show its invoices, bills and what it owes.
+  page can show its invoices, bills and what it owes. Your own companies are Company
+  records too, so your legal name and address are kept in one place.
 - **Drive**: receipts, supplier invoices and contracts are Drive documents linked to
   the records they evidence. Without Drive, this blueprint builds a minimal document
   store that Drive later extends.
@@ -60,8 +61,8 @@ Build our Bookkeeping from the bookkeeping blueprint.
   balances before you rely on the books.
 - The first version has no bank feeds or bank reconciliation, no tax returns and no
   payroll. They are described as extensions and are future blueprints.
-- It keeps the books of each legal entity separately. It does not consolidate groups,
-  track inventory or replace an audit.
+- It keeps the books of each of your own legal entities separately, one book per own
+  company. It does not consolidate groups, track inventory or replace an audit.
 
 ## Authors
 

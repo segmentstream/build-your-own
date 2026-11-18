@@ -29,12 +29,15 @@ not decide what a court accepts; it decides what evidence exists.
 
 ## Who signs for the company
 
+Each of the business's own legal entities is a foundation Company marked
+`isOwn`, and who may sign for it is a `CompanySignatory` record in every option.
+
 | Option | Changes |
 | --- | --- |
-| One company, one `companySignatory` role (default) | As designed. |
-| Several legal entities | One signatory role per entity in code, the entity's legal name in config, and `capacity: ourCompany` names the entity. |
-| Signing limits | A limit per role or per person in config; `submit` refuses an envelope above the signer's limit. |
-| Two company signatures required | A rule in `submit`: at least two `ourCompany` signers above a value. |
+| One own company (default) | As designed: `ownCompany` defaults to it, and signatory records name it. |
+| Several own companies | Nothing in code. An admin marks each company own; signatory records are granted per company; the sender picks the envelope's `ownCompany` and each signer's `signsFor`. An agreement between two own companies has a signer for each. |
+| Signing limits | `limitMinor` and `limitCurrency` on the signatory record, granted with it; `submit` refuses an envelope above the signer's limit, and fails closed on a missing value or another currency. |
+| Two company signatures required | A rule in `submit`: above a value, at least two `ownCompany` signers for the same `signsFor`. |
 
 ## Internal approval
 

@@ -98,10 +98,11 @@ instead.
     unique notification key; link emails rate-limited per address and per link.
 
 13. **Deduplicating by file hash across the whole Drive.**
-    Symptom: the same signed contract cannot be stored for two legal entities, or
+    Symptom: the same signed contract cannot be stored for two of the business's
+    own companies, or
     an intake upload silently lands in someone else's folder.
     Cause: `sha256` declared unique globally.
-    Instead: deduplicate within a folder (or one entity's books), answer the
+    Instead: deduplicate within a folder (or one own company's book), answer the
     existing document there, and keep the platform's idempotency key for retries.
 
 14. **Drive content read through the warehouse.**

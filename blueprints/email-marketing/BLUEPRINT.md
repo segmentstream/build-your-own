@@ -115,7 +115,8 @@ Who a campaign comes from. Keeps its generated writes, held only by `emailAdmin`
 | `fromName`, `fromAddress` | text, email | The From header. The address is on a domain verified with the provider. |
 | `replyTo` | email, optional | Where replies go: a monitored mailbox. |
 | `defaultTopic` | select (topics) | The topic its campaigns use unless the draft names another. |
-| `footer` | text | The company's legal name and postal address, shown in every email it sends. |
+| `company` | relationship to Company, optional | The business's own company the emails come from (foundation, `isOwn`). Its `legalName` and `registeredAddress` head the footer of every email, read when the email is rendered. Set it in a new build. |
+| `footer` | text | The rest of the footer every email shows: a postal address when it differs from the registered one, and any line the law asks for. Never a copy of the legal name. Without `company` (a build from 2.0.0 not yet migrated), it holds the legal name and postal address itself. |
 | `unsubscribeEndpoint` | url, optional | The `emailUnsubscribe` webhook URL with its token, as `segmentstream workflow webhooks` prints it. Without it, a campaign from this sender cannot be tested or approved. |
 
 ### Campaign
@@ -245,8 +246,8 @@ the From domain is verified (with Resend, a key that may read domains).
 | `edit` | `marketing` | Any content, audience or cap field | Status `draft` or `ready` | Applies the change and returns the campaign to `draft`; content changes set `contentChangedAt`. |
 | `prepare` | `marketing`, the agent | `campaign` | Status `draft`, `ready` or `preparing` (restarts a stuck preparation) | `preparing`, `preparation + 1`. The `prepareCampaign` workflow starts. Sends nothing. |
 | `completePreparation` | `campaignPreparer` | `campaign`, `preparation` | Still `preparing` with that number, else no-op | `ready`, `preparedAt`. |
-| `sendTest` | `marketing`, approvers | `campaign`, `to` | `to` is an active member's address; the sender has an unsubscribe endpoint. Irreversible: agents confirm | Sends the rendered email with `[Test]` in the subject, through the provider, with a test token that unsubscribes nobody. Sets `testSentAt`. Writes no message. |
-| `approve` | `campaignApprover` only | `campaign`, `plannedCount`, `sendAt` | Status `ready`; `plannedCount` equals a fresh count of planned messages of the current preparation, and is above zero; the sender has an unsubscribe endpoint; `sendAt` within 30 days. Irreversible: agents confirm | `sending`, or `scheduled` with `scheduledFor`; `approvedBy`, `approvedAt`. Repeating by the same approver returns the same result. |
+| `sendTest` | `marketing`, approvers | `campaign`, `to` | `to` is an active member's address; the sender has an unsubscribe endpoint; the sender's `company`, when set, is own and has a legal name and registered address. Irreversible: agents confirm | Sends the rendered email with `[Test]` in the subject, through the provider, with a test token that unsubscribes nobody. Sets `testSentAt`. Writes no message. |
+| `approve` | `campaignApprover` only | `campaign`, `plannedCount`, `sendAt` | Status `ready`; `plannedCount` equals a fresh count of planned messages of the current preparation, and is above zero; the sender has an unsubscribe endpoint; the sender's `company`, when set, is own and has a legal name and registered address; `sendAt` within 30 days. Irreversible: agents confirm | `sending`, or `scheduled` with `scheduledFor`; `approvedBy`, `approvedAt`. Repeating by the same approver returns the same result. |
 | `startScheduled` | `campaignClock` | `campaign` | `scheduled` and due, else no-op | `sending`. |
 | `resumeSending` | `campaignClock` | `campaign` | `sending`, planned messages left, none sent in 15 minutes | Starts a new `sendCampaign` run through its trigger. |
 | `cancel` | `marketing`, approvers | `campaign` | Not `sent`. Irreversible while sending: agents confirm | `cancelled`. Messages not yet sent stay unsent. |
@@ -265,7 +266,8 @@ the From domain is verified (with Resend, a key that may read domains).
 
 `sendTest` and `send` share one pure renderer, `ontology/email-layout.ts`: it
 fills `{{firstName|there}}` and `{{company|your team}}` (HTML-escaped in the body),
-lays out heading, body and the sender's footer, writes the plain-text part, and adds
+lays out heading, body and the footer (the sender company's legal name and
+registered address, then the sender's `footer`), writes the plain-text part, and adds
 the personal unsubscribe link and the RFC 8058 headers `List-Unsubscribe` and
 `List-Unsubscribe-Post: List-Unsubscribe=One-Click`.
 

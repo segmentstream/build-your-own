@@ -164,3 +164,27 @@ Mistakes already made building signing on the platform. Each is easy to repeat.
 - **Instead:** keep the starter's email sign-in (codes and links), which needs
   no account. Recipients are invited by the envelope, so `signIn.policy:
   "invited"` admits them.
+
+## 16. The legal name copied into configuration
+
+- **Symptom:** the company changed its legal name, the company record shows the
+  new one, and new certificates still print the old one; or a second legal
+  entity needs a code change and a deploy.
+- **Cause:** the legal name, or a list of legal entities, kept in `config.ts` or
+  a setup record as well as on the company.
+- **Instead:** the legal identity lives only on the own company. Configuration
+  keeps the brand name that emails and the signing page show. `submit` copies
+  the legal name into the envelope and its `ownCompany` recipients, because a
+  sent envelope is a finished fact; nothing else copies it.
+
+## 17. Signing for the company gated by a role name
+
+- **Symptom:** anyone an admin gave a "signatory" role can sign for every own
+  company; nobody can say who allowed a person to sign, when, or for which
+  entity; revoking a role silently changes what an old envelope seems to prove.
+- **Cause:** the check reads a role name, or a list of names or emails in
+  configuration JSON, instead of a record per company and person.
+- **Instead:** a `CompanySignatory` record per own company and member, created
+  and revoked only by `esignAdmin` with a reason, unique per company and member.
+  `setRecipients`, `submit` and `sign` look it up through one helper, and
+  revoking it never edits a submitted envelope or a signature.

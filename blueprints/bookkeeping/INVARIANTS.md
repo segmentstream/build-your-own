@@ -1,8 +1,8 @@
 # Bookkeeping: invariants
 
 Rules that hold in every version, whatever the company. Each one becomes a test in
-the project, run on the harness in [testing](../../docs/testing.md) with invented records (a book `main` in a
-two-decimal base currency, a starter chart, rates for one foreign currency). Amounts
+the project, run on the harness in [testing](../../docs/testing.md) with invented records (a book `main` of
+Northwind, an own company, in a two-decimal base currency, a starter chart, rates for one foreign currency). Amounts
 below are minor units.
 
 ## The ledger
@@ -214,3 +214,29 @@ below are minor units.
   `journal_line.balance` and `book.trialBalance`: each is refused. A `financeViewer`
   reads them and cannot post. Only a role that names `restricted_document:read` (or
   Drive's role for the confidential class) reads a restricted document.
+
+## Own companies
+
+### 26. A book belongs to one own company, and an own company has at most one book
+
+- **Why**: a book is the books of a legal entity. A book for a company that is not
+  ours, two books for one entity, or a book whose entity changes splits or mixes the
+  ledger of one legal person.
+- **Test**: `book.open` for a company with `isOwn` false: refused, naming the
+  company. An admin calls `company.setOwn` on it with a reason: `isOwn` is true and
+  the history shows the member and the reason. Open its book: opened. Open a second
+  book for the same company: refused, naming the first. `book.configure` with a
+  `company`: refused or ignored, and the book's company is unchanged. `company.setOwn`
+  clearing `isOwn` while the book exists: refused. Deleting the company: refused. A
+  member holding every finance role but not `admin` calls `company.setOwn`: refused.
+
+### 27. The seller is read from the book's company, and an issued invoice keeps what it printed
+
+- **Why**: one identity in one place cannot disagree with itself, and the customer
+  holds the invoice as it was issued.
+- **Test**: assert from the manifest that `book` has no property for the seller's
+  name, address, tax id or registration. Issue an invoice: its `sellerName` and
+  `sellerAddress` equal the company's `legalName` and `registeredAddress`. An admin
+  changes the company's registered address: the issued invoice's seller copy is
+  unchanged, and the next issued invoice prints the new address. Clear the company's
+  `legalName`, then issue: refused, naming the missing field.
