@@ -119,12 +119,25 @@ names of their own: `upsert_by_<property>` is reserved for the generated upsert.
   clients read them.
 - **The repository never holds business data.** Tests and demos use invented
   data. Real records arrive through connections, event streams and actions.
-- **Private entities stay out of the warehouse.** Stored entities replicate to
-  the warehouse by default. Exclusions of entities, fields or relationships are
-  a workspace setting, not code (see the project's
-  `docs/ontology-replication.md`). Exclude a private entity before it is first
-  deployed: pause replication, deploy, then resume with the entity excluded.
-  Exclusions stop new exports; they do not erase what was exported earlier.
+- **Every stored record reaches the warehouse.** Every stored entity, with its
+  fields and relationships, replicates to the workspace's warehouse. Replication
+  is always on: the platform is removing exclusions of entities, fields and
+  relationships, and pausing replication, so a design never relies on either,
+  even where a project's docs still describe them. Warehouse SQL does not apply
+  the ontology's permissions: whoever can query the warehouse reads every
+  replicated record. That includes people who run queries on it, pipeline code,
+  and raw SQL in the app's server code (`segmentstream.warehouse`), which any
+  signed-in user of the app can trigger. Metric queries through the ontology do
+  apply the caller's read scopes. So a design:
+  - grants warehouse access only to people who may read every record;
+  - shows records on screens through the ontology (finds, actions, metric
+    queries), never through warehouse SQL over entities some users may not read;
+  - never stores a secret a reader could use: it stores the SHA-256 hash of a
+    token, never the token, and finds the record by hashing the token it is
+    given, as Drive's share links do with `tokenHash`;
+  - keeps data that must not be in the warehouse out of stored entities
+    altogether: in the provider that holds it, in an uploaded file (its bytes
+    stay in file storage), or not kept at all.
 
 ## Platform notes every blueprint shares
 

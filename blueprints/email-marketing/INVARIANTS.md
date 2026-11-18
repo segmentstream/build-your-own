@@ -4,7 +4,8 @@ Each rule holds in every version. Each becomes a test in the project. Tests run
 the actions on the harness in [testing](../../docs/testing.md), with the email
 provider replaced by `Connections.test({ <provider>: (request) => … })` that
 records every request. Data is invented: Northwind, Ada Example
-(`ada@example.com`), Grace Sample (`grace@example.com`).
+(`ada@example.com`), Grace Sample (`grace@example.com`). A test that runs `send`
+passes a token of 43 base64url characters, the same one on a repeat.
 
 ### 1. Consent is checked again just before each message is sent.
 
@@ -170,10 +171,10 @@ To an active member's address: one provider request with `[Test]` in the subject
 must not unsubscribe anyone; a token must not reach anyone else.
 
 **Test.** Call `emailMessage.unsubscribe` as the `emailUnsubscriber` workflow user
-with Ada's token and `scope: topic`: Ada's topic record is `unsubscribed`,
-explicit, `changedBy: contact`; Grace's records are unchanged. Repeat: no further
-change. Scope `all`: Ada's `marketingOptOutAt` is set. An unknown token: no
-change. A GET to the unsubscribe page writes nothing.
+with the token Ada's message was sent with and `scope: topic`: Ada's topic record
+is `unsubscribed`, explicit, `changedBy: contact`; Grace's records are unchanged.
+Repeat: no further change. Scope `all`: Ada's `marketingOptOutAt` is set. An
+unknown token: no change. A GET to the unsubscribe page writes nothing.
 
 ### 19. Bounces and complaints set the address's status, in rank order, whatever email caused them.
 
@@ -234,3 +235,15 @@ only `planned` messages: deleted with them. Structural: `Campaign` declares no
 integer property except `preparation` and `frequencyCapDays`; after three sends
 and two `delivered` events, `EmailMessage.queryMetrics` for the campaign returns
 `sent` 3 and `delivered` 2.
+
+### 25. An unsubscribe token is stored only as its hash.
+
+**Why.** Every stored field reaches the warehouse. A token there would let any
+reader unsubscribe a person in their name, recorded as `changedBy: contact`.
+
+**Test.** Send Ada's planned message with token `T` and a stub answering `200`.
+Expect the request's link and `List-Unsubscribe` header to carry `T`,
+`unsubscribeTokenHash` to equal the SHA-256 hex of `T`, and no field or history
+row of the message to contain `T`. `unsubscribe` with `T`: Ada is unsubscribed.
+With the stored hash as the token: no change. `send` with a token of 10
+characters: refused, zero provider requests.

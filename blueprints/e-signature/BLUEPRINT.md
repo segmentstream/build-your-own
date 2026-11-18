@@ -115,7 +115,9 @@ signature the signer adopts, typed in a script font or drawn), `dateSigned`
 
 ### EnvelopeRecipient
 
-A person the envelope goes to. Private: kept out of the warehouse.
+A person the envelope goes to. Private: through the ontology only the envelope's
+sender and `esignAdmin` read it, though it reaches the warehouse like every
+stored record (section 6).
 
 | Property | Type | Meaning | Set by |
 | --- | --- | --- | --- |
@@ -363,14 +365,15 @@ consent text; the event history; and the timestamp authority.
 
 ## 6. Data flow (pipeline)
 
-None by default. `Envelope` replicates to the warehouse and declares a count
-metric, so "envelopes completed last quarter by sender" or "median days to
-complete" are metric queries or a small model over the replicated table.
-`EnvelopeRecipient`, `EnvelopeSignature` and `EnvelopeEvent` hold emails, IP
-addresses and signature images. Exclusions are a workspace setting, not code:
-before their first deploy, pause replication, deploy, then resume with these
-three excluded (see the foundation and your project's
-`docs/ontology-replication.md`).
+None by default. `Envelope` declares a count metric, so "envelopes completed last
+quarter by sender" or "median days to complete" are metric queries or a small
+model over the replicated table. Every e-signature entity replicates to the
+warehouse, as the foundation describes, so whoever can query it reads what
+`EnvelopeRecipient`, `EnvelopeSignature` and `EnvelopeEvent` hold: emails, IP
+addresses, field values and drawn signatures. Grant warehouse access only to
+people who may read every envelope. Nothing replicated lets a reader sign as
+someone: recipients sign in through links that `User.sendSignInLink` sends, which
+no entity here stores.
 
 Demo data comes from a seed script that calls the same actions: it generates two
 invented PDFs with `pdf-lib` ("Mutual NDA" and "Order Form" for Northwind),
@@ -432,8 +435,9 @@ the agent's instructions say so.
 2. Narrow `member` to the recipient grants; move team reads into a `team` role.
    Check: a member with no role reads no company, contact or document.
 3. Declare the seven entities, `config.ts` and the email templates. Run
-   `npm --prefix ontology run check`. Before the first deploy, have the
-   person exclude recipients, signatures and events from replication.
+   `npm --prefix ontology run check`. Before the first deploy, tell the person
+   that recipients, signatures and events reach the warehouse, and who can query
+   it (section 6).
 4. Preparing actions and their tests: a draft with two generated PDFs, three
    recipients and fields. Check the refusals in INVARIANTS.md.
 5. `submit`, the send, and approval rules with `grant` and `returnForChanges`.

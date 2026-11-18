@@ -29,7 +29,8 @@ a fine answer.
    Why: each confidential class is a confidentiality value, a top-level folder
    and a role that reads and administers it.
    Changes: one class and role per answer (`hr`, `board`, `legal`); classes are
-   never opened through folder shares or links.
+   never opened through folder shares or links. Every class reaches the
+   warehouse, so only people who may read all of them get warehouse access.
    Default: one class, `hr`, held by the people team.
 
 4. **Should Drive admins be able to open everyone's personal files?**

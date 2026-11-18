@@ -7,6 +7,138 @@ project's `BLUEPRINTS.md` (see [AGENTS.md](AGENTS.md#updating-a-build)).
 Each entry names the blueprint and its new version, what changed, and what a
 project built from the previous version should do.
 
+## Foundation: every stored record reaches the warehouse
+
+Replication to the warehouse is always on. The platform is removing exclusions of
+entities, fields and relationships, and pausing replication, so the convention
+"Private entities stay out of the warehouse" is replaced by "Every stored record
+reaches the warehouse". Warehouse SQL applies no ontology permission, so a design
+grants warehouse access only to people who may read every record, shows records on
+screens through the ontology, stores a token only as its hash, and keeps data that
+must not reach the warehouse out of stored entities. The entries below apply this to
+each blueprint that excluded records.
+
+A project built on the earlier foundation:
+
+1. Has nothing to undo in code: exclusions were a workspace setting. Once the
+   platform removes them, expect the excluded entities and fields in the warehouse.
+2. Keeps warehouse access to people who may read every record.
+3. Moves any screen that shows warehouse SQL over records some of its users may not
+   read to finds, actions or metric queries.
+4. Stores the SHA-256 hash of any stored token instead of the token, as the email
+   marketing entry describes.
+
+## CRM 0.2.0
+
+Lead `name`, `message`, `answers` and `attribution`, and Activity `body`, are no
+longer excluded from replication. "What stays out of the warehouse" becomes "What
+reaches the warehouse": every CRM field does, so warehouse access goes only to people
+who may read every lead and activity, and screens read them through the ontology.
+The "Private by team" variation says that warehouse readers still read every team's
+records.
+
+A project built from 0.1.0 has nothing to undo. Once the platform removes
+exclusions, expect those fields in the warehouse, and check who can query it.
+
+## Email marketing 2.0.0
+
+An unsubscribe token is stored only as its hash (new invariant 25).
+
+- `EmailMessage.unsubscribeToken` is replaced by `unsubscribeTokenHash`, the SHA-256
+  hex of the token, written by `send`. `plan` no longer makes tokens.
+- `sendCampaign` draws a random seed for the run in its first step and gives each
+  message the HMAC-SHA256 of its id under the seed as its token. `send` takes the
+  token, refuses a malformed one and renders it into the link. The seed stays in the
+  run, so a retried page resends the same email.
+- `unsubscribe` hashes the token it is given to find the message.
+- Replication excludes nothing: addresses, consent records and messages reach the
+  warehouse, and warehouse access goes only to people who may read all of them.
+- Invariant 18's test uses the token the message was sent with. The double opt-in
+  variation keeps its confirmation token only as a hash.
+
+A hash beside the token would leave the token in every replicated row, so this
+replaces the field rather than adding one. A project built from 1.0.0:
+
+1. Add `unsubscribeTokenHash` (text, unique, optional, managed) to `EmailMessage`.
+   Make `unsubscribe` find the message by the token's hash, falling back to
+   `unsubscribeToken` until step 3. Change `send` and `sendCampaign` as in the
+   sketch, stop `plan` from making tokens, and deploy.
+2. Run a one-time workflow that pages through messages with an `unsubscribeToken`
+   and, through an action, sets each one's `unsubscribeTokenHash` to the token's
+   SHA-256 hex and clears the token, so links in emails already sent keep working.
+3. Remove the fallback and the `unsubscribeToken` property. Pass a token wherever a
+   test runs `send`, and add the test for invariant 25.
+
+Do it soon: once the platform removes exclusions, every value still stored
+replicates, the tokens included. Clearing a token does not remove it from the
+message's history or from rows already replicated.
+
+## Bookkeeping 2.0.0
+
+Restricted documents are no longer excluded from replication. Invariant 25 no
+longer tests that `restricted_document` is absent from replication, and its reason
+says the warehouse is outside the rule: whoever can query it reads every finance
+record. The design, interview question 11, the payroll variation and pitfall 13 keep
+a restricted file's contents out of every field, since only the file's bytes stay in
+file storage, and grant warehouse access only to people who may read every finance
+record.
+
+A project built from 1.0.0:
+
+1. Remove the replication check from the test for invariant 25; it fails once the
+   platform removes exclusions.
+2. Expect restricted documents' titles and fields, not their files, in the
+   warehouse. Check that none copies a file's contents, and who can query the
+   warehouse.
+
+## Company agent 0.2.0
+
+Questions and routine runs are no longer excluded from replication. Invariant 20 is
+retired. Section 6 says that whoever can query the warehouse reads every question,
+answer and routine message, and that a question never asks for a password, a
+sign-in code or a card number. Build order step 6 no longer excludes them.
+
+A project built from 0.1.0:
+
+1. Delete the test for invariant 20.
+2. Grant warehouse access only to people who may read every question and routine
+   message, finance ones included.
+3. Say in `question.raise`'s description that a question never asks for a
+   password, a sign-in code or a card number.
+
+## Drive 2.0.0
+
+Drive entities are no longer excluded from replication: every Drive record reaches
+the warehouse, where neither `accessOf` nor the fence applies. Invariant 21 is
+retired, and the new invariant 22 says the app never reads Drive records with
+warehouse SQL. Section 6 says who may query the warehouse, that link tokens stay
+hashed, and that content which must not reach warehouse readers is uploaded as a
+file under a title that says nothing private. Build order step 1, pitfall 14,
+interview question 3, the README and the Search and Reporting variations follow.
+
+A project built from 1.0.0:
+
+1. Delete the test for invariant 21. Add the test for invariant 22, and move any
+   screen that reads Drive through `segmentstream.warehouse` to actions and fenced
+   finds.
+2. Once the platform removes exclusions, expect every Drive entity in the
+   warehouse. Grant warehouse access only to people who may open every document,
+   every confidential class included.
+3. With full-text search, extract no text in a class whose content must not reach
+   warehouse readers.
+
+## E-signature 1.1.0
+
+Recipients, signatures and events are no longer excluded from replication. Section 6
+says they reach the warehouse with their emails, IP addresses, field values and
+drawn signatures, that warehouse access goes only to people who may read every
+envelope, and that nothing replicated lets a reader sign. Build order step 3 tells
+the person instead of excluding them.
+
+A project built from 1.0.0 has nothing to undo. Once the platform removes
+exclusions, expect those three entities in the warehouse, and check who can query
+it.
+
 ## Marketing analytics 1.1.0
 
 Collection follows the visitor's consent with `@segmentstream/web-tracker` 0.2.

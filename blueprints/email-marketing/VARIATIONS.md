@@ -53,8 +53,9 @@ legal name and postal address, opt-outs applied at once.
 - **Single opt-in** (default): `contact.subscribe` records `subscribed` with its
   source and evidence.
 - **Double opt-in:** `subscribe` records `pending` and sends one confirmation
-  email through its own small action (not a campaign); the link carries a token
-  that a webhook workflow passes to `contact.confirmSubscription`, which records
+  email through its own small action (not a campaign); the link carries a token,
+  kept only as its SHA-256 hash on the pending record, that a webhook workflow
+  passes to `contact.confirmSubscription`, which records
   `subscribed` with the confirmation time in `evidence`. Pending records expire
   after a set number of days and never receive campaigns.
 

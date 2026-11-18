@@ -75,8 +75,10 @@ people. The extension points:
 
 Pay runs are posted as ordinary journals through `journal.post` (gross pay, employer
 costs and the liabilities to employees and authorities) and paid with
-`journal.recordPayment`. Payslips and employee records are `restricted_document` and
-restricted entities, excluded from replication. Pay calculation is country law.
+`journal.recordPayment`. Payslips are `restricted_document` files and employee records
+restricted entities. Both reach the warehouse like every stored record (a payslip's
+bytes stay in file storage), so only people who may read pay get warehouse access.
+Pay calculation is country law.
 
 ## Exchange rates
 

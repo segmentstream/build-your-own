@@ -63,7 +63,7 @@ a list of disposable email domains that `lead.submit` rejects.
 | --- | --- | --- |
 | Open team | Everyone in `sales` reads and changes every lead and deal. | **Default** |
 | Own records | `sales` changes only leads and deals it owns: scoped permissions `{ permission: "deal:moveStage", where: { owner: me }, readsAll: true }` and the same for the other deal and lead actions. Managers keep unscoped grants. | |
-| Private by team | Reads scoped too, by an owner's team through a path from `me`. Metric queries refuse some path scopes; check the project's `docs/ontology.md` before choosing. | |
+| Private by team | Reads scoped too, by an owner's team through a path from `me`. Metric queries refuse some path scopes; check the project's `docs/ontology.md` before choosing. Whoever can query the warehouse still reads every team's records. | |
 | Whole company reads CRM | `member` keeps `*:read`. | **Default** if the project already has it |
 | CRM is sales-only | `member` loses CRM reads; roles grant them. Do this before finance or HR blueprints add members who should not see leads. | |
 
