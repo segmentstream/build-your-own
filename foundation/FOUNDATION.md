@@ -8,24 +8,52 @@ entities; they never create a second company or contact table.
 
 ### Company
 
-An organization the business deals with: a prospect, customer, supplier,
-partner or any mix of these over time.
+An organization: one the business deals with (a prospect, customer, supplier,
+partner or any mix of these over time), or one of the business's own legal
+entities. Our own companies are companies too, marked `isOwn`; see "Our own
+companies" below.
 
 | Property | Type | Meaning |
 | --- | --- | --- |
 | `name` | text | The name people use. |
 | `legalName` | text, optional | The registered name, for invoices and contracts. |
+| `registeredAddress` | text, optional | The registered address, as invoices and contracts print it. |
 | `domain` | text, unique, optional | Primary web domain, lowercase, without `www.`. The natural key for upserts. |
 | `additionalDomains` | json, optional | Other domains that belong to the same company, as a JSON list of lowercase domains. (`p.list` exists only on the built-in `User`.) |
 | `countryCode` | text, optional | ISO 3166-1 alpha-2 country of the headquarters. |
 | `registrationNumber`, `registrationCountry` | text, optional | Legal registration, when finance or contracts need it. |
 | `taxId` | text, optional | VAT or tax number, when invoices need it. |
+| `isOwn` | boolean, managed, default false | One of the business's own legal entities: the company whose books are kept, or for which members sign. Set only by `company.createOwn` and `company.setOwn`, and cleared only by `company.setOwn`. |
+| `ownNote` | text, optional, managed | Why `isOwn` last changed. Written by `company.createOwn` and `company.setOwn` with the flag. |
 | `isProspect`, `isCustomer`, `isFormerCustomer`, `isSupplier`, `isPartner` | boolean, managed, default false | What the company is to the business, in any mix over time. One flag per value: the SDK has no multi-select property, and a `find` filters booleans directly. Set by people through `setRelationships`. |
 | `relationshipsNote` | text, optional, managed | Why the flags last changed. Written by `setRelationships` with the flags, so the record's history shows the reason beside the change. |
 | `owner` | relationship to a member, optional | The person responsible for the relationship. |
 
 Facts computed from other records (revenue to date, open deals, last activity)
 are metrics or warehouse tables, never stored properties.
+
+### Our own companies
+
+The business's own legal entities are modelled once, as companies with `isOwn`
+true. A business with one entity has one own company; a group has several.
+
+- **Registered identity lives only on `Company`:** `legalName`,
+  `registrationNumber` and `registrationCountry`, `registeredAddress`, `taxId`.
+  Other blueprints reference the own company (a book's `company`, the company a
+  signer signs for) and never copy these fields into their settings,
+  configuration code or JSON.
+- **Only an admin decides what is own.** `company.setOwn` sets or clears the flag
+  with a reason kept in `ownNote`, so the history shows who decided and why.
+  Clearing it is refused while another blueprint's record needs the company to
+  be own: each such blueprint extends `setOwn`, as it extends `mergeInto`.
+- **Only an admin edits an own company's identity.** Job roles hold
+  `company:update` scoped to companies that are not own (`where: { isOwn: false }`);
+  `admin` holds it unscoped.
+- **A finished fact keeps what it printed.** An issued invoice keeps the seller
+  it printed, and a signature the legal name it was signed for: a snapshot of a
+  finished fact is evidence. A copy of configuration (a legal name kept in a
+  book's settings or a config file) is not: it drifts from the company and
+  nobody knows which one is right.
 
 ### Contact
 
@@ -67,7 +95,9 @@ the wire (`company.find_or_create_by_domain`, MCP tool
 | `company.findOrCreateByDomain` | job roles | Finds the company by normalized domain or creates it. Refuses a free mail domain. Idempotent. |
 | `company.update` | job roles | The generated update: changes descriptive properties. Managed flags stay out of it. |
 | `company.setRelationships` | job roles | Sets the relationship flags given, and `relationshipsNote` when a reason is given. |
-| `company.mergeInto` | `admin` | Moves every related record from a duplicate to the kept company, then deletes the duplicate. Each blueprint that relates its records to Company extends it to move them. Refuses when legal identities conflict. |
+| `company.mergeInto` | `admin` | Moves every related record from a duplicate to the kept company, then deletes the duplicate. Each blueprint that relates its records to Company extends it to move them. Refuses when legal identities conflict, or when the duplicate is own: a stray copy of our company may be merged into it, never the other way. |
+| `company.createOwn` | `admin` | Creates one of our own companies with `isOwn` true: `name`, `legalName`, `registrationNumber`, `registrationCountry`, `registeredAddress`, `taxId` and `domain` optional, and a required reason in `ownNote`. For an own entity that `findOrCreateByDomain` cannot create, such as a second entity sharing the group's domain. Refuses a registration number and country already on another company. |
+| `company.setOwn` | `admin` | Sets or clears `isOwn`, with a required reason written to `ownNote`. Refused when the flag already has that value, and when clearing it while a blueprint's record needs the company to be own (a book, a signatory record). |
 | `contact.findOrCreateByEmail` | job roles | Finds the contact by lowercased email or creates it, filling only empty fields; links a company found by the email's domain when the domain is not a free mail provider. Idempotent. |
 | `contact.update` | job roles | The generated update: changes descriptive properties. |
 | `contact.resetEmailStatus` | `admin` | Sets `emailStatus` to `ok` with a required reason in `emailStatusNote`. Refused when it is already `ok`. |
@@ -86,13 +116,13 @@ names of their own: `upsert_by_<property>` is reserved for the generated upsert.
 | Role | Holder | Foundation permissions |
 | --- | --- | --- |
 | `member` | Every active member | `*:read` by default. A blueprint narrows it before members who should not read its records join. |
-| Job roles: `sales`, `marketing`, `finance`, `support` | Members, by job; one member may hold several | `company:read`, `contact:read`, `company:findOrCreateByDomain`, `company:update`, `company:setRelationships`, `contact:findOrCreateByEmail`, `contact:update` |
-| `admin` | One or two members who keep records clean | `company:read`, `contact:read`, `company:mergeInto`, `contact:resetEmailStatus`, `contact:delete`; answers app feedback (`feedback: { builders: ["admin"] }`) |
+| Job roles: `sales`, `marketing`, `finance`, `support` | Members, by job; one member may hold several | `company:read`, `contact:read`, `company:findOrCreateByDomain`, `company:update` scoped to `{ isOwn: false }`, `company:setRelationships`, `contact:findOrCreateByEmail`, `contact:update` |
+| `admin` | One or two members who keep records clean | `company:read`, `contact:read`, `company:update`, `company:mergeInto`, `company:createOwn`, `company:setOwn`, `contact:resetEmailStatus`, `contact:delete`; answers app feedback (`feedback: { builders: ["admin"] }`) |
 | Machine roles, such as `intake` | One API key or one workflow each | Only what that caller runs. A website key gets a blueprint's submit action, which finds or creates companies and contacts inside it, not the finders themselves: a key that can call `findOrCreateByEmail` learns which emails exist. |
 
 - Name a role for the job, never for a person.
-- Destructive and irreversible permissions (`mergeInto`, deletes, sending,
-  signing, posting to the ledger) are granted by name, never through a broad
+- Destructive and irreversible permissions (`mergeInto`, `setOwn`, deletes,
+  sending, signing, posting to the ledger) are granted by name, never through a broad
   role or a wildcard.
 - `user:*` permissions (inviting, granting roles) go only to a role written for
   member administration, never to a job role or a machine role.

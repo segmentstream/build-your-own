@@ -143,3 +143,33 @@ cause and what to do instead.
   writes by minutes.
 - **Instead**: close checks and report pages use the read-only actions, which compute
   fresh in the database; dashboards may use the replica and say when it was read.
+
+## 16. The seller's identity copied into the book
+
+- **Symptom**: the company's new registered address is on its page, but new invoices
+  print the old one; or two books of one company print different legal names.
+- **Cause**: the legal name, address and tax id kept as settings on the book (or in
+  configuration code) as well as on the company, and only one copy was updated.
+- **Instead**: the book relates to one own company and keeps only accounting
+  settings. Issuing reads the seller through `book.company`. Only the issued invoice
+  keeps a copy, as the snapshot of what it printed.
+
+## 17. An issued invoice's seller edited or re-read
+
+- **Symptom**: after the company moves office, reprinting last year's invoice shows
+  the new address, which is not what the customer holds; or someone "fixes" a legal
+  name on an issued invoice.
+- **Cause**: the print view of an issued invoice reads the live company, or an action
+  lets the seller copy change after issue.
+- **Instead**: print an issued invoice from its own `seller*` and `billTo*` copies,
+  which no action changes after issue. A wrong issued invoice is corrected by a credit
+  note and a new invoice.
+
+## 18. A book opened for a customer
+
+- **Symptom**: a book appears for a supplier or a customer, or a company is unmarked
+  as own while its books are still kept.
+- **Cause**: `book.open` took any company, or `isOwn` was a generated, editable flag.
+- **Instead**: `book.open` refuses a company that is not own or already has a book;
+  `isOwn` is managed and set only by the foundation's `company.setOwn`, held by
+  `admin`, which refuses to clear it on a company that has a book.

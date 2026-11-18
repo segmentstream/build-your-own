@@ -26,9 +26,14 @@ never a default.
 
 ## Legal entities
 
-- **One book** (default).
-- **Several books**, one per legal entity, each with its own base currency, numbering
-  and lock date. Pages and reports gain a book filter; when different teams keep
+Each own legal entity is a foundation `Company` marked `isOwn`, and has at most one
+book. Its legal identity is kept on the company in every option below.
+
+- **One own company, one book** (default).
+- **Several own companies**, one book each, each with its own base currency,
+  numbering and lock date. An admin marks each company own before its book is opened.
+  An own company that keeps no books here (a dormant entity, one whose books an
+  outside firm keeps) simply has no book. Pages and reports gain a book filter; when different teams keep
   different entities, scope roles to books through a path from `me` (such as a
   book-assignment record): a scope cannot name a literal book id, and metric
   queries refuse path scopes, so those teams read figures through the report
@@ -124,7 +129,9 @@ Pay calculation is country law.
   prefix per legal requirement. Some jurisdictions require registered numbering,
   e-invoicing through an authority, or a fiscal device; those are country variations.
 - **Printed content**: what the law requires on an invoice (tax identifiers,
-  wording, language) comes from the accountant.
+  wording, language) comes from the accountant. The seller's identity always comes
+  from the book's company; a trading name or a different address for one series is
+  a property of the series, never a second copy of the legal name.
 - **Delivery**: a print view the member downloads and sends (default), or email
   through the email blueprint, always confirmed by a member.
 - **Sales recorded elsewhere**: a shop or payment provider issues its own documents;

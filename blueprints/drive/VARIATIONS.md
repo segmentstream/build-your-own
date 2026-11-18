@@ -114,8 +114,9 @@ changes, and the default this blueprint takes.
 - **Changes:** one optional relationship on `document_link` per target, and a
   Documents tab on its page.
 - **Documents attached to accounting records:** one file may evidence several
-  records and the same bytes may evidence two legal entities, so deduplicate by
-  `sha256` within one entity's books, never across the whole Drive. Evidence
+  records and the same bytes may evidence two of the business's own companies
+  (each an own `Company` with one book in Bookkeeping), so deduplicate by
+  `sha256` within one book, never across the whole Drive. Evidence
   rules (which records need a document) belong to Bookkeeping. If Bookkeeping
   built its minimal `document` first, extend that entity under the same name and
   keep its fields.

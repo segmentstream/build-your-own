@@ -104,15 +104,22 @@ signature on it.
 `customer` signer: rejected naming `company`. Two signers, one without a
 signature field: rejected naming that signer. Fix both: submitted.
 
-## 8. Only authorised people sign for the company
+## 8. Only authorised people sign for one of our own companies
 
-**Rule:** a recipient with capacity `ourCompany` must be an active member
-holding the company signatory role, both at `submit` and at `sign`.
+**Rule:** a recipient with capacity `ownCompany` names in `signsFor` a company
+whose `isOwn` is true, and must be an active member with an active
+`CompanySignatory` record for that company, at `setRecipients`, at `submit` and
+at `sign`. No role name grants it.
 
-**Why:** the company is bound only by people allowed to bind it.
+**Why:** a company is bound only by people allowed to bind it, and being allowed
+to sign for one entity is not being allowed to sign for another.
 
-**Test:** submit with Ada as `ourCompany` without the role: rejected, naming
-the role. Grant it, submit, revoke it, then Ada signs: rejected.
+**Test:** with Northwind and Northwind Labs both own and Ada a signatory of
+Northwind only: Ada as `ownCompany` for Northwind Labs is rejected, naming the
+company. Ada for a company that is not own: rejected. Ada for Northwind:
+accepted; submit; an `esignAdmin` revokes her record; Ada signs: rejected.
+Assert from the manifest that no role is named for signing for the company and
+that `sign` succeeds for no principal without a signatory record.
 
 ## 9. Every signature carries complete evidence
 
@@ -258,3 +265,42 @@ never reactivates or grants roles to anyone.
 **Test:** deactivate a member, add their email as a recipient, submit:
 rejected, the member stays inactive with the same roles. A new outside email is
 invited with no roles.
+
+## 20. Signatory records change only through admin actions, and keep their history
+
+**Rule:** a `CompanySignatory` record is created, reactivated and revoked only
+by `company_signatory.grant` and `revoke`, held only by `esignAdmin`, each with a
+reason; there is at most one record per company and member, its company is own,
+and its member holds a team role.
+
+**Why:** who may bind the company is a decision someone must answer for later.
+
+**Test:** assert from the manifest that `company_signatory` has no generated
+`create`, `update` or `delete` and that only `esignAdmin` holds `grant` and
+`revoke`. A `sender` calls `grant`: rejected. `grant` without a reason, for a
+company that is not own, or for a member holding only `member`: rejected. Grant
+Ada for Northwind twice: one record, the second refused. Revoke, then grant
+again: still one record, `active`, and its history shows both reasons and who
+gave them. `company.setOwn` clearing Northwind's `isOwn` while Ada's record is
+active: refused.
+
+## 21. An envelope keeps the legal name it was submitted with
+
+**Rule:** `submit` sets the envelope's `ownCompany` from its first `ownCompany`
+signer and copies that company's legal name into
+`ownCompanyLegalName`, and the legal name of each `ownCompany` recipient's
+`signsFor` into
+`signsForLegalName`; they are part of the fingerprint, and no later change to the
+company or to a signatory record changes them, the signature's capacity or the
+certificate.
+
+**Why:** a sent envelope is a finished fact. What the other side was shown and
+signed against must not move when the company record is edited.
+
+**Test:** submit an envelope for Northwind with Ada signing for it: both
+snapshots equal the company's `legalName`. An admin renames the company's legal
+name; Ada signs; seal and complete: the envelope, recipient, signature
+`capacity` and certificate text all carry the old name. Submit with an own
+company that has no `legalName`: rejected, naming the company. Return a
+submitted envelope for changes: the snapshots are cleared, and the next submit
+copies the current name.

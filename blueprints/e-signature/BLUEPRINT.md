@@ -20,11 +20,14 @@ Document (drive) ──< DocumentVersion (drive)
     └──< EnvelopeDocument ┴────────────┘   frozen PDF, fields, seal
               │
 Envelope ─────┼──< EnvelopeRecipient ──> User (member they sign in as)
-  │  │        │          │          └──> Contact (foundation), optional
+  │  │        │          │          ├──> Contact (foundation), optional
+  │  │        │          │          └──> Company (signsFor: an own company), optional
   │  │        │          └──< EnvelopeSignature   one per recipient, immutable
   │  │        └──< EnvelopeEvent                   the audit trail, append-only
   │  └──< EnvelopeApproval ──> EnvelopeApprovalRule (by name, at submit)
-  └──> User (sender), Company (foundation), Deal (crm), all optional but sender
+  └──> User (sender), Company (counterparty, and ownCompany), Deal (crm), all optional but sender
+
+CompanySignatory ──> Company (an own company), User   who may sign for it
 ```
 
 Every entity declares `writes: "actions"` except `EnvelopeApprovalRule`, which
@@ -68,13 +71,17 @@ One sending of one to ten PDFs to one to twenty recipients.
 | `dueAt` | timestamp, optional | Signing closes then. `sign` refuses after it even before `expire` runs. Defaults at submit to now plus the configured days. | `updateDraft`, `submit` |
 | `remindEveryDays` | integer 1 to 30, optional | Remind whoever's turn it is after this many days without an act. Empty: no reminders. | `updateDraft` |
 | `valueMinor`, `valueCurrency` | integer (minor units), text (ISO 4217, lowercase), optional | What the documents commit to, for approval rules: `12000.00 EUR` is `1200000` with `eur`, as the foundation stores money. | `updateDraft`, or copied from a deal |
-| `fingerprint` | text, 64 hex, optional | SHA-256 over the frozen content: each document's hash and field layer, each recipient's email, kind, order, party and capacity, the message and the due date, in canonical JSON. Approvals bind to it. | `submit` |
+| `fingerprint` | text, 64 hex, optional | SHA-256 over the frozen content: each document's hash and field layer, each recipient's email, kind, order, party, capacity, `signsFor` and its legal name, the envelope's own company and its legal name, the message and the due date, in canonical JSON. Approvals bind to it. | `submit` |
+| `ownCompanyLegalName` | text, optional | The legal name of `ownCompany` when the envelope was submitted: the party on our side as the envelope froze it. Printed on the certificate. Never changes after `submit`; cleared only when the envelope returns to draft. | `submit` |
 | `submittedAt`, `sentAt`, `completedAt`, `endedAt` | timestamp, optional | When each happened, server time. | Actions |
 | `endReason` | text, max 1000, optional | The void reason, the decline reason, or that it expired. | `void`, `decline`, `expire` |
 
 Relationships: `sender` (User, required, the member who created it),
-`company` (foundation Company, optional), `deal` (CRM Deal, optional, only when
-the CRM is built). Index `[status, createdAt]`.
+`company` (foundation Company, optional: the other side), `ownCompany`
+(foundation Company with `isOwn`, optional, `restrict`: the party on our side,
+set by `submit` to the `signsFor` of the first `ownCompany` signer in order, and
+empty when nobody signs for one of ours), `deal` (CRM Deal, optional, only when the CRM is built). Index
+`[status, createdAt]`.
 
 ### EnvelopeDocument
 
@@ -126,8 +133,9 @@ stored record (section 6).
 | `kind` | select: `signer`, `approver`, `viewer` | Signers fill their party's fields and sign. Approvers approve or decline in their turn without fields. Viewers read the documents and get the sealed copy. | `setRecipients` |
 | `order` | integer 1 to 20 | Signers and approvers act in ascending order; equal numbers act in parallel. Viewers ignore it. | `setRecipients` |
 | `party` | text, max 60, optional | Signers only: the party whose fields they fill. | `setRecipients` |
-| `capacity` | select: `personal`, `ourCompany`, `otherCompany` | Whom they sign for. `ourCompany` requires an active member holding `companySignatory`. | `setRecipients` |
-| `organizationName`, `jobTitle` | text, optional | Printed with the signature: "for Northwind Ltd, Director". For `ourCompany` the name comes from configuration. | `setRecipients` |
+| `capacity` | select: `personal`, `ownCompany`, `otherCompany` | Whom they sign for. `ownCompany`: one of the business's own companies, named in `signsFor`. | `setRecipients` |
+| `organizationName`, `jobTitle` | text, optional | Printed with the signature: "for Northwind Ltd, Director". For `otherCompany` as the sender typed them. For `ownCompany` the name is `signsForLegalName`, and the title defaults to the signatory record's `title`. | `setRecipients` |
+| `signsForLegalName` | text, optional | For `ownCompany`: the legal name of `signsFor` at submit, a finished fact. Never changes after `submit`; cleared only when the envelope returns to draft. | `submit` |
 | `status` | select: `waiting`, `notified`, `viewed`, `signed`, `approved`, `declined` | Where they are. | Actions |
 | `notifiedAt`, `viewedAt`, `actedAt` | timestamp, optional | First notice, first open, the act. | Actions |
 | `declineReason` | text, max 2000, optional | Their reason. | `decline` |
@@ -135,7 +143,26 @@ stored record (section 6).
 Relationships: `envelope` (cascade), `user` (User, set at submit, inverse
 `envelopeRecipients`; scopes depend on this name), `contact` (foundation
 Contact, optional: linked when a contact with that email exists; never created
-here). Indexes `[envelope, order]`, `[email]`.
+here), `signsFor` (foundation Company with `isOwn`, optional, `restrict`: set
+exactly when `capacity` is `ownCompany`). Indexes `[envelope, order]`, `[email]`.
+
+### CompanySignatory
+
+Who may sign for which of the business's own companies. One record per company
+and member, created and revoked only by `esignAdmin` through its actions, so
+the history shows who allowed whom, when and why. A role name or a list in
+configuration does not do this job: it cannot say which company, and it has no
+history of its own.
+
+| Property | Type | Meaning | Set by |
+| --- | --- | --- | --- |
+| `title` | text, max 200, optional | Printed with their signature: "Director". | `grant` |
+| `status` | select: `active`, `revoked` | Only an active record lets them sign. | `grant`, `revoke` |
+| `reason` | text, max 1000, managed | Why it was last granted or revoked, written with the change. | `grant`, `revoke` |
+
+Relationships: `company` (foundation Company, required, `restrict`; must be own),
+`user` (User, required, `restrict`, inverse `companySignatories`). Unique on
+`[company, user]`: revoking keeps the record, and granting again reactivates it.
 
 ### EnvelopeSignature
 
@@ -208,7 +235,9 @@ Relationships: `envelope` (cascade), `decidedBy` (User, optional).
 
 `ontology/esign/config.ts` holds what the company decides once and reviews as
 code: the consent wording and its version (raise the version when a word
-changes), the company's legal name for `ourCompany` signers, limits (20
+changes), the brand name that emails, the signing page and email text
+overrides show (never a legal name, and never a list of legal entities: those
+are own companies), limits (20
 recipients, 10 documents, 25 MB and 200 pages per PDF), defaults (due in 30
 days, reminders every 3 days), the date format, and the list of approver roles.
 The emails are the workspace's own templates in `defineOntology({ emails })`:
@@ -225,7 +254,7 @@ The emails are the workspace's own templates in `defineOntology({ emails })`:
 | `envelope.updateDraft` | envelope, title?, message?, dueAt?, remindEveryDays?, value? | Draft; the caller is its sender; dueAt in the future. | The fields. |
 | `envelope.addDocument` | envelope, document; call options carry an idempotency key and a create intent | Draft and sender. In `prepare`: the caller may read the drive document; its lock is `none` or `final`; its latest version has signable PDF bytes (above); the PDF opens, is not password-protected, carries no digital signature (new pages would break it), fits the size and page limits. The document is not out in another envelope, nor already in this one. | Copies the bytes into a new `EnvelopeDocument.frozenPdf` with their SHA-256, page count and sizes; links `sourceVersion`; stores `sealIntent`. |
 | `envelope.removeDocument` | envelope, item | Draft and sender. | Deletes the item and its fields. |
-| `envelope.setRecipients` | envelope, recipients[] | Draft and sender; 1 to 20; valid, distinct emails; at least one signer; `party` only on signers; `ourCompany` only for active members holding `companySignatory`. | Replaces the list. Links `contact` by email when one exists. |
+| `envelope.setRecipients` | envelope, recipients[] | Draft and sender; 1 to 20; valid, distinct emails; at least one signer; `party` only on signers; `signsFor` given exactly for `ownCompany` signers, naming an own company; an `ownCompany` signer is an active member with an active `CompanySignatory` record for that company. | Replaces the list. Links `contact` by email when one exists. |
 | `envelope.placeFields` | envelope, item, fields[] | Draft and sender; kinds known; keys unique in the envelope; page within `pageCount`; rectangle inside the page. | Replaces the item's field layer. |
 | `envelope.discardDraft` | envelope | Draft never submitted, and sender. A draft that was returned from approval has events: void it instead. | Deletes the envelope, its items and recipients. Destructive. |
 
@@ -233,9 +262,9 @@ The emails are the workspace's own templates in `defineOntology({ emails })`:
 
 | Action | Who | Checks | Changes |
 | --- | --- | --- | --- |
-| `envelope.submit` | Sender | Draft. At least one document. Each item's `sourceVersion` is still the drive document's latest version; the document is not trashed and its lock is `none` or `final`. Every field's party has exactly one signer; every signer has a party with at least one `signature` field; approvers and viewers have none. `ourCompany` signers still hold the role. `dueAt` in the future. Refuses a deactivated member among recipients: an administrator decides whether they come back. | Sets `fingerprint`, `submittedAt`, `dueAt`. If an active rule applies: status `awaitingApproval`, one `EnvelopeApproval` per approver role, drive locks `signing`, `approvalRequest` emails to the role's active holders (at most 50), events. Otherwise runs **the send** below. Answers `{ envelope, status, url }`. Irreversible: it emails outside people. |
+| `envelope.submit` | Sender | Draft. At least one document. Each item's `sourceVersion` is still the drive document's latest version; the document is not trashed and its lock is `none` or `final`. Every field's party has exactly one signer; every signer has a party with at least one `signature` field; approvers and viewers have none. Each `ownCompany` signer is still an active member with an active `CompanySignatory` record for `signsFor`, which is still own and has a `legalName`. `dueAt` in the future. Refuses a deactivated member among recipients: an administrator decides whether they come back. | Sets `ownCompany` from the first `ownCompany` signer, `ownCompanyLegalName` and each `ownCompany` recipient's `signsForLegalName` from the companies, then `fingerprint`, `submittedAt`, `dueAt`. If an active rule applies: status `awaitingApproval`, one `EnvelopeApproval` per approver role, drive locks `signing`, `approvalRequest` emails to the role's active holders (at most 50), events. Otherwise runs **the send** below. Answers `{ envelope, status, url }`. Irreversible: it emails outside people. |
 | `envelope_approval.grant` | Holder of `approverRole` | Pending; envelope `awaitingApproval`; its fingerprint unchanged; the caller is not the envelope's sender (see VARIATIONS.md). | `granted`, `decidedBy`, event `approvalGranted`. When no approval is pending, runs **the send** in the same transaction. |
-| `envelope_approval.returnForChanges` | Holder of `approverRole` | Pending; note required. | This approval `returned`, the envelope's other pending approvals `superseded`, envelope back to `draft` (fingerprint cleared), drive locks restored, sender emailed, event. |
+| `envelope_approval.returnForChanges` | Holder of `approverRole` | Pending; note required. | This approval `returned`, the envelope's other pending approvals `superseded`, envelope back to `draft` (fingerprint and legal-name snapshots cleared), drive locks restored, sender emailed, event. |
 | `envelope.void` | Sender, `esignAdmin` | Status `awaitingApproval` or `sent`, or a draft returned from approval; reason required. | `voided`, `endedAt`, `endReason`; drive locks restored; `envelopeEnded` to the sender and to recipients already notified; event. Signatures stay. Destructive, irreversible. |
 | `envelope.resend` | Sender | `sent`; at most once an hour per recipient. | New sign-in link to the recipients whose turn it is; events `notified`. |
 
@@ -269,8 +298,12 @@ refuses otherwise.
 | --- | --- | --- |
 | `envelope.signingPage` (read-only, `prepare` only) | The caller is a recipient, the sender, an admin, or a pending approver. A recipient not yet notified sees only whose turn it is; a voided envelope shows outside recipients only that it was withdrawn. | Nothing. Answers the envelope, the caller's row, each item (id, title, sha256, page sizes, the caller's own fields to fill, others' fields as read-only values), co-recipients' names, kinds, orders and statuses (no emails, IPs or browsers), the consent text and version, and, once completed, the sealed items. |
 | `envelope.recordView` | Caller is a recipient; `ip` and `userAgent` from the app server. | First open: `viewedAt`, status `viewed` if `notified`. Every open: event `viewed`. |
-| `envelope.sign` | Caller is a signer of the envelope; envelope `sent`; before `dueAt`; their turn; consent given for the current version; typed name of at least two characters; every document hash equals the frozen one; required fields of their party filled; drawing is path data only. A repeat with the same hashes returns the first signature; anything else after signing is refused. | `EnvelopeSignature` (kind `signature`), recipient `signed`, event `signed`, then the hand-over. Irreversible. |
+| `envelope.sign` | Caller is a signer of the envelope; envelope `sent`; before `dueAt`; their turn; for an `ownCompany` signer, an active `CompanySignatory` record for `signsFor`, which is still own; consent given for the current version; typed name of at least two characters; every document hash equals the frozen one; required fields of their party filled; drawing is path data only. A repeat with the same hashes returns the first signature; anything else after signing is refused. | `EnvelopeSignature` (kind `signature`), recipient `signed`, event `signed`, then the hand-over. Irreversible. |
 | `envelope.approve` | As `sign`, for an approver, without fields. | `EnvelopeSignature` (kind `approval`), recipient `approved`, event, hand-over. |
+
+`EnvelopeSignature.capacity` is written from the recipient's snapshot: "for
+<signsForLegalName>, <title>" for an `ownCompany` signer. A later change to the
+company or the signatory record changes no signature, envelope or certificate.
 | `envelope.decline` | Caller is a notified signer or approver who has not acted; envelope `sent`; reason required. | Recipient `declined`, envelope `declined` with the reason, drive locks restored, `envelopeEnded` to the sender and other notified recipients, event. |
 
 ### Run by workflows
@@ -282,6 +315,17 @@ refuses otherwise.
 | `envelope.remind` | `sent`; reminders on; the recipient's last notice is at least `remindEveryDays` old. | `signatureReminder` with a fresh link; event `reminded`. |
 | `envelope.expire` | `sent` or `awaitingApproval`; `dueAt` passed. | `expired`; drive locks restored; `envelopeEnded` to sender and notified recipients; event. |
 | `envelope.pendingWork` (read-only) | | The newest 50 each of: `sealing` envelopes quiet for 10 minutes, overdue envelopes, envelopes with reminders due. |
+
+### Signatories (admin)
+
+| Action | Who | Checks | Changes |
+| --- | --- | --- | --- |
+| `company_signatory.grant` | `esignAdmin` | `company` is own; `user` is an active member who holds a team role (not an outside recipient); reason required; refused when an active record exists. | Creates the record, or reactivates a revoked one, with `title` and `reason`. |
+| `company_signatory.revoke` | `esignAdmin` | Active; reason required. | `revoked` with the reason. Envelopes already submitted are not changed; the signer's next `sign` is refused. |
+
+The foundation's `company.setOwn` is extended to refuse clearing `isOwn` while the
+company has an active signatory record or is `ownCompany` of an envelope out for
+signature.
 
 ### Reading
 
@@ -298,18 +342,22 @@ signature field for it."
 | Role | Held by | Permissions |
 | --- | --- | --- |
 | `member` (built-in) | Every signed-in person, outside recipients included | Scoped to envelopes sent to the caller (`id in me.envelopeRecipients.envelope`): `envelope:read`, `recordView`, `sign`, `approve`, `decline`; `envelope_document:read` on those envelopes' items. Unscoped: `envelope:signingPage`, a read-only action that cannot carry a scope; its `prepare` checks the caller. Nothing else. |
-| `sender` | People who send documents | `envelope:read` and every preparing action, `submit`, `void`, `resend`, scoped `{ sender: me }`; reads of items, recipients, signatures, events and approvals of their own envelopes; `envelope_document:verify`; `envelope_approval_rule:read`. Drive read access to what they send comes from drive's roles. |
-| `companySignatory` | Members who may sign for the company | The recipient grants above and `envelope_document:verify`. `submit` and `sign` check that an `ourCompany` signer holds it. |
+| `sender` | People who send documents | `envelope:read` and every preparing action, `submit`, `void`, `resend`, scoped `{ sender: me }`; reads of items, recipients, signatures, events and approvals of their own envelopes; `envelope_document:verify`; `envelope_approval_rule:read`; `company_signatory:read`. Drive read access to what they send comes from drive's roles. |
 | `contractApprover` (one per approver role) | Managers, finance, legal | `envelope_approval:read`, `grant`, `returnForChanges`; `envelope:read` and `envelope_document:read` where the envelope is `awaitingApproval`; `envelope_approval_rule:read`. |
-| `esignAdmin` | Whoever owns signing | Unscoped reads of every e-signature entity; `envelope:void`; `envelope_approval_rule:create`, `update`, `delete`; `envelope_document:verify`. |
+| `esignAdmin` | Whoever owns signing | Unscoped reads of every e-signature entity; `envelope:void`; `envelope_approval_rule:create`, `update`, `delete`; `company_signatory:grant`, `revoke`; `envelope_document:verify`. |
 | `esignWorker` | The two workflows | Unscoped reads; `envelope_document:seal`, `envelope:complete`, `remind`, `expire`, `pendingWork`. Keep workflow roles unscoped: a scoped grant there draws `check`'s `workflow_role_scoped` warning, and `me` is the workflow's own user. |
+
+Signing for one of our own companies is not a role: the people who may do it
+hold the team role and `member`'s recipient grants like everyone else, and
+`setRecipients`, `submit` and `sign` look up their `CompanySignatory` record.
 
 Because `member` reaches outside recipients, it must grant nothing else. Move
 whatever every employee reads (the starter's `*:read`) into a `team` role that
 every employee holds. Never grant by default: `envelope:sign`, `approve` or
 `decline` beyond `member`'s own-envelope scope; `envelope_approval:grant` to any
 workflow, API key or agent task; `submit`, `void` or `resend` to an agent task
-(they email outside people); `envelope_approval_rule` writes outside `esignAdmin`.
+(they email outside people); `envelope_approval_rule` writes or
+`company_signatory:grant` and `revoke` outside `esignAdmin`.
 
 ## 5. Workflows
 
@@ -356,7 +404,8 @@ file breaks it. The company holds no private key.
 ### The certificate of completion
 
 Appended to each sealed PDF and shown on the completed signing page, in the
-envelope's language, all times in UTC: envelope id and title; sender; sent and
+envelope's language, all times in UTC: envelope id and title; sender and
+`ownCompanyLegalName`; sent and
 completed times; for each document, its title and the SHA-256 of the frozen
 PDF; for each signer and approver, their name, email, capacity, kind, order,
 notified, viewed and signed times, IP address, browser and system in words,
@@ -377,8 +426,10 @@ no entity here stores.
 
 Demo data comes from a seed script that calls the same actions: it generates two
 invented PDFs with `pdf-lib` ("Mutual NDA" and "Order Form" for Northwind),
-adds them through drive's actions, creates a draft with Ada Example
-(`ada@example.com`) and Grace Sample (`grace@example.com`), and places fields.
+adds them through drive's actions, marks Northwind as own with the foundation's
+`company.setOwn` and grants Ada Example (`ada@example.com`) a signatory record
+for it, creates a draft with Ada signing for Northwind and Grace Sample
+(`grace@example.com`), and places fields.
 It never submits outside development: submitting emails people. Tests generate
 their PDFs the same way and replace the timestamp authority with
 `Connections.test`.
@@ -389,12 +440,12 @@ their PDFs the same way and replace the timestamp authority with
 | --- | --- | --- |
 | `/envelopes` | Senders, admins | Tabs: drafts, awaiting approval, out, completed, ended. Each row: title, company, progress ("1 of 2 signed"), whose turn, sent and due dates. New envelope. |
 | `/envelopes/new?document=…` | Senders | Opened from a drive document or a deal. Creates a draft with that document. |
-| `/envelopes/<id>/edit` | Sender | Four steps on one page: documents (add from drive, reorder, remove), recipients (name, email, kind, order, party, capacity; suggestions from the deal's contacts and the company's signatories), fields (each page with drag-and-drop fields, one color per party), message, due date and reminders. "Send" shows exactly who gets what and when, and whether approval is needed. |
+| `/envelopes/<id>/edit` | Sender | Four steps on one page: documents (add from drive, reorder, remove), recipients (name, email, kind, order, party, capacity and, for `ownCompany`, which own company; suggestions from the deal's contacts and the own company's active signatories), fields (each page with drag-and-drop fields, one color per party), message, due date and reminders. "Send" shows exactly who gets what and when, and whether approval is needed. |
 | `/envelopes/<id>` | Sender, admins, approvers | Status, recipients in order with their state and times, the audit trail, approvals with notes. Resend, void with reason. When completed: sealed PDFs and the certificate. |
 | `/sign/<id>` | Recipients | The documents as PDF pages, their own fields highlighted, one bar that always says the next step and takes them there. Consent text with a checkbox, typed or drawn signature, Finish. Decline with a reason. Approvers get Approve and Decline. Viewers read. Afterwards: who still has to act; "the signed PDF is being prepared" while sealing; then download. Works on a phone. |
 | `/sign` | Outside recipients | The envelopes sent to them. Where `/` sends a member who holds no team role. |
 | `/envelopes/<id>/approve` | Approvers | The frozen documents, the rules that asked, the value. Grant, or return with a comment. |
-| `/settings/signing` | Admins | Approval rules; the consent wording and limits from configuration, read-only. |
+| `/settings/signing` | Admins | Approval rules; signatories per own company, granted and revoked with a reason, with their history; the consent wording and limits from configuration, read-only. |
 | `/verify` | Team | Drop a PDF: the browser hashes it and the page shows the envelope it belongs to, or that it matches none. |
 
 The signing page's Server Functions read the IP address and user agent from the
@@ -411,7 +462,8 @@ Once built, a member can ask the workspace agent:
   order form?" (reads)
 - "Send the Northwind NDA in the drive to Grace Sample, grace@example.com; Ada
   signs for us after her." The agent runs `createDraft`, `addDocument`,
-  `setRecipients` and, when the person gives positions (or a saved field layout
+  `setRecipients` (Ada as an `ownCompany` signer for Northwind, refused if she
+  has no signatory record) and, when the person gives positions (or a saved field layout
   exists, a variation), `placeFields`; otherwise it returns the draft's link so
   the person places fields on the page. Then `submit`.
 - "Remind Grace", "Void it, the price changed", "Show me the evidence for the
@@ -434,12 +486,14 @@ the agent's instructions say so.
    locked `signing` cannot be edited, given a new version or trashed.
 2. Narrow `member` to the recipient grants; move team reads into a `team` role.
    Check: a member with no role reads no company, contact or document.
-3. Declare the seven entities, `config.ts` and the email templates. Run
+3. Declare the eight entities, `config.ts` and the email templates. Run
    `npm --prefix ontology run check`. Before the first deploy, tell the person
    that recipients, signatures and events reach the warehouse, and who can query
    it (section 6).
-4. Preparing actions and their tests: a draft with two generated PDFs, three
-   recipients and fields. Check the refusals in INVARIANTS.md.
+4. `company_signatory.grant` and `revoke`, and the foundation's `isOwn` and
+   `company.setOwn` if missing. Preparing actions and their tests: a draft with
+   two generated PDFs, three recipients (one signing for Northwind) and fields.
+   Check the refusals in INVARIANTS.md.
 5. `submit`, the send, and approval rules with `grant` and `returnForChanges`.
    Check in development that links are recorded, not sent.
 6. Recipient actions and `signingPage`: order, parallel signers, idempotent
@@ -574,6 +628,34 @@ export const EnvelopeWithActions = Envelope.actions((self) => ({
       }),
   }),
 }));
+```
+
+```ts
+// ontology/esign/signatory.ts: one check, called by setRecipients and submit (with the active member
+// found by the recipient's email; both refuse a deactivated one first) and by sign (with recipient.user).
+import { ActionRejected } from "@segmentstream/ontology";
+import { Effect } from "effect";
+
+import { Company } from "../company";
+import type { RecordEffect } from "../effects"; // the foundation's platform notes define it
+import { CompanySignatory } from "./schema";
+
+const reject = (message: string) => new ActionRejected({ message });
+
+export function mustSignFor(name: string, userId: string | null, signsForId: string | null): RecordEffect<void> {
+  return Effect.gen(function* () {
+    if (signsForId === null) return yield* reject(`Choose which of our companies ${name} signs for.`);
+    const company = yield* Company.get(signsForId);
+    if (!company.isOwn) return yield* reject(`${company.name} is not one of our own companies.`);
+    if (userId === null) return yield* reject(`${name} is not a member yet; only members sign for our companies.`);
+    const [record] = yield* CompanySignatory.find({
+      where: { companyId: company.id, userId, status: "active" }, limit: 1,
+    });
+    if (record === undefined) {
+      return yield* reject(`${name} may not sign for ${company.name}. An e-signature admin can grant it.`);
+    }
+  });
+}
 ```
 
 ```ts

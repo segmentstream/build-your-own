@@ -6,14 +6,19 @@ chat; real records arrive through the app and connections after deploy. Say once
 the start, that this builds bookkeeping software, not tax or accounting advice, and
 that their accountant should review the setup before they rely on it.
 
-## 1. Which companies keep books here, and in which currency?
+## 1. Which of your own companies keep books here, and in which currency?
 
-- **Why**: each legal entity is one book with one base currency and its own numbering.
-  The base currency cannot change once anything is posted.
-- **Changes**: one `book` record per entity, its `baseCurrency`, `timeZone` and invoice
-  prefixes. Several books add a book filter to every page and report.
-- **Default**: one book in the currency of the country where the company is
-  registered, in that country's time zone.
+- **Why**: each own legal entity is one book with one base currency and its own
+  numbering. The base currency cannot change once anything is posted. Each entity is
+  a Company record marked as own by an admin, and its legal name, registration
+  number, registered address and tax id are entered once, on that company: invoices
+  print them from there.
+- **Changes**: one own `company` and one `book` per entity, its `baseCurrency`,
+  `timeZone` and invoice prefixes. Several books add a book filter to every page and
+  report.
+- **Default**: one own company and one book in the currency of the country where the
+  company is registered, in that country's time zone. The person enters the legal
+  details in the app after deploy, not in chat.
 
 ## 2. When does your financial year start?
 
@@ -131,4 +136,6 @@ time, and no workflow or agent task role is granted them:
 - posting a manual journal or a payment, reversing a journal, voiding a document;
 - closing a period, and above all reopening one;
 - deleting or discarding anything, and the apply step of an import;
-- changing a book's settings, the chart of accounts or a tax rate.
+- changing a book's settings, the chart of accounts or a tax rate;
+- marking a company as one of your own, or unmarking it, and changing an own
+  company's legal name, address, registration or tax id.

@@ -46,7 +46,8 @@ where recipients are. Common patterns, to be confirmed by the person:
   honoured within five working days.
 
 **Default:** every topic `optIn`, single opt-in with evidence, a footer with the
-legal name and postal address, opt-outs applied at once.
+legal name and registered address of the sender's own company (and a postal
+address in `footer` when it differs), opt-outs applied at once.
 
 ## Opt-in confirmation
 

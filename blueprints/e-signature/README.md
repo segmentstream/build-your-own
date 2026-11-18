@@ -19,6 +19,8 @@ It is built to replace DocuSign, Adobe Acrobat Sign and similar tools.
 - Every send, email, view, signature, decline, void and seal is recorded with
   its time, the person, their IP address and browser. The record is
   append-only: no action edits it.
+- Only the people you record as signatories of each of your own companies can
+  sign for it, and each signature keeps the legal name it was signed for.
 - Envelopes that need a manager's or lawyer's approval wait for it before they
   go out, and the approval is tied to the exact content that was approved.
 - When the last person signs, each document becomes one sealed PDF: the
@@ -59,7 +61,8 @@ Build our E-signature from the e-signature blueprint.
 - **[Company agent](../company-agent/)**: ask in chat what is waiting for
   signature, prepare an envelope, remind or void, with a confirmation.
 - Builds on the shared [foundation](../../foundation/FOUNDATION.md): recipients
-  link to its contacts, envelopes to its companies.
+  link to its contacts, envelopes to its companies, and your own legal entities
+  are its companies marked as own.
 
 ## What it is not
 

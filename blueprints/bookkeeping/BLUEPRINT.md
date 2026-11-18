@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-Keep a company's books: one general ledger per legal entity, fed by sales invoices,
+Keep a company's books: one general ledger per own legal entity, fed by sales invoices,
 supplier bills, expenses, payments, fixed assets and month-end revaluation, and read
 as a trial balance, general ledger, profit and loss, balance sheet and aged
 receivables and payables. Every posting is the same kind of record, a balanced
@@ -28,19 +28,29 @@ Conventions for every entity below:
   `journal_line` metrics, filtered to a document, an account or a period.
 - Dates are `p.date`. Customers and suppliers are the foundation's `Company`, billing
   people `Contact`, and people who act are members (`User`).
+- **The entity whose books these are is a `Company` too**, one marked `isOwn` (see
+  the foundation's "Our own companies"). Its legal name, registration, registered
+  address and tax id live only there; nothing here copies them, except an issued
+  invoice's snapshot of what it printed.
 
 ### Book
 
-One legal entity's books, set by people through actions: `code` (unique, such as
-`main`), `name`, `baseCurrency` (ISO 4217 code of every `amountMinor`; fixed once a
-journal is posted), `fiscalYearStartMonth` (1–12; revenue and expense restart at zero
-on its first day), `timeZone` (IANA zone that decides "today" and month ends; workflows
-run in UTC), `lockDate` (managed: the last closed day), `lockChangeReason` (managed),
-`nextJournalNumber`, `invoicePrefix` and `creditNotePrefix` (such as `INV-`, `CN-`),
-`nextInvoiceNumber` and `nextCreditNoteNumber` (managed), `issuerName`,
-`issuerAddress`, `issuerTaxId`, `issuerRegistration` (the legal entity as printed on
-its invoices) and `rateLookbackDays` (default 7: how far back a posting may take the
-latest earlier rate).
+One own company's books. Relationship `company`: required, to a foundation `Company`
+whose `isOwn` is true, unique (one book per company, a unique index on `company`),
+`onDelete: restrict`, inverse `book`. It is set by `book.open` and never changes. The
+book keeps only accounting settings, set by people through actions: `code` (unique,
+such as `main`), `name`, `baseCurrency` (ISO 4217 code of every `amountMinor`; fixed
+once a journal is posted), `fiscalYearStartMonth` (1–12; revenue and expense restart
+at zero on its first day), `timeZone` (IANA zone that decides "today" and month ends;
+workflows run in UTC), `lockDate` (managed: the last closed day), `lockChangeReason`
+(managed), `nextJournalNumber`, `invoicePrefix` and `creditNotePrefix` (such as `INV-`,
+`CN-`), `nextInvoiceNumber` and `nextCreditNoteNumber` (managed) and
+`rateLookbackDays` (default 7: how far back a posting may take the latest earlier
+rate).
+
+Who the seller is (legal name, registered address, tax id, registration number and
+country) is read through `book.company` whenever it is needed, and printed from there.
+The book holds no copy of it.
 
 ### LedgerAccount
 
@@ -118,7 +128,9 @@ payment provider or the previous system under its own number), `status` (managed
 (managed, set at issue, never reused), `date`, `dueDate`, `currency`, `subtotalMinor`,
 `taxMinor`, `totalMinor` (managed, fixed at issue), `billToName`, `billToAddress`,
 `billToTaxId` (copied from the Company at issue, so a later rename never changes an
-issued invoice), `reference` (the customer's order number), `notes` (printed terms),
+issued invoice), `sellerName`, `sellerAddress`, `sellerTaxId`, `sellerRegistration`
+(managed, copied from `book.company` at issue: the seller the invoice printed, a
+finished fact; a draft has none and its preview reads the company), `reference` (the customer's order number), `notes` (printed terms),
 `key` (unique). Relationships: `customer` (Company), `billingContact` (Contact),
 `paymentInstruction`, `credits` (the invoice a credit note corrects), `recognition`
 (Journal). Lines: `lineNo`, `description`, `quantity` (decimal text),
@@ -236,8 +248,8 @@ exactly to the converted total.
 
 | Action | Who | Checks and effect |
 | --- | --- | --- |
-| `book.open` | finance owner | Creates a book with its settings and numbering. |
-| `book.configure` | finance owner | Changes settings. Refuses a new base currency once a journal is posted, and a `nextJournalNumber` already used. |
+| `book.open` | finance owner | Creates a book for `company` with its settings and numbering. Refuses a company that is not own (an admin marks it with the foundation's `company.setOwn`) and one that already has a book. |
+| `book.configure` | finance owner | Changes settings. Takes no `company`: the book's company never changes. Refuses a new base currency once a journal is posted, and a `nextJournalNumber` already used. |
 | `book.closeThrough` | finance owner | Moves the lock date forward only. |
 | `book.reopenTo` | finance admin | Moves the lock date earlier; a reason is required and kept in history. |
 | `book.trialBalance` | readers | Read-only: `hints: { readOnly: true }`, `connections: []`, a `prepare` computing with `JournalLine.queryMetrics`, no handler. For every account: opening at `from` (default the fiscal year start), movement, closing at `date`; revenue and expense accounts open each year at zero, earlier results are `retainedEarnings`; `outOfBalance` must be zero. |
@@ -268,7 +280,7 @@ exactly to the converted total.
 | Action | Who | Checks and effect |
 | --- | --- | --- |
 | `sales_invoice.draft`, `updateDraft` | bookkeeper | Customer, currency, date, due days, lines; tax computed per line from its rate. Repeated `key` returns the draft. |
-| `sales_invoice.issue` | bookkeeper, members only | Refuses a service principal. Locks the book, takes the series' next number, copies the bill-to details, posts the recognition journal (revenue and tax against `receivables`, the control line naming the invoice) on the invoice date. Sends nothing. |
+| `sales_invoice.issue` | bookkeeper, members only | Refuses a service principal, and a book whose company has no `legalName` or `registeredAddress`. Locks the book, takes the series' next number, copies the bill-to details and the seller from `book.company`, posts the recognition journal (revenue and tax against `receivables`, the control line naming the invoice) on the invoice date. Sends nothing. |
 | `sales_invoice.record` | bookkeeper | A document already issued elsewhere under its own number: posts its recognition at once. A repeated key, or the same number in the book, returns the existing one. |
 | `sales_invoice.void` | accountant | Only when nothing settles it. Reverses the recognition on a date after the lock date and sets `voided` in one transaction. The number stays used. |
 | `sales_invoice.discardDraft` | bookkeeper | Drafts only; no number was used. |
@@ -297,6 +309,10 @@ its own series, then allocated to the invoice or refunded with `recordPayment`.
 | `finance_question.markAsked`, `recordAnswer` | bookkeeper | After the message was sent; the answer verbatim with optional documents. Writes only the question and its links. |
 | `finance_question.resolve`, `drop`, `reopen` | accountant | Resolve names what was done through the normal actions, or that nothing was needed. |
 | `payment_instruction.register`, `retire` | finance owner | Retired instructions stay on issued invoices. |
+
+The foundation's `company.setOwn` is extended to refuse clearing `isOwn` on a
+company that has a book. `company.mergeInto` needs nothing more: it refuses an own
+duplicate, so the duplicate never has a book.
 
 ### Month-end revaluation
 
@@ -380,7 +396,8 @@ things, neither of which writes records:
   Check: no difference without a written reason.
 
 Demos use a seed script that calls the same actions as people with invented records:
-Northwind as the book, a few customers and suppliers, rates, invoices, a bill,
+Northwind as the own company (marked with `company.setOwn`) and its book, a few
+customers and suppliers, rates, invoices, a bill,
 receipts and an asset.
 
 ## 7. Screens (app)
@@ -394,15 +411,17 @@ book. Add `page.navigation.json` beside each page so the agent can link to it.
   history and reverse; a new-journal form that posts only when the difference is zero.
 - **Sales invoices**: list with each listed invoice's outstanding amount (one metric
   query filtered to the page's ids); detail with lines, postings and payments; issue,
-  void, discard, credit note, record payment; a print view of an issued invoice.
+  void, discard, credit note, record payment; a print view that shows an issued
+  invoice's own seller and bill-to copies, and a draft's seller from `book.company`.
 - **Bills** and **expenses**: lists (expenses with evidence badges), details with the
   files, evidence status and gaps; forms with the file beside the lines.
 - **Payments**: record a payment against documents; allocate credits or unallocated money.
 - **Fixed assets**: register, schedule, postings, dispose, post a month.
 - **Reports**: trial balance, general ledger, profit and loss with a comparative
   period, balance sheet, aged receivables and payables; each exports CSV.
-- **Questions**: the queue by batch and order. **Settings**: books, chart, tax rates,
-  currency rates, payment instructions, close and reopen periods.
+- **Questions**: the queue by batch and order. **Settings**: books (each showing its
+  company's legal identity, edited on the company's page by an admin), chart, tax
+  rates, currency rates, payment instructions, close and reopen periods.
 
 ## 8. The company agent
 
@@ -429,18 +448,21 @@ the question and is not permission to post.
 
 ## 9. Build order
 
-1. Build the foundation. Check: a Company and a Contact exist.
-2. `Book`, `LedgerAccount`, `Journal`, `JournalLine` and the posting path, with the
-   invariant tests for balance, lock date, numbering, keys and reversal. Start the
-   seed script and extend it at every step. Check: post a seed journal and read it back.
+1. Build the foundation, with `isOwn`, `registeredAddress` and `company.setOwn`.
+   Check: a Company and a Contact exist, and an admin marks Northwind as own.
+2. `Book` with its `company`, `LedgerAccount`, `Journal`, `JournalLine` and the
+   posting path, with the invariant tests for balance, lock date, numbering, keys,
+   reversal and the book's company. Start the seed script and extend it at every
+   step. Check: open a book for a company that is not own (refused), then for
+   Northwind; post a seed journal and read it back.
 3. `book.trialBalance`, `ledger_account.ledger` and the report pages. Check: the
    seed's trial balance is out of balance by zero.
 4. `CurrencyRate`, foreign postings, the `exchangeRates` connection and
    `recordDailyRates`. Check: a foreign journal converts at the seed rate; a date
    without a rate is refused.
 5. `TaxRate`, `PaymentInstruction`, sales invoices, `recordPayment`, `allocate`,
-   `book.ageing`. Check: issue, part-pay and age a seed invoice; void refuses while it
-   is part-paid.
+   `book.ageing`. Check: issue, part-pay and age a seed invoice, and see Northwind's
+   legal name and address on it; void refuses while it is part-paid.
 6. Documents, bills, expenses, evidence status and `book.missingEvidence`. Check: an
    expense without a receipt shows `missing`; attaching one makes it `complete`.
 7. `FixedAsset`, depreciation, disposal, `book.revalue` and `monthEndClose`. Check:
@@ -510,6 +532,34 @@ export const JournalLine = entity("journal_line", {
   },
   indexes: [["book", "ledgerAccount", "date"], ["journal", "position"]],
 });
+```
+
+The book's company, and the check that opens a book (in `Book`'s `relationships` and
+`.actions((self) => ({ … }))`):
+
+```ts
+company: rel.one(() => Company, {
+  inverse: "book", onDelete: "restrict",
+  description: "The own company whose books these are. Set by book.open; never changes. Its legal identity is read from it.",
+}),
+// indexes: [["company"]] declared unique: one book per company
+
+open: action({
+  description:
+    "Open the books of one of our own companies. Refused when the company is not marked own " +
+    "(an admin marks it with company.setOwn) or already has a book.",
+  writes: [self],
+  input: Schema.Struct({ company: p.ref("company", { description: "An own company." }), code: p.text({ maxLength: 40 }) /* … settings */ }),
+  handler: ({ input }) =>
+    Effect.gen(function* () {
+      const company = yield* Company.get(input.company);
+      if (!company.isOwn) return yield* new ActionRejected({ message: `${company.name} is not one of our own companies. Ask an admin to mark it.` });
+      const [existing] = yield* self.find({ where: { companyId: company.id }, limit: 1 });
+      if (existing !== undefined) return yield* new ActionRejected({ message: `${company.name} already has the book ${existing.code}.` });
+      // A concurrent second open fails on the unique index on company and rolls back.
+      return { book: (yield* self.create({ ...input, company: company.id })).id };
+    }),
+}),
 ```
 
 A guarded action, in `SalesInvoice`'s `.actions((self) => ({ … }))`; `reverseJournal`

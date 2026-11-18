@@ -14,15 +14,17 @@ Ask these in one message, after the drive interview. Offer the default for each.
 - **Default:** any PDF from the drive; fields placed per envelope; no saved
   layouts.
 
-## 2. Who may sign on behalf of your company, and for which legal entities?
+## 2. Which legal entities sign as you, and who may sign for each?
 
 - **Why:** a signature "for Northwind Ltd" is only worth something if the
-  person may bind the company.
-- **Changes:** one company: one `companySignatory` role. Several legal
-  entities: one signatory role per entity, and `capacity: ourCompany` names the
-  entity. Signing limits by amount: a check in `submit` against the envelope's
-  value.
-- **Default:** one company, one `companySignatory` role, no amount limit.
+  person may bind that company.
+- **Changes:** each entity is a foundation Company marked as own by an admin,
+  with its legal name entered on the company. Each person who may sign for it
+  gets a `CompanySignatory` record for that company, granted by `esignAdmin`
+  with a reason and an optional title. Signing limits by amount: a limit on the
+  record and a check in `submit` against the envelope's value.
+- **Default:** one own company; the people the person names get signatory
+  records for it, granted by an admin in the app after deploy; no amount limit.
 
 ## 3. Which envelopes need someone's approval before they go out, and who approves?
 
@@ -123,5 +125,7 @@ what will happen, and waits for a yes:
 - **Signing, approving as a recipient or declining:** only the recipient, on
   the signing page. Never an agent, never on someone's behalf.
 - **Discarding** a draft, and any change to the consent wording.
+- **Granting or revoking** who may sign for one of your own companies, and
+  marking a company as own.
 - **Running the seed script** anywhere but development: submitting emails
   people.

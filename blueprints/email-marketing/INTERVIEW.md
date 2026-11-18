@@ -85,7 +85,8 @@ already said. Never ask for API keys, passwords or real subscriber lists in chat
   give legal advice; the person confirms their own obligations.
 - **Changes:** topic bases, double opt-in, consent expiry, the sender footer.
 - **Default:** `optIn` topics, single opt-in with evidence, a footer with the
-  company's legal name and postal address, opt-outs applied immediately.
+  legal name and registered address of the own company the sender names, opt-outs
+  applied immediately.
 
 ### 10. Do you want opens and clicks?
 

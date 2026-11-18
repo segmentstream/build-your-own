@@ -59,6 +59,12 @@ The CRM adds no properties to them, only inverse relationships: a company's
 `activities`. The foundation's `company.mergeInto` must move every one of
 these to the kept company (see section 3).
 
+The business's own legal entities are companies too, marked `isOwn` by an admin
+(foundation, "Our own companies"). The CRM never sets or reads their legal
+identity. Company lists for selling filter `isOwn: false`, and a lead whose email
+domain belongs to an own company (usually a colleague testing the form) is shown
+in the inbox as internal.
+
 ### Lead
 
 One submission from one person: a website form, a form tool, an imported row
@@ -603,7 +609,8 @@ const MERGE_PAGE = 199; // one more is read to detect an overflow; a find page h
 mergeInto: action({
   description:
     "Merge a duplicate company into the one to keep: move its contacts, leads, deals and activities, then " +
-    "delete it. Refused for different registration numbers or tax ids, and above 199 records of one kind.",
+    "delete it. Refused for different registration numbers or tax ids, when the duplicate is one of our own " +
+    "companies, and above 199 records of one kind.",
   input: Schema.Struct({ duplicate: self.ref, keep: self.ref }),
   writes: [self, (): AnyEntity => Contact, (): AnyEntity => Lead, (): AnyEntity => Deal, (): AnyEntity => Activity],
   hints: { destructive: true, irreversible: true, idempotent: false },
@@ -614,7 +621,7 @@ mergeInto: action({
       }
       const duplicate = yield* self.get(input.duplicate, { forUpdate: true });
       const keep = yield* self.get(input.keep, { forUpdate: true });
-      // …refuse when both carry a different registrationNumber or taxId
+      // …refuse when both carry a different registrationNumber or taxId, or when duplicate.isOwn
       const leads = yield* Lead.find({ where: { companyId: duplicate.id }, limit: MERGE_PAGE + 1 });
       const deals = yield* Deal.find({ where: { companyId: duplicate.id }, limit: MERGE_PAGE + 1 });
       // …contacts and activities the same way
