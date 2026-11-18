@@ -52,8 +52,7 @@ A book belongs to one own company, and the seller's identity is read from it.
 - `SalesInvoice` gains `sellerName`, `sellerAddress`, `sellerTaxId` and
   `sellerRegistration`, copied at issue like the bill-to details: the seller the
   invoice printed. The print view of an issued invoice reads only its own copies.
-- `company.setOwn` refuses to clear `isOwn` on a company with a book;
-  `company.mergeInto` refuses when both companies have a book.
+- `company.setOwn` refuses to clear `isOwn` on a company with a book.
 - New invariants 26 (a book belongs to one own company, and an own company has at
   most one book) and 27 (the seller is read from the book's company, and an issued
   invoice keeps what it printed). New pitfalls 16 to 18. Interview question 1, the
