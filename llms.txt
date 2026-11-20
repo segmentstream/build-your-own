@@ -5,6 +5,7 @@
 ## Start here
 
 - [AGENTS.md](https://raw.githubusercontent.com/segmentstream/build-your-own/main/AGENTS.md): the build procedure a coding agent follows
+- [What the platform supports](https://raw.githubusercontent.com/segmentstream/build-your-own/main/docs/platform.md): public pages, sign-up, website guests, your own domain, the framework, where data lives, work that takes minutes, AI models without API keys and pricing, in short answers
 - [registry.json](https://raw.githubusercontent.com/segmentstream/build-your-own/main/registry.json): every blueprint with its metadata
 - [Foundation](https://raw.githubusercontent.com/segmentstream/build-your-own/main/foundation/FOUNDATION.md): shared companies, contacts, members and conventions
 - [SDKs](https://raw.githubusercontent.com/segmentstream/build-your-own/main/SDKS.md): the public SDKs and where they are documented

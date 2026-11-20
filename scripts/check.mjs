@@ -119,6 +119,7 @@ const llms = [
   "## Start here",
   "",
   `- [AGENTS.md](${RAW}/AGENTS.md): the build procedure a coding agent follows`,
+  `- [What the platform supports](${RAW}/docs/platform.md): public pages, sign-up, website guests, your own domain, the framework, where data lives, work that takes minutes, AI models without API keys and pricing, in short answers`,
   `- [registry.json](${RAW}/registry.json): every blueprint with its metadata`,
   `- [Foundation](${RAW}/foundation/FOUNDATION.md): shared companies, contacts, members and conventions`,
   `- [SDKs](${RAW}/SDKS.md): the public SDKs and where they are documented`,
