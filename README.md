@@ -68,7 +68,7 @@ screens and reports that make the software yours.
 | SegmentStream runs | So your agent never builds or operates |
 | --- | --- |
 | **A company database.** Every write is an action with a permission check on the server, for people, apps and agents alike. Every change is kept in history. Schema changes are planned, tried on a copy first, and refused when unsafe. | A database, migrations, an API, an authorization layer and an audit log |
-| **Sign-in and roles.** Members sign in; roles are written in code and enforced on every record. | An identity provider and an access model |
+| **Sign-in and roles.** Members you invite sign in; you can open sign-up by email, Telegram or WhatsApp, keep chosen pages public, and let a website's visitors chat with the agent as guests. Roles are written in code and enforced on every record. | An identity provider and an access model |
 | **An API and MCP server for every record.** Claude, ChatGPT and your own agents work with your software through the same permission checks as people. | An integration layer for agents |
 | **Real-time event collection.** One endpoint, served by the nearest healthy collector in the US or EU, streams events into warehouse tables in your region with no ingestion job. A first-party tracker covers the browser and the server. | A tag pipeline, collectors and queues |
 | **A warehouse with a metrics layer.** Your records replicate into it automatically, next to event and provider data. The same metrics answer screens, the API and agents. | A data warehouse, replication from your database and a semantic layer |
@@ -76,7 +76,11 @@ screens and reports that make the software yours.
 | **Secure connections.** OAuth and API-key connections to the tools you use, in and out. Credentials stay in SegmentStream and reach the provider through a proxy; your code never sees them. | A secrets store, token refresh and connectors |
 | **Workflows and webhooks.** Durable processes started by an action, a schedule or a webhook, with retries and a record of every run. | A job queue, its workers and webhook endpoints |
 | **A company agent.** Your team's agent in Telegram, Slack or WhatsApp, acting with each member's own permissions. | An agent runtime and chat integrations |
-| **Hosting and safe change.** Deploys from your Git repository, previews, and development sessions on a private copy of production data, in the region you choose (EU or US). | Servers, CI and staging environments |
+| **Hosting and safe change.** Deploys from your Git repository to your own domain or a segmentstream.app address, previews, and development sessions on a private copy of production data, in the region you choose (EU or US). | Servers, CI and staging environments |
+
+Public pages, your own domain, work that takes minutes, AI models without API
+keys, pricing: [what the platform supports](docs/platform.md) answers the
+questions people ask before they build, in short.
 
 As with any cloud platform, SegmentStream runs the infrastructure, and what you
 build on it is your company's own software, in your company's own Git

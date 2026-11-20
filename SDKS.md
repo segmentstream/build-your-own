@@ -3,7 +3,7 @@
 Everything a blueprint needs is published under the Apache-2.0 licence. A new
 project from `segmentstream init` already depends on the right packages at
 current versions; the CLI tells you when a newer release is available, and
-`segmentstream sync` refreshes the project's agent docs and skills.
+`segmentstream upgrade` brings the project's SDKs, agent docs and skills up to date with the installed CLI.
 
 | Package | Registry | Used for | Blueprints |
 | --- | --- | --- | --- |
@@ -23,7 +23,8 @@ Where each one is documented inside a project:
 | Choosing where work goes | `docs/concepts.md` |
 | Ontology, actions, roles, workflows | `docs/ontology.md`, `.agents/skills/ontology/` |
 | Metrics on entities | `docs/ontology-metrics.md` |
-| App data and sign-in | `docs/app-data.md`, `docs/app-authentication.md` |
+| App data and sign-in | `docs/app-data.md`, `docs/app-authentication.md`, `.agents/skills/app-auth/` (public paths, sign-up) |
+| Your own domain | `.agents/skills/domains/` |
 | Connections | `docs/connections.md`, `.agents/skills/connections/` |
 | Event streams | `docs/events.md` |
 | Ingestions, models, checks, jobs | `docs/ingestion.md`, `docs/models.md`, `docs/checks.md`, `docs/jobs.md` |
